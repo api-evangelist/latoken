@@ -1,0 +1,25 @@
+generated: '2026-10-13'
+method: searched
+source: https://api.latoken.com/doc/v2/swagger.json
+note: The API v2 reference (info.description, "Official client libraries") lists these first-party clients. CCXT is also listed there as a third-party option.
+packages:
+- name: latoken-api-v2-python-client
+  registry: pypi
+  url: https://pypi.org/project/latoken-api-v2-python-client/
+  repository: https://github.com/LATOKEN/latoken-api-v2-python-client
+  language: Python
+  official: true
+  version: 0.2.1
+  published: '2021-10-19'
+- name: latoken-api-v2-dotnet-client
+  registry: github
+  url: https://github.com/LATOKEN/latoken-api-v2-dotnet-client
+  repository: https://github.com/LATOKEN/latoken-api-v2-dotnet-client
+  language: C#
+  official: true
+- name: latoken-java-client
+  registry: github
+  url: https://github.com/LATOKEN/latoken-java-client
+  repository: https://github.com/LATOKEN/latoken-java-client
+  language: Java
+  official: true

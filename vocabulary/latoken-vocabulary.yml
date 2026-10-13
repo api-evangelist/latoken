@@ -1,0 +1,113 @@
+generated: '2026-10-13'
+method: derived
+generator: derive-vocabulary.py
+source:
+- openapi/latoken-openapi.yml
+- openapi/latoken-p2p-openapi.yml
+vocabulary:
+  name: LATOKEN Domain Vocabulary
+  description: 'Terms declared by LATOKEN''s own API contract: its resource groups, objects and enumerations, with the contract''s definitions.
+    Derived, not authored.'
+  version: '2026-10-13'
+  terms:
+  - term: Account
+    definition: 'Resource group in the contract; its operation GET /v2/auth/account: Request all accounts of current user'
+    tags:
+    - Resource Group
+    source: openapi/latoken-openapi.yml
+  - term: Order
+    definition: 'Resource group in the contract; its operation GET /v2/auth/order: Get all my orders'
+    tags:
+    - Resource Group
+    source: openapi/latoken-openapi.yml
+  - term: Spot
+    definition: 'Resource group in the contract; its operation POST /v2/auth/spot/deposit: Deposit spot account'
+    tags:
+    - Resource Group
+    source: openapi/latoken-openapi.yml
+  - term: Trade
+    definition: 'Resource group in the contract; its operation GET /v2/auth/trade: Request trade history of authorized user for given pair'
+    tags:
+    - Resource Group
+    source: openapi/latoken-openapi.yml
+  - term: Transaction
+    definition: 'Resource group in the contract; its operation GET /v2/auth/transaction: Request deposits and withdrawals'
+    tags:
+    - Resource Group
+    source: openapi/latoken-openapi.yml
+  - term: Transfer
+    definition: 'Resource group in the contract; its operation GET /v2/auth/transfer: Get transfers'
+    tags:
+    - Resource Group
+    source: openapi/latoken-openapi.yml
+  - term: Order Book
+    definition: 'Resource group in the contract; its operation GET /v2/book/{currency}/{quote}: Book can be fetched by currency ID and currency
+      TAG'
+    tags:
+    - Resource Group
+    source: openapi/latoken-openapi.yml
+  - term: Chart
+    definition: 'Resource group in the contract; its operation GET /v2/chart/week: Get all weekly charts'
+    tags:
+    - Resource Group
+    source: openapi/latoken-openapi.yml
+  - term: Currency
+    definition: 'Resource group in the contract; its operation GET /v2/currency: Request list of active currencies'
+    tags:
+    - Resource Group
+    source: openapi/latoken-openapi.yml
+  - term: Pair
+    definition: 'Resource group in the contract; its operation GET /v2/pair: Request list of all active trading pairs'
+    tags:
+    - Resource Group
+    source: openapi/latoken-openapi.yml
+  - term: StopOrder
+    definition: 'Resource group in the contract; its operation GET /v2/auth/stopOrder: Request list of all my stop orders'
+    tags:
+    - Resource Group
+    source: openapi/latoken-openapi.yml
+  - term: BulkOrder
+    definition: 'Resource group in the contract; its operation POST /v2/auth/order/placeBulk: Place an array of orders.'
+    tags:
+    - Resource Group
+    source: openapi/latoken-openapi.yml
+  - term: Ticker
+    definition: 'Resource group in the contract; its operation GET /v2/ticker: Request tickers for all pairs'
+    tags:
+    - Resource Group
+    source: openapi/latoken-openapi.yml
+  - term: Time
+    definition: 'Resource group in the contract; its operation GET /v2/time: Request current server time'
+    tags:
+    - Resource Group
+    source: openapi/latoken-openapi.yml
+  - term: OfferController
+    definition: 'Resource group in the contract; its operation GET /p2p/offers: List Public Offers'
+    tags:
+    - Resource Group
+    source: openapi/latoken-p2p-openapi.yml
+  - term: UserController
+    definition: 'Resource group in the contract; its operation POST /auth/p2p/user/register: Register and Accept Agreement'
+    tags:
+    - Resource Group
+    source: openapi/latoken-p2p-openapi.yml
+  - term: PaymentMethodController
+    definition: 'Resource group in the contract; its operation POST /auth/p2p/paymentMethods: Create new Payment Method'
+    tags:
+    - Resource Group
+    source: openapi/latoken-p2p-openapi.yml
+  - term: OrderController
+    definition: 'Resource group in the contract; its operation POST /auth/p2p/order: Create Order'
+    tags:
+    - Resource Group
+    source: openapi/latoken-p2p-openapi.yml
+  - term: AppealController
+    definition: 'Resource group in the contract; its operation POST /auth/p2p/order/appeal: Create Appeal'
+    tags:
+    - Resource Group
+    source: openapi/latoken-p2p-openapi.yml
+  - term: ChatController
+    definition: 'Resource group in the contract; its operation POST /auth/p2p/order/chat/{id}: Send Message'
+    tags:
+    - Resource Group
+    source: openapi/latoken-p2p-openapi.yml

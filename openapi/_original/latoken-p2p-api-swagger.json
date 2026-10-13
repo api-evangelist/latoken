@@ -1,0 +1,2373 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "LATOKEN P2P API",
+    "version": "V1",
+    "x-logo": {
+      "url": "./logo.png"
+    },
+    "description": "# WebSocket and REST documentation\n- LATOKEN WebSocket API documentation is located at [**https://api.latoken.com/doc/ws/**](/doc/ws/)\n- LATOKEN REST API documentation is located at [**https://api.latoken.com/doc/v2/**](/doc/v2/)\n"
+  },
+  "basePath": "/pay/v1",
+  "schemes": [
+    "https"
+  ],
+  "securityDefinitions": {
+    "api_key": {
+      "type": "apiKey",
+      "name": "X-LA-APIKEY",
+      "in": "header"
+    },
+    "api_signature": {
+      "type": "apiKey",
+      "name": "X-LA-SIGNATURE",
+      "in": "header"
+    }
+  },
+  "tags": [
+    {
+      "name": "UserController"
+    },
+    {
+      "name": "PaymentMethodController"
+    },
+    {
+      "name": "OfferController"
+    },
+    {
+      "name": "OrderController"
+    },
+    {
+      "name": "AppealController"
+    },
+    {
+      "name": "ChatController"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "definitions": {
+    "Offer": {
+      "type": "object",
+      "title": "Offer",
+      "properties": {
+        "id": {
+          "type": "string",
+          "example": "3d7e1b02-c7f7-49c2-912e-5f4dc9460f8e"
+        },
+        "cryptoTag": {
+          "type": "string",
+          "example": "BTC"
+        },
+        "fiatTag": {
+          "type": "string",
+          "example": "USD"
+        },
+        "amount": {
+          "type": "string",
+          "example": "0.500368396618455100"
+        },
+        "availableAmount": {
+          "type": "string",
+          "example": "0.400368396618455140"
+        },
+        "limits": {
+          "type": "object",
+          "properties": {
+            "min": {
+              "type": "string",
+              "example": "0.000100000000000000"
+            },
+            "max": {
+              "type": "string",
+              "example": "0.005000000000000000"
+            }
+          }
+        },
+        "rate": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "RATE_TYPE_FIXED",
+                "RATE_TYPE_FLOAT_PERCENT",
+                "RATE_TYPE_FLOAT_VALUE",
+                "RATE_TYPE_FLOAT_PERCENT_AND_VALUE"
+              ],
+              "example": "RATE_TYPE_FLOAT_PERCENT"
+            },
+            "value": {
+              "type": "string",
+              "example": "24703558.793020000000000000"
+            }
+          }
+        },
+        "merchant": {
+          "$ref": "#/definitions/UserPublic"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "OFFER_TYPE_UNSPECIFIED",
+            "OFFER_TYPE_SELL",
+            "OFFER_TYPE_BUY"
+          ],
+          "example": "OFFER_TYPE_BUY"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "OFFER_STATUS_UNSPECIFIED",
+            "OFFER_STATUS_ACTIVE",
+            "OFFER_STATUS_NOT_ACTIVE",
+            "OFFER_STATUS_DELETED"
+          ],
+          "example": "OFFER_STATUS_ACTIVE"
+        },
+        "terms": {
+          "type": "string",
+          "example": "Buy bitcoin"
+        },
+        "method": {
+          "$ref": "#/definitions/PaymentMethodPublic"
+        },
+        "acceptableMethod": {
+          "type": "string",
+          "example": null
+        },
+        "createdAt": {
+          "type": "string",
+          "example": "2021-08-19T15:56:16.323Z"
+        },
+        "updatedAt": {
+          "type": "string",
+          "example": "2021-08-20T17:12:30.332Z"
+        }
+      },
+      "description": "Offer Entity"
+    },
+    "UserPrivate": {
+      "type": "object",
+      "title": "User Private",
+      "properties": {
+        "id": {
+          "type": "string",
+          "example": "3d7e1b02-c7f7-49c2-912e-5f4dc9460f8e"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "USER_TYPE_USER",
+            "USER_TYPE_MERCHANT"
+          ],
+          "example": "USER_TYPE_USER"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "USER_STATUS_ACTIVE",
+            "USER_STATUS_BANNED"
+          ],
+          "example": "USER_STATUS_ACTIVE"
+        },
+        "details": {
+          "type": "object",
+          "properties": {
+            "kyc": {
+              "type": "boolean",
+              "example": true
+            },
+            "twoFa": {
+              "type": "boolean",
+              "example": true
+            },
+            "online": {
+              "type": "boolean",
+              "example": true
+            }
+          }
+        },
+        "info": {
+          "type": "object",
+          "properties": {
+            "nickname": {
+              "type": "string",
+              "example": "cointrader"
+            },
+            "firstname": {
+              "type": "string",
+              "example": "Rick"
+            },
+            "lastname": {
+              "type": "string",
+              "example": "Cooper"
+            }
+          }
+        },
+        "createdAt": {
+          "type": "string",
+          "example": "2021-08-19T15:56:16.323Z"
+        },
+        "updatedAt": {
+          "type": "string",
+          "example": "2021-08-19T15:56:16.323Z"
+        }
+      },
+      "description": "User Private Entity"
+    },
+    "UserPublic": {
+      "type": "object",
+      "title": "User Public",
+      "properties": {
+        "online": {
+          "type": "boolean",
+          "example": true
+        },
+        "nickname": {
+          "type": "string",
+          "example": "cointrader"
+        }
+      },
+      "description": "User Public Entity"
+    },
+    "PaymentMethodPrivate": {
+      "type": "object",
+      "title": "Payment Method Private",
+      "properties": {
+        "id": {
+          "type": "string",
+          "example": "3d7e1b02-c7f7-49c2-912e-5f4dc9460f8e"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "PAYMENT_TYPE_UNSPECIFIED",
+            "PAYMENT_TYPE_BANK_TRANSFER",
+            "PAYMENT_TYPE_BKASH",
+            "PAYMENT_TYPE_ROCKET",
+            "PAYMENT_TYPE_NAGAD",
+            "PAYMENT_TYPE_UPI"
+          ],
+          "example": "PAYMENT_TYPE_BANK_TRANSFER"
+        },
+        "bank": {
+          "type": "string",
+          "example": "BANK NAME"
+        },
+        "account": {
+          "type": "string",
+          "example": 1234123412341234
+        },
+        "name": {
+          "type": "string",
+          "example": "NAME SURNAME"
+        },
+        "createdAt": {
+          "type": "string",
+          "example": "2021-08-19T15:56:16.323Z"
+        },
+        "updatedAt": {
+          "type": "string",
+          "example": "2021-08-19T15:56:16.323Z"
+        }
+      },
+      "description": "Payment Method Private Entity"
+    },
+    "PaymentMethodPublic": {
+      "type": "object",
+      "title": "Payment Method Public",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "PAYMENT_TYPE_UNSPECIFIED",
+            "PAYMENT_TYPE_BANK_TRANSFER",
+            "PAYMENT_TYPE_BKASH",
+            "PAYMENT_TYPE_ROCKET",
+            "PAYMENT_TYPE_NAGAD",
+            "PAYMENT_TYPE_UPI"
+          ],
+          "example": "PAYMENT_TYPE_BANK_TRANSFER"
+        },
+        "bank": {
+          "type": "string",
+          "example": "BANK NAME"
+        },
+        "account": {
+          "type": "string",
+          "example": 1234123412341234
+        },
+        "name": {
+          "type": "string",
+          "example": "NAME SURNAME"
+        }
+      },
+      "description": "Payment Method Public Entity"
+    },
+    "Order": {
+      "type": "object",
+      "title": "Order",
+      "properties": {
+        "id": {
+          "type": "string",
+          "example": "3d7e1b02-c7f7-49c2-912e-5f4dc9460f8e"
+        },
+        "amountCrypto": {
+          "type": "string",
+          "example": "0.345678956789000000"
+        },
+        "amountFiat": {
+          "type": "string",
+          "example": "1000.000000000000000000"
+        },
+        "offer": {
+          "$ref": "#/definitions/Offer"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "ORDER_STATUS_UNSPECIFIED",
+            "ORDER_STATUS_CREATED",
+            "ORDER_STATUS_CANCELED",
+            "ORDER_STATUS_PAID",
+            "ORDER_STATUS_APPEAL",
+            "ORDER_STATUS_COMPLETED"
+          ],
+          "example": "ORDER_STATUS_PAID"
+        },
+        "method": {
+          "$ref": "#/definitions/PaymentMethodPublic"
+        },
+        "appeal": {
+          "$ref": "#/definitions/Appeal"
+        },
+        "user": {
+          "$ref": "#/definitions/UserPublic"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "ORDER_TYPE_UNSPECIFIED",
+            "ORDER_TYPE_SELL",
+            "ORDER_TYPE_BUY"
+          ],
+          "example": "ORDER_TYPE_BUY"
+        },
+        "createdAt": {
+          "type": "string",
+          "example": "2021-08-19T15:56:16.323Z"
+        },
+        "updatedAt": {
+          "type": "string",
+          "example": "2021-08-19T15:56:16.323Z"
+        }
+      },
+      "description": "Order Entity"
+    },
+    "Appeal": {
+      "type": "object",
+      "title": "Appeal",
+      "properties": {
+        "id": {
+          "type": "string",
+          "example": "3d7e1b02-c7f7-49c2-912e-5f4dc9460f8e"
+        },
+        "appealer": {
+          "type": "string",
+          "example": "5b144930-5da9-42af-9038-cd95b87eeb84"
+        },
+        "reason": {
+          "type": "string",
+          "example": "Did not receive funds"
+        },
+        "description": {
+          "type": "string",
+          "example": "Sent fiat, but merchant didn't complete order"
+        },
+        "proof": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "example": "https://url.to.your/proof"
+          }
+        },
+        "status": {
+          "type": "string",
+          "example": "APPEAL_STATUS_PENDING"
+        },
+        "createdAt": {
+          "type": "string",
+          "example": "2021-08-19T15:56:16.323Z"
+        },
+        "updatedAt": {
+          "type": "string",
+          "example": "2021-08-19T15:56:16.323Z"
+        }
+      },
+      "description": "Appeal Entity"
+    },
+    "Config": {
+      "type": "object",
+      "title": "Config",
+      "example": {
+        "defaultFeePercent": "0.01",
+        "showForCountries": "[\"NG\",\"BND\"]",
+        "paymentTypesByCurrency": "{\"NGN\":[\"PAYMENT_TYPE_BANK_TRANSFER\"]}",
+        "fee": "[{\"currency\":BDT\",\"value\":0.05}]"
+      },
+      "description": "Config Entity"
+    },
+    "Rates": {
+      "type": "object",
+      "title": "Rates",
+      "example": {
+        "USDT": {
+          "BDT": "85.872938008300000000",
+          "INR": "74.508477450600000000",
+          "NGN": "411.127588000000000000"
+        }
+      },
+      "description": "Rates Entity"
+    },
+    "OffersList": {
+      "type": "object",
+      "title": "Offers List",
+      "properties": {
+        "content": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Offer"
+          }
+        },
+        "currentPage": {
+          "example": 1,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "lastPage": {
+          "example": 1,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "size": {
+          "example": 50,
+          "minimum": 1,
+          "type": "integer"
+        }
+      }
+    },
+    "PaymentMethodsList": {
+      "type": "array",
+      "title": "Payment Methods List",
+      "items": {
+        "$ref": "#/definitions/PaymentMethodPrivate"
+      }
+    },
+    "OrdersList": {
+      "type": "object",
+      "title": "Orders List",
+      "properties": {
+        "content": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Order"
+          }
+        },
+        "currentPage": {
+          "example": 1,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "lastPage": {
+          "example": 1,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "size": {
+          "example": 50,
+          "minimum": 1,
+          "type": "integer"
+        }
+      }
+    },
+    "CreatePaymentMethodRequest": {
+      "type": "object",
+      "title": "CreatePaymentMethodRequest",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "PAYMENT_TYPE_UNSPECIFIED",
+            "PAYMENT_TYPE_BANK_TRANSFER",
+            "PAYMENT_TYPE_BKASH",
+            "PAYMENT_TYPE_ROCKET",
+            "PAYMENT_TYPE_NAGAD",
+            "PAYMENT_TYPE_UPI"
+          ],
+          "example": "PAYMENT_TYPE_BANK_TRANSFER"
+        },
+        "bank": {
+          "type": "string",
+          "example": "BANK NAME"
+        },
+        "account": {
+          "type": "string",
+          "example": "1234123412341234"
+        },
+        "name": {
+          "type": "string",
+          "example": "NAME SURNAME"
+        }
+      },
+      "description": "CreatePaymentMethodRequest Entity"
+    },
+    "UpdatePaymentMethodRequest": {
+      "type": "object",
+      "title": "UpdatePaymentMethodRequest",
+      "properties": {
+        "id": {
+          "type": "string",
+          "example": "1c18d0bb-511d-41c5-8fb2-66626531d59d"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "PAYMENT_TYPE_UNSPECIFIED",
+            "PAYMENT_TYPE_BANK_TRANSFER",
+            "PAYMENT_TYPE_BKASH",
+            "PAYMENT_TYPE_ROCKET",
+            "PAYMENT_TYPE_NAGAD",
+            "PAYMENT_TYPE_UPI"
+          ],
+          "example": "PAYMENT_TYPE_BANK_TRANSFER"
+        },
+        "bank": {
+          "type": "string",
+          "example": "BANK NAME"
+        },
+        "account": {
+          "type": "string",
+          "example": 1234123412341234
+        },
+        "name": {
+          "type": "string",
+          "example": "NAME SURNAME"
+        }
+      },
+      "description": "UpdatePaymentMethodRequest Entity"
+    },
+    "RemovePaymentMethodRequest": {
+      "type": "object",
+      "title": "RemovePaymentMethodRequest",
+      "properties": {
+        "id": {
+          "type": "string",
+          "example": "1c18d0bb-511d-41c5-8fb2-66626531d59d"
+        }
+      },
+      "description": "RemovePaymentMethodRequest Entity"
+    },
+    "CreateOfferRequest": {
+      "type": "object",
+      "title": "CreateOfferRequest",
+      "properties": {
+        "cryptoTag": {
+          "type": "string",
+          "example": "USDT"
+        },
+        "fiatTag": {
+          "type": "string",
+          "example": "USD"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "OFFER_TYPE_UNSPECIFIED",
+            "OFFER_TYPE_SELL",
+            "OFFER_TYPE_BUY"
+          ],
+          "example": "OFFER_TYPE_BUY"
+        },
+        "method": {
+          "type": "string",
+          "example": "1c18d0bb-511d-41c5-8fb2-66626531d59d"
+        },
+        "acceptableMethod": {
+          "type": "string",
+          "enum": [
+            "PAYMENT_TYPE_UNSPECIFIED",
+            "PAYMENT_TYPE_BANK_TRANSFER",
+            "PAYMENT_TYPE_BKASH",
+            "PAYMENT_TYPE_ROCKET",
+            "PAYMENT_TYPE_NAGAD",
+            "PAYMENT_TYPE_UPI"
+          ],
+          "example": "PAYMENT_TYPE_BANK_TRANSFER"
+        },
+        "amount": {
+          "type": "string",
+          "example": 1000
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "OFFER_STATUS_ACTIVE",
+            "OFFER_STATUS_NOT_ACTIVE"
+          ],
+          "example": "OFFER_STATUS_ACTIVE"
+        },
+        "rate": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "RATE_TYPE_FIXED",
+                "RATE_TYPE_FLOAT_PERCENT",
+                "RATE_TYPE_FLOAT_VALUE",
+                "RATE_TYPE_FLOAT_PERCENT_AND_VALUE"
+              ],
+              "example": "RATE_TYPE_FLOAT_PERCENT"
+            },
+            "value": {
+              "type": "string",
+              "example": 0.05
+            }
+          }
+        },
+        "limits": {
+          "type": "object",
+          "properties": {
+            "min": {
+              "type": "string",
+              "example": 10
+            },
+            "max": {
+              "type": "string",
+              "example": 100
+            }
+          }
+        },
+        "terms": {
+          "type": "string",
+          "example": "Buy bitcoin"
+        }
+      },
+      "description": "CreateOfferRequest Entity"
+    },
+    "UpdateOfferRequest": {
+      "type": "object",
+      "title": "UpdateOfferRequest",
+      "properties": {
+        "offer": {
+          "type": "string",
+          "example": "32ba928f-02c3-4d62-a455-1e36dc1d6b64"
+        },
+        "method": {
+          "type": "string",
+          "example": "1c18d0bb-511d-41c5-8fb2-66626531d59d"
+        },
+        "acceptableMethod": {
+          "type": "string",
+          "enum": [
+            "PAYMENT_TYPE_UNSPECIFIED",
+            "PAYMENT_TYPE_BANK_TRANSFER",
+            "PAYMENT_TYPE_BKASH",
+            "PAYMENT_TYPE_ROCKET",
+            "PAYMENT_TYPE_NAGAD",
+            "PAYMENT_TYPE_UPI"
+          ],
+          "example": "PAYMENT_TYPE_BANK_TRANSFER"
+        },
+        "amount": {
+          "type": "string",
+          "example": 1000
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "OFFER_STATUS_ACTIVE",
+            "OFFER_STATUS_NOT_ACTIVE"
+          ],
+          "example": "OFFER_STATUS_ACTIVE"
+        },
+        "limits": {
+          "type": "object",
+          "properties": {
+            "min": {
+              "type": "string",
+              "example": 10
+            },
+            "max": {
+              "type": "string",
+              "example": 100
+            }
+          }
+        }
+      },
+      "description": "UpdateOfferRequest Entity"
+    },
+    "RemoveOfferRequest": {
+      "type": "object",
+      "title": "RemoveOfferRequest",
+      "properties": {
+        "offer": {
+          "type": "string",
+          "example": "32ba928f-02c3-4d62-a455-1e36dc1d6b64"
+        }
+      },
+      "description": "RemoveOfferRequest Entity"
+    },
+    "CreateOrderRequest": {
+      "type": "object",
+      "title": "CreateOrderRequest",
+      "properties": {
+        "offer": {
+          "type": "string",
+          "example": "32ba928f-02c3-4d62-a455-1e36dc1d6b64"
+        },
+        "amountCrypto": {
+          "type": "string",
+          "example": 0.5
+        },
+        "amountFiat": {
+          "type": "string",
+          "example": 100
+        },
+        "paymentMethod": {
+          "type": "string",
+          "example": "1c18d0bb-511d-41c5-8fb2-66626531d59d"
+        }
+      },
+      "description": "CreateOrderRequest Entity"
+    },
+    "ConfirmOrderRequest": {
+      "type": "object",
+      "title": "ConfirmOrderRequest",
+      "properties": {
+        "order": {
+          "type": "string",
+          "example": "53e8911a-caf6-4fb6-92dd-ced31b0eaf90"
+        }
+      },
+      "description": "ConfirmOrderRequest Entity"
+    },
+    "CompleteOrderRequest": {
+      "type": "object",
+      "title": "CompleteOrderRequest",
+      "properties": {
+        "order": {
+          "type": "string",
+          "example": "53e8911a-caf6-4fb6-92dd-ced31b0eaf90"
+        }
+      },
+      "description": "CompleteOrderRequest Entity"
+    },
+    "CancelOrderRequest": {
+      "type": "object",
+      "title": "CancelOrderRequest",
+      "properties": {
+        "order": {
+          "type": "string",
+          "example": "53e8911a-caf6-4fb6-92dd-ced31b0eaf90"
+        }
+      },
+      "description": "CancelOrderRequest Entity"
+    },
+    "CreateAppealRequest": {
+      "type": "object",
+      "title": "CreateAppealRequest",
+      "properties": {
+        "order": {
+          "type": "string",
+          "example": "53e8911a-caf6-4fb6-92dd-ced31b0eaf90"
+        },
+        "reason": {
+          "type": "string",
+          "example": "Did not receive funds"
+        },
+        "description": {
+          "type": "string",
+          "example": "Sent fiat, but merchant didn't complete order"
+        },
+        "proof": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "example": "https://url.to.your/proof"
+          }
+        }
+      },
+      "description": "CreateAppealRequest Entity"
+    },
+    "CancelAppealRequest": {
+      "type": "object",
+      "title": "CancelAppealRequest",
+      "properties": {
+        "order": {
+          "type": "string",
+          "example": "53e8911a-caf6-4fb6-92dd-ced31b0eaf90"
+        }
+      },
+      "description": "CancelAppealRequest Entity"
+    },
+    "SendMessageRequest": {
+      "type": "object",
+      "title": "SendMessageRequest",
+      "properties": {
+        "message": {
+          "type": "string",
+          "example": "Some message..."
+        }
+      },
+      "description": "SendMessageRequest Entity"
+    },
+    "Error": {
+      "type": "object",
+      "title": "Error",
+      "properties": {
+        "message": {
+          "type": "string",
+          "example": "..."
+        },
+        "status": {
+          "type": "string",
+          "example": "FAILURE"
+        },
+        "error": {
+          "type": "string",
+          "example": "INVALID_ARGUMENT"
+        }
+      },
+      "description": "Error Entity"
+    },
+    "ServiceUnavailableError": {
+      "type": "object",
+      "title": "Service Unavailable Error",
+      "properties": {
+        "message": {
+          "type": "string",
+          "example": "service unavailable"
+        },
+        "status": {
+          "type": "string",
+          "example": "FAILURE"
+        },
+        "error": {
+          "type": "string",
+          "example": "SERVICE_UNAVAILABLE"
+        }
+      },
+      "description": "Service Unavailable Error Entity"
+    },
+    "UnauthorizedError": {
+      "type": "object",
+      "title": "Unauthorized Error",
+      "properties": {
+        "result": {
+          "type": "boolean",
+          "example": false
+        },
+        "message": {
+          "type": "string",
+          "example": "user must be authenticated"
+        },
+        "status": {
+          "type": "string",
+          "example": "FAILURE"
+        },
+        "error": {
+          "type": "string",
+          "example": "UNAUTHORIZED"
+        }
+      },
+      "description": "Unauthorized Error Entity"
+    }
+  },
+  "paths": {
+    "/p2p/offers": {
+      "get": {
+        "summary": "List Public Offers",
+        "tags": [
+          "OfferController"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "type": "integer",
+            "default": 1,
+            "minimum": 1,
+            "description": "Number of the page"
+          },
+          {
+            "in": "query",
+            "name": "size",
+            "type": "integer",
+            "default": 50,
+            "minimum": 1,
+            "description": "Count of entities in the set"
+          },
+          {
+            "in": "query",
+            "name": "sort",
+            "type": "string",
+            "default": "updatedAt",
+            "description": "Property for sorting"
+          },
+          {
+            "in": "query",
+            "name": "direction",
+            "default": "DESC",
+            "type": "string",
+            "enum": [
+              "ASC",
+              "DESC"
+            ],
+            "description": "Sorting direction"
+          },
+          {
+            "in": "query",
+            "name": "cryptoTag",
+            "type": "string",
+            "default": "",
+            "description": "Select offers with this cryptocurrency"
+          },
+          {
+            "in": "query",
+            "name": "fiatTag",
+            "type": "string",
+            "default": "",
+            "description": "Select offers with this fiat currency"
+          },
+          {
+            "in": "query",
+            "name": "type",
+            "default": "OFFER_TYPE_UNSPECIFIED",
+            "type": "string",
+            "enum": [
+              "OFFER_TYPE_UNSPECIFIED",
+              "OFFER_TYPE_SELL",
+              "OFFER_TYPE_BUY"
+            ],
+            "description": "Offers' direction"
+          }
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "$ref": "#/definitions/OffersList"
+            },
+            "description": "Success"
+          },
+          "400": {
+            "schema": {
+              "$ref": "#/definitions/Error"
+            },
+            "description": "Bad Request"
+          },
+          "503": {
+            "schema": {
+              "$ref": "#/definitions/ServiceUnavailableError"
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "x-code-samples": [
+          {
+            "lang": "TypeScript",
+            "source": "import axios from 'axios';\n\nconst baseUrl = 'https://api.latoken.com';\nconst endpoint = '/pay/v1/p2p/offers';\n\naxios\n  .get(baseUrl + endpoint)\n  .then((result) => console.log(result.data))\n  .catch((error) => console.error(error));\n"
+          }
+        ]
+      }
+    },
+    "/p2p/config": {
+      "get": {
+        "summary": "Get Config",
+        "tags": [
+          "OfferController"
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "$ref": "#/definitions/Config"
+            },
+            "description": "Success"
+          },
+          "400": {
+            "schema": {
+              "$ref": "#/definitions/Error"
+            },
+            "description": "Bad Request"
+          },
+          "503": {
+            "schema": {
+              "$ref": "#/definitions/ServiceUnavailableError"
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "x-code-samples": [
+          {
+            "lang": "TypeScript",
+            "source": "import axios from 'axios';\n\nconst baseUrl = 'https://api.latoken.com';\nconst endpoint = '/pay/v1/p2p/config';\n\naxios\n  .get(baseUrl + endpoint)\n  .then((result) => console.log(result.data))\n  .catch((error) => console.error(error));\n"
+          }
+        ]
+      }
+    },
+    "/p2p/offers/rates": {
+      "get": {
+        "summary": "Get Rates",
+        "tags": [
+          "OfferController"
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "$ref": "#/definitions/Rates"
+            },
+            "description": "Success"
+          },
+          "400": {
+            "schema": {
+              "$ref": "#/definitions/Error"
+            },
+            "description": "Bad Request"
+          },
+          "503": {
+            "schema": {
+              "$ref": "#/definitions/ServiceUnavailableError"
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "x-code-samples": [
+          {
+            "lang": "TypeScript",
+            "source": "import axios from 'axios';\n\nconst baseUrl = 'https://api.latoken.com';\nconst endpoint = '/pay/v1/p2p/offers/rates';\n\naxios\n  .get(baseUrl + endpoint)\n  .then((result) => console.log(result.data))\n  .catch((error) => console.error(error));\n"
+          }
+        ]
+      }
+    },
+    "/auth/p2p/user/register": {
+      "post": {
+        "security": [
+          {
+            "api_key": [],
+            "api_signature": []
+          }
+        ],
+        "summary": "Register and Accept Agreement",
+        "tags": [
+          "UserController"
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "$ref": "#/definitions/UserPrivate"
+            },
+            "description": "Success"
+          },
+          "400": {
+            "schema": {
+              "$ref": "#/definitions/Error"
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "schema": {
+              "$ref": "#/definitions/UnauthorizedError"
+            },
+            "description": "User Unauthorized"
+          },
+          "503": {
+            "schema": {
+              "$ref": "#/definitions/ServiceUnavailableError"
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "x-code-samples": [
+          {
+            "lang": "TypeScript",
+            "source": "import * as crypto from 'crypto';\nimport axios, { AxiosRequestConfig } from 'axios';\n\nconst apiKey = '<Your API Public Key>';\nconst apiSecret = '<You API Private Key>';\n\nconst baseUrl = 'https://api.latoken.com';\nconst endpoint = '/pay/v1/auth/p2p/user/register';\nconst method = 'POST';\n\nconst signature: string = crypto\n  .createHmac('sha256', apiSecret)\n  .update(method + endpoint)\n  .digest('hex');\n\nconst config: AxiosRequestConfig = {\n  headers: {\n    'X-LA-APIKEY': apiKey,\n    'X-LA-SIGNATURE': signature,\n  },\n};\n\naxios\n  .post(baseUrl + endpoint, {}, config)\n  .then((result) => console.log(result.data))\n  .catch((error) => console.error(error));\n"
+          }
+        ]
+      }
+    },
+    "/auth/p2p/user": {
+      "get": {
+        "security": [
+          {
+            "api_key": [],
+            "api_signature": []
+          }
+        ],
+        "summary": "Get your User",
+        "tags": [
+          "UserController"
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "$ref": "#/definitions/UserPrivate"
+            },
+            "description": "Success"
+          },
+          "400": {
+            "schema": {
+              "$ref": "#/definitions/Error"
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "schema": {
+              "$ref": "#/definitions/UnauthorizedError"
+            },
+            "description": "User Unauthorized"
+          },
+          "503": {
+            "schema": {
+              "$ref": "#/definitions/ServiceUnavailableError"
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "x-code-samples": [
+          {
+            "lang": "TypeScript",
+            "source": "import * as crypto from 'crypto';\nimport axios, { AxiosRequestConfig } from 'axios';\n\nconst apiKey = '<Your API Public Key>';\nconst apiSecret = '<You API Private Key>';\n\nconst baseUrl = 'https://api.latoken.com';\nconst endpoint = '/pay/v1/auth/p2p/user';\nconst method = 'GET';\n\nconst signature: string = crypto\n  .createHmac('sha256', apiSecret)\n  .update(method + endpoint)\n  .digest('hex');\n\nconst config: AxiosRequestConfig = {\n  headers: {\n    'X-LA-APIKEY': apiKey,\n    'X-LA-SIGNATURE': signature,\n  },\n};\n\naxios\n  .get(baseUrl + endpoint, config)\n  .then((result) => console.log(result.data))\n  .catch((error) => console.error(error));\n"
+          }
+        ]
+      }
+    },
+    "/auth/p2p/paymentMethods": {
+      "post": {
+        "security": [
+          {
+            "api_key": [],
+            "api_signature": []
+          }
+        ],
+        "summary": "Create new Payment Method",
+        "tags": [
+          "PaymentMethodController"
+        ],
+        "parameters": [
+          {
+            "name": "Request",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/CreatePaymentMethodRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "$ref": "#/definitions/PaymentMethodPrivate"
+            },
+            "description": "Success"
+          },
+          "400": {
+            "schema": {
+              "$ref": "#/definitions/Error"
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "schema": {
+              "$ref": "#/definitions/UnauthorizedError"
+            },
+            "description": "User Unauthorized"
+          },
+          "503": {
+            "schema": {
+              "$ref": "#/definitions/ServiceUnavailableError"
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "x-code-samples": [
+          {
+            "lang": "TypeScript",
+            "source": "import * as crypto from 'crypto';\nimport axios, { AxiosRequestConfig } from 'axios';\n\nconst apiKey = '<Your API Public Key>';\nconst apiSecret = '<You API Private Key>';\n\nconst baseUrl = 'https://api.latoken.com';\nconst endpoint = '/pay/v1/auth/p2p/paymentMethods';\nconst method = 'POST';\n\nconst signature: string = crypto\n  .createHmac('sha256', apiSecret)\n  .update(method + endpoint)\n  .digest('hex');\n\nconst config: AxiosRequestConfig = {\n  headers: {\n    'X-LA-APIKEY': apiKey,\n    'X-LA-SIGNATURE': signature,\n  },\n};\n\nconst params = {\n  type: 'PAYMENT_TYPE_BANK_TRANSFER',\n  bank: 'BANK NAME',\n  account: '1234123412341234',\n  name: 'NAME SURNAME',\n};\n\naxios\n  .post(baseUrl + endpoint, params, config)\n  .then((result) => console.log(result.data))\n  .catch((error) => console.error(error));\n"
+          }
+        ]
+      },
+      "get": {
+        "security": [
+          {
+            "api_key": [],
+            "api_signature": []
+          }
+        ],
+        "summary": "List Payment Methods",
+        "tags": [
+          "PaymentMethodController"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "type": "integer",
+            "default": 1,
+            "minimum": 1,
+            "description": "Number of the page"
+          },
+          {
+            "in": "query",
+            "name": "size",
+            "type": "integer",
+            "default": 50,
+            "minimum": 1,
+            "description": "Count of entities in the set"
+          },
+          {
+            "in": "query",
+            "name": "sort",
+            "type": "string",
+            "default": "updatedAt",
+            "description": "Property for sorting"
+          },
+          {
+            "in": "query",
+            "name": "direction",
+            "default": "DESC",
+            "type": "string",
+            "enum": [
+              "ASC",
+              "DESC"
+            ],
+            "description": "Sorting direction"
+          }
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "$ref": "#/definitions/PaymentMethodsList"
+            },
+            "description": "Success"
+          },
+          "400": {
+            "schema": {
+              "$ref": "#/definitions/Error"
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "schema": {
+              "$ref": "#/definitions/UnauthorizedError"
+            },
+            "description": "User Unauthorized"
+          },
+          "503": {
+            "schema": {
+              "$ref": "#/definitions/ServiceUnavailableError"
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "x-code-samples": [
+          {
+            "lang": "TypeScript",
+            "source": "import * as crypto from 'crypto';\nimport axios, { AxiosRequestConfig } from 'axios';\n\nconst apiKey = '<Your API Public Key>';\nconst apiSecret = '<You API Private Key>';\n\nconst baseUrl = 'https://api.latoken.com';\nconst endpoint = '/pay/v1/auth/p2p/paymentMethods';\nconst method = 'GET';\n\nconst signature: string = crypto\n  .createHmac('sha256', apiSecret)\n  .update(method + endpoint)\n  .digest('hex');\n\nconst config: AxiosRequestConfig = {\n  headers: {\n    'X-LA-APIKEY': apiKey,\n    'X-LA-SIGNATURE': signature,\n  },\n};\n\naxios\n  .get(baseUrl + endpoint, config)\n  .then((result) => console.log(result.data))\n  .catch((error) => console.error(error));\n"
+          }
+        ]
+      }
+    },
+    "/auth/p2p/paymentMethods/update": {
+      "post": {
+        "security": [
+          {
+            "api_key": [],
+            "api_signature": []
+          }
+        ],
+        "summary": "Update Payment Method",
+        "tags": [
+          "PaymentMethodController"
+        ],
+        "parameters": [
+          {
+            "name": "Request",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/UpdatePaymentMethodRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "$ref": "#/definitions/PaymentMethodPrivate"
+            },
+            "description": "Success"
+          },
+          "400": {
+            "schema": {
+              "$ref": "#/definitions/Error"
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "schema": {
+              "$ref": "#/definitions/UnauthorizedError"
+            },
+            "description": "User Unauthorized"
+          },
+          "503": {
+            "schema": {
+              "$ref": "#/definitions/ServiceUnavailableError"
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "x-code-samples": [
+          {
+            "lang": "TypeScript",
+            "source": "import * as crypto from 'crypto';\nimport axios, { AxiosRequestConfig } from 'axios';\n\nconst apiKey = '<Your API Public Key>';\nconst apiSecret = '<You API Private Key>';\n\nconst baseUrl = 'https://api.latoken.com';\nconst endpoint = '/pay/v1/auth/p2p/paymentMethods/update';\nconst method = 'POST';\n\nconst signature: string = crypto\n  .createHmac('sha256', apiSecret)\n  .update(method + endpoint)\n  .digest('hex');\n\nconst config: AxiosRequestConfig = {\n  headers: {\n    'X-LA-APIKEY': apiKey,\n    'X-LA-SIGNATURE': signature,\n  },\n};\n\nconst params = {\n  id: '1c18d0bb-511d-41c5-8fb2-66626531d59d',\n  type: 'PAYMENT_TYPE_BANK_TRANSFER',\n  bank: 'BANK NAME',\n  account: '1234123412341234',\n  name: 'NAME SURNAME',\n};\n\naxios\n  .post(baseUrl + endpoint, params, config)\n  .then((result) => console.log(result.data))\n  .catch((error) => console.error(error));\n"
+          }
+        ]
+      }
+    },
+    "/auth/p2p/paymentMethods/remove": {
+      "post": {
+        "security": [
+          {
+            "api_key": [],
+            "api_signature": []
+          }
+        ],
+        "summary": "Remove Payment Method",
+        "tags": [
+          "PaymentMethodController"
+        ],
+        "parameters": [
+          {
+            "name": "Request",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/RemovePaymentMethodRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "$ref": "#/definitions/PaymentMethodPrivate"
+            },
+            "description": "Success"
+          },
+          "400": {
+            "schema": {
+              "$ref": "#/definitions/Error"
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "schema": {
+              "$ref": "#/definitions/UnauthorizedError"
+            },
+            "description": "User Unauthorized"
+          },
+          "503": {
+            "schema": {
+              "$ref": "#/definitions/ServiceUnavailableError"
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "x-code-samples": [
+          {
+            "lang": "TypeScript",
+            "source": "import * as crypto from 'crypto';\nimport axios, { AxiosRequestConfig } from 'axios';\n\nconst apiKey = '<Your API Public Key>';\nconst apiSecret = '<You API Private Key>';\n\nconst baseUrl = 'https://api.latoken.com';\nconst endpoint = '/pay/v1/auth/p2p/paymentMethods/update';\nconst method = 'POST';\n\nconst signature: string = crypto\n  .createHmac('sha256', apiSecret)\n  .update(method + endpoint)\n  .digest('hex');\n\nconst config: AxiosRequestConfig = {\n  headers: {\n    'X-LA-APIKEY': apiKey,\n    'X-LA-SIGNATURE': signature,\n  },\n};\n\nconst params = {\n  id: '1c18d0bb-511d-41c5-8fb2-66626531d59d',\n};\n\naxios\n  .post(baseUrl + endpoint, params, config)\n  .then((result) => console.log(result.data))\n  .catch((error) => console.error(error));\n"
+          }
+        ]
+      }
+    },
+    "/auth/p2p/paymentMethods/{id}": {
+      "get": {
+        "security": [
+          {
+            "api_key": [],
+            "api_signature": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "ID of the method"
+          }
+        ],
+        "summary": "Get Payment Method by Id",
+        "tags": [
+          "PaymentMethodController"
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "$ref": "#/definitions/PaymentMethodPrivate"
+            },
+            "description": "Success"
+          },
+          "400": {
+            "schema": {
+              "$ref": "#/definitions/Error"
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "schema": {
+              "$ref": "#/definitions/UnauthorizedError"
+            },
+            "description": "User Unauthorized"
+          },
+          "503": {
+            "schema": {
+              "$ref": "#/definitions/ServiceUnavailableError"
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "x-code-samples": [
+          {
+            "lang": "TypeScript",
+            "source": "import * as crypto from 'crypto';\nimport axios, { AxiosRequestConfig } from 'axios';\n\nconst apiKey = '<Your API Public Key>';\nconst apiSecret = '<You API Private Key>';\n\nconst baseUrl = 'https://api.latoken.com';\nconst endpoint = '/pay/v1/auth/p2p/paymentMethods/<Payment Method ID>';\nconst method = 'GET';\n\nconst signature: string = crypto\n  .createHmac('sha256', apiSecret)\n  .update(method + endpoint)\n  .digest('hex');\n\nconst config: AxiosRequestConfig = {\n  headers: {\n    'X-LA-APIKEY': apiKey,\n    'X-LA-SIGNATURE': signature,\n  },\n};\n\naxios\n  .get(baseUrl + endpoint, config)\n  .then((result) => console.log(result.data))\n  .catch((error) => console.error(error));\n"
+          }
+        ]
+      }
+    },
+    "/auth/p2p/offer": {
+      "post": {
+        "security": [
+          {
+            "api_key": [],
+            "api_signature": []
+          }
+        ],
+        "summary": "Create new Offer",
+        "tags": [
+          "OfferController"
+        ],
+        "parameters": [
+          {
+            "name": "Request",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/CreateOfferRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "$ref": "#/definitions/Offer"
+            },
+            "description": "Success"
+          },
+          "400": {
+            "schema": {
+              "$ref": "#/definitions/Error"
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "schema": {
+              "$ref": "#/definitions/UnauthorizedError"
+            },
+            "description": "User Unauthorized"
+          },
+          "503": {
+            "schema": {
+              "$ref": "#/definitions/ServiceUnavailableError"
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "x-code-samples": [
+          {
+            "lang": "TypeScript",
+            "source": "import * as crypto from 'crypto';\nimport axios, { AxiosRequestConfig } from 'axios';\n\nconst apiKey = '<Your API Public Key>';\nconst apiSecret = '<You API Private Key>';\n\nconst baseUrl = 'https://api.latoken.com';\nconst endpoint = '/pay/v1/auth/p2p/offer';\nconst method = 'POST';\n\nconst signature: string = crypto\n  .createHmac('sha256', apiSecret)\n  .update(method + endpoint)\n  .digest('hex');\n\nconst config: AxiosRequestConfig = {\n  headers: {\n    'X-LA-APIKEY': apiKey,\n    'X-LA-SIGNATURE': signature,\n  },\n};\n\nconst params = {\n  cryptoTag: 'USDT',\n  fiatTag: 'USD',\n  type: 'OFFER_TYPE_BUY',\n  method: '1c18d0bb-511d-41c5-8fb2-66626531d59d',\n  acceptableMethod: 'PAYMENT_TYPE_BANK_TRANSFER',\n  amount: '1000',\n  status: 'OFFER_STATUS_ACTIVE',\n  rate: {\n    type: 'RATE_TYPE_FLOAT_PERCENT',\n    value: '0.05',\n  },\n  limits: {\n    min: '10',\n    max: '100',\n  },\n  terms: 'Buy bitcoin',\n};\n\naxios\n  .post(baseUrl + endpoint, params, config)\n  .then((result) => console.log(result.data))\n  .catch((error) => console.error(error));\n"
+          }
+        ]
+      }
+    },
+    "/auth/p2p/merchant/offers": {
+      "get": {
+        "security": [
+          {
+            "api_key": [],
+            "api_signature": []
+          }
+        ],
+        "summary": "List Merchant Offers",
+        "tags": [
+          "OfferController"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "type": "integer",
+            "default": 1,
+            "minimum": 1,
+            "description": "Number of the page"
+          },
+          {
+            "in": "query",
+            "name": "size",
+            "type": "integer",
+            "default": 50,
+            "minimum": 1,
+            "description": "Count of entities in the set"
+          },
+          {
+            "in": "query",
+            "name": "sort",
+            "type": "string",
+            "default": "updatedAt",
+            "description": "Property for sorting"
+          },
+          {
+            "in": "query",
+            "name": "direction",
+            "default": "DESC",
+            "type": "string",
+            "enum": [
+              "ASC",
+              "DESC"
+            ],
+            "description": "Sorting direction"
+          },
+          {
+            "in": "query",
+            "name": "type",
+            "default": "OFFER_TYPE_UNSPECIFIED",
+            "type": "string",
+            "enum": [
+              "OFFER_TYPE_UNSPECIFIED",
+              "OFFER_TYPE_SELL",
+              "OFFER_TYPE_BUY"
+            ],
+            "description": "Offers' direction"
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "default": "OFFER_STATUS_UNSPECIFIED",
+            "type": "string",
+            "enum": [
+              "OFFER_STATUS_UNSPECIFIED",
+              "OFFER_STATUS_ACTIVE",
+              "OFFER_STATUS_NOT_ACTIVE"
+            ],
+            "description": "Offers' status"
+          }
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "$ref": "#/definitions/OffersList"
+            },
+            "description": "Success"
+          },
+          "400": {
+            "schema": {
+              "$ref": "#/definitions/Error"
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "schema": {
+              "$ref": "#/definitions/UnauthorizedError"
+            },
+            "description": "User Unauthorized"
+          },
+          "503": {
+            "schema": {
+              "$ref": "#/definitions/ServiceUnavailableError"
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "x-code-samples": [
+          {
+            "lang": "TypeScript",
+            "source": "import * as crypto from 'crypto';\nimport axios, { AxiosRequestConfig } from 'axios';\n\nconst apiKey = '<Your API Public Key>';\nconst apiSecret = '<You API Private Key>';\n\nconst baseUrl = 'https://api.latoken.com';\nconst endpoint = '/pay/v1/auth/p2p/merchant/offers';\nconst method = 'GET';\n\nconst signature: string = crypto\n  .createHmac('sha256', apiSecret)\n  .update(method + endpoint)\n  .digest('hex');\n\nconst config: AxiosRequestConfig = {\n  headers: {\n    'X-LA-APIKEY': apiKey,\n    'X-LA-SIGNATURE': signature,\n  },\n};\n\naxios\n  .get(baseUrl + endpoint, config)\n  .then((result) => console.log(result.data))\n  .catch((error) => console.error(error));\n"
+          }
+        ]
+      }
+    },
+    "/auth/p2p/offer/update": {
+      "post": {
+        "security": [
+          {
+            "api_key": [],
+            "api_signature": []
+          }
+        ],
+        "summary": "Update Offer",
+        "tags": [
+          "OfferController"
+        ],
+        "parameters": [
+          {
+            "name": "Request",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/UpdateOfferRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "$ref": "#/definitions/Offer"
+            },
+            "description": "Success"
+          },
+          "400": {
+            "schema": {
+              "$ref": "#/definitions/Error"
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "schema": {
+              "$ref": "#/definitions/UnauthorizedError"
+            },
+            "description": "User Unauthorized"
+          },
+          "503": {
+            "schema": {
+              "$ref": "#/definitions/ServiceUnavailableError"
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "x-code-samples": [
+          {
+            "lang": "TypeScript",
+            "source": "import * as crypto from 'crypto';\nimport axios, { AxiosRequestConfig } from 'axios';\n\nconst apiKey = '<Your API Public Key>';\nconst apiSecret = '<You API Private Key>';\n\nconst baseUrl = 'https://api.latoken.com';\nconst endpoint = '/pay/v1/auth/p2p/offer/update';\nconst method = 'POST';\n\nconst signature: string = crypto\n  .createHmac('sha256', apiSecret)\n  .update(method + endpoint)\n  .digest('hex');\n\nconst config: AxiosRequestConfig = {\n  headers: {\n    'X-LA-APIKEY': apiKey,\n    'X-LA-SIGNATURE': signature,\n  },\n};\n\nconst params = {\n  offer: '32ba928f-02c3-4d62-a455-1e36dc1d6b64',\n  method: '1c18d0bb-511d-41c5-8fb2-66626531d59d',\n  acceptableMethod: 'PAYMENT_TYPE_BANK_TRANSFER',\n  amount: '1000',\n  status: 'OFFER_STATUS_ACTIVE',\n  limits: {\n    min: '10',\n    max: '100',\n  },\n};\n\naxios\n  .post(baseUrl + endpoint, params, config)\n  .then((result) => console.log(result.data))\n  .catch((error) => console.error(error));\n"
+          }
+        ]
+      }
+    },
+    "/auth/p2p/offer/delete": {
+      "post": {
+        "security": [
+          {
+            "api_key": [],
+            "api_signature": []
+          }
+        ],
+        "summary": "Delete Offer",
+        "tags": [
+          "OfferController"
+        ],
+        "parameters": [
+          {
+            "name": "Request",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/RemoveOfferRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "$ref": "#/definitions/Offer"
+            },
+            "description": "Success"
+          },
+          "400": {
+            "schema": {
+              "$ref": "#/definitions/Error"
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "schema": {
+              "$ref": "#/definitions/UnauthorizedError"
+            },
+            "description": "User Unauthorized"
+          },
+          "503": {
+            "schema": {
+              "$ref": "#/definitions/ServiceUnavailableError"
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "x-code-samples": [
+          {
+            "lang": "TypeScript",
+            "source": "import * as crypto from 'crypto';\nimport axios, { AxiosRequestConfig } from 'axios';\n\nconst apiKey = '<Your API Public Key>';\nconst apiSecret = '<You API Private Key>';\n\nconst baseUrl = 'https://api.latoken.com';\nconst endpoint = '/pay/v1/auth/p2p/offer/delete';\nconst method = 'POST';\n\nconst signature: string = crypto\n  .createHmac('sha256', apiSecret)\n  .update(method + endpoint)\n  .digest('hex');\n\nconst config: AxiosRequestConfig = {\n  headers: {\n    'X-LA-APIKEY': apiKey,\n    'X-LA-SIGNATURE': signature,\n  },\n};\n\nconst params = {\n  offer: '32ba928f-02c3-4d62-a455-1e36dc1d6b64',\n};\n\naxios\n  .post(baseUrl + endpoint, params, config)\n  .then((result) => console.log(result.data))\n  .catch((error) => console.error(error));\n"
+          }
+        ]
+      }
+    },
+    "/auth/p2p/order": {
+      "post": {
+        "security": [
+          {
+            "api_key": [],
+            "api_signature": []
+          }
+        ],
+        "summary": "Create Order",
+        "tags": [
+          "OrderController"
+        ],
+        "parameters": [
+          {
+            "name": "Request",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/CreateOrderRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "$ref": "#/definitions/Order"
+            },
+            "description": "Success"
+          },
+          "400": {
+            "schema": {
+              "$ref": "#/definitions/Error"
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "schema": {
+              "$ref": "#/definitions/UnauthorizedError"
+            },
+            "description": "User Unauthorized"
+          },
+          "503": {
+            "schema": {
+              "$ref": "#/definitions/ServiceUnavailableError"
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "x-code-samples": [
+          {
+            "lang": "TypeScript",
+            "source": "import * as crypto from 'crypto';\nimport axios, { AxiosRequestConfig } from 'axios';\n\nconst apiKey = '<Your API Public Key>';\nconst apiSecret = '<You API Private Key>';\n\nconst baseUrl = 'https://api.latoken.com';\nconst endpoint = '/pay/v1/auth/p2p/order';\nconst method = 'POST';\n\nconst signature: string = crypto\n  .createHmac('sha256', apiSecret)\n  .update(method + endpoint)\n  .digest('hex');\n\nconst config: AxiosRequestConfig = {\n  headers: {\n    'X-LA-APIKEY': apiKey,\n    'X-LA-SIGNATURE': signature,\n  },\n};\n\nconst params = {\n  offer: '32ba928f-02c3-4d62-a455-1e36dc1d6b64',\n  amountCrypto: '0.5',\n  amountFiat: '100',\n  paymentMethod: '1c18d0bb-511d-41c5-8fb2-66626531d59d',\n};\n\naxios\n  .post(baseUrl + endpoint, params, config)\n  .then((result) => console.log(result.data))\n  .catch((error) => console.error(error));\n"
+          }
+        ]
+      }
+    },
+    "/auth/p2p/order/{id}": {
+      "get": {
+        "security": [
+          {
+            "api_key": [],
+            "api_signature": []
+          }
+        ],
+        "summary": "Get Order by Id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "ID of the order"
+          }
+        ],
+        "tags": [
+          "OrderController"
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "$ref": "#/definitions/Order"
+            },
+            "description": "Success"
+          },
+          "400": {
+            "schema": {
+              "$ref": "#/definitions/Error"
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "schema": {
+              "$ref": "#/definitions/UnauthorizedError"
+            },
+            "description": "User Unauthorized"
+          },
+          "503": {
+            "schema": {
+              "$ref": "#/definitions/ServiceUnavailableError"
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "x-code-samples": [
+          {
+            "lang": "TypeScript",
+            "source": "import * as crypto from 'crypto';\nimport axios, { AxiosRequestConfig } from 'axios';\n\nconst apiKey = '<Your API Public Key>';\nconst apiSecret = '<You API Private Key>';\n\nconst baseUrl = 'https://api.latoken.com';\nconst endpoint = '/pay/v1/auth/p2p/order/<Payment Method ID>';\nconst method = 'GET';\n\nconst signature: string = crypto\n  .createHmac('sha256', apiSecret)\n  .update(method + endpoint)\n  .digest('hex');\n\nconst config: AxiosRequestConfig = {\n  headers: {\n    'X-LA-APIKEY': apiKey,\n    'X-LA-SIGNATURE': signature,\n  },\n};\n\naxios\n  .get(baseUrl + endpoint, config)\n  .then((result) => console.log(result.data))\n  .catch((error) => console.error(error));\n"
+          }
+        ]
+      }
+    },
+    "/auth/p2p/orders": {
+      "get": {
+        "security": [
+          {
+            "api_key": [],
+            "api_signature": []
+          }
+        ],
+        "summary": "List User Orders",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "type": "integer",
+            "default": 1,
+            "minimum": 1,
+            "description": "Number of the page"
+          },
+          {
+            "in": "query",
+            "name": "size",
+            "type": "integer",
+            "default": 50,
+            "minimum": 1,
+            "description": "Count of entities in the set"
+          },
+          {
+            "in": "query",
+            "name": "sort",
+            "type": "string",
+            "default": "updatedAt",
+            "description": "Property for sorting"
+          },
+          {
+            "in": "query",
+            "name": "direction",
+            "default": "DESC",
+            "type": "string",
+            "enum": [
+              "ASC",
+              "DESC"
+            ],
+            "description": "Sorting direction"
+          }
+        ],
+        "tags": [
+          "OrderController"
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "$ref": "#/definitions/OrdersList"
+            },
+            "description": "Success"
+          },
+          "400": {
+            "schema": {
+              "$ref": "#/definitions/Error"
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "schema": {
+              "$ref": "#/definitions/UnauthorizedError"
+            },
+            "description": "User Unauthorized"
+          },
+          "503": {
+            "schema": {
+              "$ref": "#/definitions/ServiceUnavailableError"
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "x-code-samples": [
+          {
+            "lang": "TypeScript",
+            "source": "import * as crypto from 'crypto';\nimport axios, { AxiosRequestConfig } from 'axios';\n\nconst apiKey = '<Your API Public Key>';\nconst apiSecret = '<You API Private Key>';\n\nconst baseUrl = 'https://api.latoken.com';\nconst endpoint = '/pay/v1/auth/p2p/orders';\nconst method = 'GET';\n\nconst signature: string = crypto\n  .createHmac('sha256', apiSecret)\n  .update(method + endpoint)\n  .digest('hex');\n\nconst config: AxiosRequestConfig = {\n  headers: {\n    'X-LA-APIKEY': apiKey,\n    'X-LA-SIGNATURE': signature,\n  },\n};\n\naxios\n  .get(baseUrl + endpoint, config)\n  .then((result) => console.log(result.data))\n  .catch((error) => console.error(error));\n"
+          }
+        ]
+      }
+    },
+    "/auth/p2p/merchant/orders": {
+      "get": {
+        "security": [
+          {
+            "api_key": [],
+            "api_signature": []
+          }
+        ],
+        "summary": "List Merchant Orders",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "type": "integer",
+            "default": 1,
+            "minimum": 1,
+            "description": "Number of the page"
+          },
+          {
+            "in": "query",
+            "name": "size",
+            "type": "integer",
+            "default": 50,
+            "minimum": 1,
+            "description": "Count of entities in the set"
+          },
+          {
+            "in": "query",
+            "name": "sort",
+            "type": "string",
+            "default": "updatedAt",
+            "description": "Property for sorting"
+          },
+          {
+            "in": "query",
+            "name": "direction",
+            "default": "DESC",
+            "type": "string",
+            "enum": [
+              "ASC",
+              "DESC"
+            ],
+            "description": "Sorting direction"
+          },
+          {
+            "in": "query",
+            "name": "type",
+            "default": "ORDER_TYPE_UNSPECIFIED",
+            "type": "string",
+            "enum": [
+              "ORDER_TYPE_UNSPECIFIED",
+              "ORDER_TYPE_SELL",
+              "ORDER_TYPE_BUY"
+            ],
+            "description": "Type of order"
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "default": "ORDER_STATUS_UNSPECIFIED",
+            "type": "string",
+            "enum": [
+              "ORDER_STATUS_UNSPECIFIED",
+              "ORDER_STATUS_CREATED",
+              "ORDER_STATUS_CANCELED",
+              "ORDER_STATUS_PAID",
+              "ORDER_STATUS_APPEAL",
+              "ORDER_STATUS_COMPLETED"
+            ],
+            "description": "Status of order"
+          },
+          {
+            "in": "query",
+            "name": "order",
+            "type": "string",
+            "default": "",
+            "description": "Search by order's id"
+          }
+        ],
+        "tags": [
+          "OrderController"
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "$ref": "#/definitions/OrdersList"
+            },
+            "description": "Success"
+          },
+          "400": {
+            "schema": {
+              "$ref": "#/definitions/Error"
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "schema": {
+              "$ref": "#/definitions/UnauthorizedError"
+            },
+            "description": "User Unauthorized"
+          },
+          "503": {
+            "schema": {
+              "$ref": "#/definitions/ServiceUnavailableError"
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "x-code-samples": [
+          {
+            "lang": "TypeScript",
+            "source": "import * as crypto from 'crypto';\nimport axios, { AxiosRequestConfig } from 'axios';\n\nconst apiKey = '<Your API Public Key>';\nconst apiSecret = '<You API Private Key>';\n\nconst baseUrl = 'https://api.latoken.com';\nconst endpoint = '/pay/v1/auth/p2p/merchant/orders';\nconst method = 'GET';\nconst query = 'status=ORDER_STATUS_CREATED';\n\nconst signature: string = crypto\n  .createHmac('sha256', apiSecret)\n  .update(method + endpoint + query)\n  .digest('hex');\n\nconst config: AxiosRequestConfig = {\n  headers: {\n    'X-LA-APIKEY': apiKey,\n    'X-LA-SIGNATURE': signature,\n  },\n};\n\naxios\n  .get(baseUrl + endpoint + '?' + query, config)\n  .then((result) => console.log(result.data))\n  .catch((error) => console.error(error));\n"
+          }
+        ]
+      }
+    },
+    "/auth/p2p/order/confirm": {
+      "post": {
+        "security": [
+          {
+            "api_key": [],
+            "api_signature": []
+          }
+        ],
+        "summary": "Confirm Order",
+        "tags": [
+          "OrderController"
+        ],
+        "parameters": [
+          {
+            "name": "Request",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/ConfirmOrderRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "$ref": "#/definitions/Order"
+            },
+            "description": "Success"
+          },
+          "400": {
+            "schema": {
+              "$ref": "#/definitions/Error"
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "schema": {
+              "$ref": "#/definitions/UnauthorizedError"
+            },
+            "description": "User Unauthorized"
+          },
+          "503": {
+            "schema": {
+              "$ref": "#/definitions/ServiceUnavailableError"
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "x-code-samples": [
+          {
+            "lang": "TypeScript",
+            "source": "import * as crypto from 'crypto';\nimport axios, { AxiosRequestConfig } from 'axios';\n\nconst apiKey = '<Your API Public Key>';\nconst apiSecret = '<You API Private Key>';\n\nconst baseUrl = 'https://api.latoken.com';\nconst endpoint = '/pay/v1/auth/p2p/order/confirm';\nconst method = 'POST';\n\nconst signature: string = crypto\n  .createHmac('sha256', apiSecret)\n  .update(method + endpoint)\n  .digest('hex');\n\nconst config: AxiosRequestConfig = {\n  headers: {\n    'X-LA-APIKEY': apiKey,\n    'X-LA-SIGNATURE': signature,\n  },\n};\n\nconst params = {\n  order: '53e8911a-caf6-4fb6-92dd-ced31b0eaf90',\n};\n\naxios\n  .post(baseUrl + endpoint, params, config)\n  .then((result) => console.log(result.data))\n  .catch((error) => console.error(error));\n"
+          }
+        ]
+      }
+    },
+    "/auth/p2p/order/complete": {
+      "post": {
+        "security": [
+          {
+            "api_key": [],
+            "api_signature": []
+          }
+        ],
+        "summary": "Complete Order",
+        "tags": [
+          "OrderController"
+        ],
+        "parameters": [
+          {
+            "name": "Request",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/CompleteOrderRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "$ref": "#/definitions/Order"
+            },
+            "description": "Success"
+          },
+          "400": {
+            "schema": {
+              "$ref": "#/definitions/Error"
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "schema": {
+              "$ref": "#/definitions/UnauthorizedError"
+            },
+            "description": "User Unauthorized"
+          },
+          "503": {
+            "schema": {
+              "$ref": "#/definitions/ServiceUnavailableError"
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "x-code-samples": [
+          {
+            "lang": "TypeScript",
+            "source": "import * as crypto from 'crypto';\nimport axios, { AxiosRequestConfig } from 'axios';\n\nconst apiKey = '<Your API Public Key>';\nconst apiSecret = '<You API Private Key>';\n\nconst baseUrl = 'https://api.latoken.com';\nconst endpoint = '/pay/v1/auth/p2p/order/complete';\nconst method = 'POST';\n\nconst signature: string = crypto\n  .createHmac('sha256', apiSecret)\n  .update(method + endpoint)\n  .digest('hex');\n\nconst config: AxiosRequestConfig = {\n  headers: {\n    'X-LA-APIKEY': apiKey,\n    'X-LA-SIGNATURE': signature,\n  },\n};\n\nconst params = {\n  order: '53e8911a-caf6-4fb6-92dd-ced31b0eaf90',\n};\n\naxios\n  .post(baseUrl + endpoint, params, config)\n  .then((result) => console.log(result.data))\n  .catch((error) => console.error(error));\n"
+          }
+        ]
+      }
+    },
+    "/auth/p2p/order/cancel": {
+      "post": {
+        "security": [
+          {
+            "api_key": [],
+            "api_signature": []
+          }
+        ],
+        "summary": "Cancel Order",
+        "tags": [
+          "OrderController"
+        ],
+        "parameters": [
+          {
+            "name": "Request",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/CancelOrderRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "$ref": "#/definitions/Order"
+            },
+            "description": "Success"
+          },
+          "400": {
+            "schema": {
+              "$ref": "#/definitions/Error"
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "schema": {
+              "$ref": "#/definitions/UnauthorizedError"
+            },
+            "description": "User Unauthorized"
+          },
+          "503": {
+            "schema": {
+              "$ref": "#/definitions/ServiceUnavailableError"
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "x-code-samples": [
+          {
+            "lang": "TypeScript",
+            "source": "import * as crypto from 'crypto';\nimport axios, { AxiosRequestConfig } from 'axios';\n\nconst apiKey = '<Your API Public Key>';\nconst apiSecret = '<You API Private Key>';\n\nconst baseUrl = 'https://api.latoken.com';\nconst endpoint = '/pay/v1/auth/p2p/order/cancel';\nconst method = 'POST';\n\nconst signature: string = crypto\n  .createHmac('sha256', apiSecret)\n  .update(method + endpoint)\n  .digest('hex');\n\nconst config: AxiosRequestConfig = {\n  headers: {\n    'X-LA-APIKEY': apiKey,\n    'X-LA-SIGNATURE': signature,\n  },\n};\n\nconst params = {\n  order: '53e8911a-caf6-4fb6-92dd-ced31b0eaf90',\n};\n\naxios\n  .post(baseUrl + endpoint, params, config)\n  .then((result) => console.log(result.data))\n  .catch((error) => console.error(error));\n"
+          }
+        ]
+      }
+    },
+    "/auth/p2p/order/appeal": {
+      "post": {
+        "security": [
+          {
+            "api_key": [],
+            "api_signature": []
+          }
+        ],
+        "summary": "Create Appeal",
+        "tags": [
+          "AppealController"
+        ],
+        "parameters": [
+          {
+            "name": "Request",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/CreateAppealRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "$ref": "#/definitions/Appeal"
+            },
+            "description": "Success"
+          },
+          "400": {
+            "schema": {
+              "$ref": "#/definitions/Error"
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "schema": {
+              "$ref": "#/definitions/UnauthorizedError"
+            },
+            "description": "User Unauthorized"
+          },
+          "503": {
+            "schema": {
+              "$ref": "#/definitions/ServiceUnavailableError"
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "x-code-samples": [
+          {
+            "lang": "TypeScript",
+            "source": "import * as crypto from 'crypto';\nimport axios, { AxiosRequestConfig } from 'axios';\n\nconst apiKey = '<Your API Public Key>';\nconst apiSecret = '<You API Private Key>';\n\nconst baseUrl = 'https://api.latoken.com';\nconst endpoint = '/pay/v1/auth/p2p/order/appeal';\nconst method = 'POST';\n\nconst signature: string = crypto\n  .createHmac('sha256', apiSecret)\n  .update(method + endpoint)\n  .digest('hex');\n\nconst config: AxiosRequestConfig = {\n  headers: {\n    'X-LA-APIKEY': apiKey,\n    'X-LA-SIGNATURE': signature,\n  },\n};\n\nconst params = {\n  order: '53e8911a-caf6-4fb6-92dd-ced31b0eaf90',\n  reason: 'Did not receive funds',\n  description: 'Sent fiat, but merchant did not complete order',\n  proof: ['https://url.to.your/proof'],\n};\n\naxios\n  .post(baseUrl + endpoint, params, config)\n  .then((result) => console.log(result.data))\n  .catch((error) => console.error(error));\n"
+          }
+        ]
+      }
+    },
+    "/auth/p2p/order/appeal/cancel": {
+      "post": {
+        "security": [
+          {
+            "api_key": [],
+            "api_signature": []
+          }
+        ],
+        "summary": "Cancel Appeal",
+        "tags": [
+          "AppealController"
+        ],
+        "parameters": [
+          {
+            "name": "Request",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/CancelAppealRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "$ref": "#/definitions/Appeal"
+            },
+            "description": "Success"
+          },
+          "400": {
+            "schema": {
+              "$ref": "#/definitions/Error"
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "schema": {
+              "$ref": "#/definitions/UnauthorizedError"
+            },
+            "description": "User Unauthorized"
+          },
+          "503": {
+            "schema": {
+              "$ref": "#/definitions/ServiceUnavailableError"
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "x-code-samples": [
+          {
+            "lang": "TypeScript",
+            "source": "import * as crypto from 'crypto';\nimport axios, { AxiosRequestConfig } from 'axios';\n\nconst apiKey = '<Your API Public Key>';\nconst apiSecret = '<You API Private Key>';\n\nconst baseUrl = 'https://api.latoken.com';\nconst endpoint = '/pay/v1/auth/p2p/order/appeal/cancel';\nconst method = 'POST';\n\nconst signature: string = crypto\n  .createHmac('sha256', apiSecret)\n  .update(method + endpoint)\n  .digest('hex');\n\nconst config: AxiosRequestConfig = {\n  headers: {\n    'X-LA-APIKEY': apiKey,\n    'X-LA-SIGNATURE': signature,\n  },\n};\n\nconst params = {\n  order: '53e8911a-caf6-4fb6-92dd-ced31b0eaf90',\n};\n\naxios\n  .post(baseUrl + endpoint, params, config)\n  .then((result) => console.log(result.data))\n  .catch((error) => console.error(error));\n"
+          }
+        ]
+      }
+    },
+    "/auth/p2p/order/chat/{id}": {
+      "post": {
+        "security": [
+          {
+            "api_key": [],
+            "api_signature": []
+          }
+        ],
+        "summary": "Send Message",
+        "tags": [
+          "ChatController"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "ID of the order"
+          },
+          {
+            "name": "Request",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/SendMessageRequest"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "schema": {
+              "$ref": "#/definitions/Error"
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "schema": {
+              "$ref": "#/definitions/UnauthorizedError"
+            },
+            "description": "User Unauthorized"
+          },
+          "503": {
+            "schema": {
+              "$ref": "#/definitions/ServiceUnavailableError"
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "x-code-samples": [
+          {
+            "lang": "TypeScript",
+            "source": "import * as crypto from 'crypto';\nimport axios, { AxiosRequestConfig } from 'axios';\n\nconst apiKey = '<Your API Public Key>';\nconst apiSecret = '<You API Private Key>';\n\nconst baseUrl = 'https://api.latoken.com';\nconst endpoint = '/pay/v1/auth/p2p/order/chat/<Order ID>';\nconst method = 'POST';\n\nconst signature: string = crypto\n  .createHmac('sha256', apiSecret)\n  .update(method + endpoint)\n  .digest('hex');\n\nconst config: AxiosRequestConfig = {\n  headers: {\n    'X-LA-APIKEY': apiKey,\n    'X-LA-SIGNATURE': signature,\n  },\n};\n\nconst params = {\n  message: 'Some message...',\n};\n\naxios\n  .get(baseUrl + endpoint, params, config)\n  .then((result) => console.log(result.data))\n  .catch((error) => console.error(error));\n"
+          }
+        ]
+      }
+    }
+  }
+}

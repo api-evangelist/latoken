@@ -1,0 +1,38 @@
+generated: '2026-10-13'
+method: derived
+generator: derive-problem-types.py
+source:
+- openapi/latoken-openapi.yml
+- openapi/latoken-p2p-openapi.yml
+format: custom
+envelope:
+  media_type: null
+  schema: Error
+coverage:
+  operations: 80
+  statuses_declared: 4
+problems:
+- status: 400
+  title: Bad Request
+  description: Bad Request
+  operations: 44
+  media_types: []
+  schema: Error
+- status: 401
+  title: Unauthorized
+  description: User Unauthorized
+  operations: 21
+  media_types: []
+  schema: UnauthorizedError
+- status: 404
+  title: Not Found
+  description: if there is no such withdrawal
+  operations: 10
+  media_types: []
+  schema: json_GetOrderErrorReply
+- status: 503
+  title: Service Unavailable
+  description: Service Unavailable
+  operations: 24
+  media_types: []
+  schema: ServiceUnavailableError

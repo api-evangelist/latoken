@@ -1,0 +1,215 @@
+generated: '2026-10-13'
+method: derived
+generator: derive-mcp-candidate.py
+source:
+- openapi/latoken-openapi.yml
+- openapi/latoken-p2p-openapi.yml
+status: candidate
+deployment:
+  mode: none
+  auth: unknown
+  verified: probed
+note: No MCP server was found. The pre-flight posted tools/list to /mcp on latoken.com, api.latoken.com, go.latoken.com; verdict absent. Candidate
+  tools below are derived from the 79 operation(s) in the provider's own OpenAPI (40 listed); they describe what a server WOULD expose, not one
+  that exists.
+tools:
+- name: get_balances_by_user
+  operationId: getBalancesByUser
+  method: GET
+  path: /v2/auth/account
+  description: Get balances
+- name: get_p2p_offers
+  operationId: GET /p2p/offers
+  method: GET
+  path: /p2p/offers
+  description: List Public Offers
+- name: get_balances_by_currency
+  operationId: getBalancesByCurrency
+  method: GET
+  path: /v2/auth/account/currency/{currency}/{type}
+  description: Get balances by currency
+- name: get_p2p_config
+  operationId: GET /p2p/config
+  method: GET
+  path: /p2p/config
+  description: Get Config
+- name: get_balances_by_user_currencies_and_types
+  operationId: getBalancesByUserCurrenciesAndTypes
+  method: GET
+  path: /v2/auth/account/filtered
+  description: Get balances of current user, filtered by currencies and account types
+- name: get_offers_rates
+  operationId: GET /p2p/offers/rates
+  method: GET
+  path: /p2p/offers/rates
+  description: Get Rates
+- name: get_my_orders
+  operationId: getMyOrders
+  method: GET
+  path: /v2/auth/order
+  description: Get all my orders
+- name: create_user_register
+  operationId: POST /auth/p2p/user/register
+  method: POST
+  path: /auth/p2p/user/register
+  description: Register and Accept Agreement
+- name: cancel_order
+  operationId: cancelOrder
+  method: POST
+  path: /v2/auth/order/cancel
+  description: Cancel one order by id
+- name: get_p2p_user
+  operationId: GET /auth/p2p/user
+  method: GET
+  path: /auth/p2p/user
+  description: Get your User
+- name: cancel_all_orders
+  operationId: cancelAllOrders
+  method: POST
+  path: /v2/auth/order/cancelAll
+  description: Cancel all orders
+- name: create_p2p_paymentmethods
+  operationId: POST /auth/p2p/paymentMethods
+  method: POST
+  path: /auth/p2p/paymentMethods
+  description: Create new Payment Method
+- name: cancel_all_orders_by_pair
+  operationId: cancelAllOrdersByPair
+  method: POST
+  path: /v2/auth/order/cancelAll/{currency}/{quote}
+  description: Cancel all orders in specified pair
+- name: get_p2p_paymentmethods
+  operationId: GET /auth/p2p/paymentMethods
+  method: GET
+  path: /auth/p2p/paymentMethods
+  description: List Payment Methods
+- name: get_order_by_id
+  operationId: getOrderById
+  method: GET
+  path: /v2/auth/order/getOrder/{id}
+  description: Get an order by id
+- name: create_paymentmethods_update
+  operationId: POST /auth/p2p/paymentMethods/update
+  method: POST
+  path: /auth/p2p/paymentMethods/update
+  description: Update Payment Method
+- name: get_my_orders_by_pair
+  operationId: getMyOrdersByPair
+  method: GET
+  path: /v2/auth/order/pair/{currency}/{quote}
+  description: Get all my orders on traded pair
+- name: create_paymentmethods_remove
+  operationId: POST /auth/p2p/paymentMethods/remove
+  method: POST
+  path: /auth/p2p/paymentMethods/remove
+  description: Remove Payment Method
+- name: get_my_active_orders_by_pair
+  operationId: getMyActiveOrdersByPair
+  method: GET
+  path: /v2/auth/order/pair/{currency}/{quote}/active
+  description: Get my active orders on traded pair
+- name: create_p2p_offer
+  operationId: POST /auth/p2p/offer
+  method: POST
+  path: /auth/p2p/offer
+  description: Create new Offer
+- name: get_my_active_orders
+  operationId: getMyActiveOrders
+  method: GET
+  path: /v2/auth/order/active
+  description: Get all my active orders
+- name: get_merchant_offers
+  operationId: GET /auth/p2p/merchant/offers
+  method: GET
+  path: /auth/p2p/merchant/offers
+  description: List Merchant Offers
+- name: place_order
+  operationId: placeOrder
+  method: POST
+  path: /v2/auth/order/place
+  description: Placing a new order
+- name: create_offer_update
+  operationId: POST /auth/p2p/offer/update
+  method: POST
+  path: /auth/p2p/offer/update
+  description: Update Offer
+- name: deposit_spot_account
+  operationId: depositSpotAccount
+  method: POST
+  path: /v2/auth/spot/deposit
+  description: Deposit spot account
+- name: create_offer_delete
+  operationId: POST /auth/p2p/offer/delete
+  method: POST
+  path: /auth/p2p/offer/delete
+  description: Delete Offer
+- name: withdraw_spot_account
+  operationId: withdrawSpotAccount
+  method: POST
+  path: /v2/auth/spot/withdraw
+  description: Withdraw spot account
+- name: create_p2p_order
+  operationId: POST /auth/p2p/order
+  method: POST
+  path: /auth/p2p/order
+  description: Create Order
+- name: get_trades_by_trader
+  operationId: getTradesByTrader
+  method: GET
+  path: /v2/auth/trade
+  description: Get trades
+- name: get_p2p_order
+  operationId: GET /auth/p2p/order/{id}
+  method: GET
+  path: /auth/p2p/order/{id}
+  description: Get Order by Id
+- name: get_trades_by_asset_and_trader
+  operationId: getTradesByAssetAndTrader
+  method: GET
+  path: /v2/auth/trade/pair/{currency}/{quote}
+  description: Get trades by pair
+- name: get_p2p_orders
+  operationId: GET /auth/p2p/orders
+  method: GET
+  path: /auth/p2p/orders
+  description: List User Orders
+- name: get_auth_fee_by_pair
+  operationId: getAuthFeeByPair
+  method: GET
+  path: /v2/auth/trade/fee/{currency}/{quote}
+  description: Get fee scheme for given pair and user
+- name: get_merchant_orders
+  operationId: GET /auth/p2p/merchant/orders
+  method: GET
+  path: /auth/p2p/merchant/orders
+  description: List Merchant Orders
+- name: get_user_transactions
+  operationId: getUserTransactions
+  method: GET
+  path: /v2/auth/transaction
+  description: Request deposits and withdrawals
+- name: create_order_confirm
+  operationId: POST /auth/p2p/order/confirm
+  method: POST
+  path: /auth/p2p/order/confirm
+  description: Confirm Order
+- name: get_currencies_bindings
+  operationId: getCurrenciesBindings
+  method: GET
+  path: /v2/auth/transaction/bindings
+  description: Request all currencies that have active bindings
+- name: create_order_complete
+  operationId: POST /auth/p2p/order/complete
+  method: POST
+  path: /auth/p2p/order/complete
+  description: Complete Order
+- name: get_currency_bindings
+  operationId: getCurrencyBindings
+  method: GET
+  path: /v2/auth/transaction/bindings/{currency}
+  description: Request bindings for specific currency
+- name: create_order_cancel
+  operationId: POST /auth/p2p/order/cancel
+  method: POST
+  path: /auth/p2p/order/cancel
+  description: Cancel Order

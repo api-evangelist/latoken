@@ -1,23 +1,138 @@
 aid: latoken
+
 name: LATOKEN
-description: 'LATOKEN is a company surfaced via the API Evangelist harvest backlog (source: market-gap:crypto-exchanges)
-  and added to the network as a stub for full-pipeline profiling.'
+
+description: LATOKEN is a centralized cryptocurrency exchange (latoken.com) offering spot trading, a P2P marketplace and token listings. It publishes a public REST API v2 (market data, accounts, orders, stop and bulk orders, transfers, transactions and withdrawals signed with HMAC headers), a P2P API v1 and a STOMP WebSocket API, each documented with Redoc from a Swagger 2.0 contract at api.latoken.com/doc/, plus first-party Python, C# and Java clients.
+
+image: https://latoken.com/images/latoken_sign_link@1191x669.png
+
 url: https://raw.githubusercontent.com/api-evangelist/latoken/refs/heads/main/apis.yml
+
 x-type: company
+
 x-source: harvest:market-gap:crypto-exchanges
-x-tier: stub
-x-tier-reason: harvest
+
+x-tier: profiled
+
+x-tier-reason: enrichment pass 2026-10-13 (local-v5; was harvest)
+
 specificationVersion: '0.20'
+
 created: '2026-10-13'
+
 modified: '2026-10-13'
+
 tags:
 - Company
-apis: []
+- Cryptocurrency
+- Exchanges
+- Trading
+- Market Data
+- P2P
+- WebSockets
+
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
 - FN: APIs.json
   email: info@apis.io
+
 common:
+- type: Security
+  url: https://hackenproof.com/latoken/latoken-exchange
+- type: VulnerabilityDisclosure
+  url: security/latoken-vulnerability-disclosure.yml
+- type: AgenticAccess
+  url: agentic-access/latoken-agentic-access.yml
+- type: Spectral
+  url: rules/latoken-rules.yml
+- type: Vocabulary
+  url: vocabulary/latoken-vocabulary.yml
+- type: DataModel
+  url: data-model/latoken-data-model.yml
+- type: ErrorCatalog
+  url: errors/latoken-error-codes.yml
+- type: ErrorCatalog
+  url: errors/latoken-problem-types.yml
+- type: Conformance
+  url: conformance/latoken-conformance.yml
+- type: Hosts
+  url: hosts/latoken-hosts.yml
+- type: Vendors
+  url: vendors/latoken-vendors.yml
+- type: SDKs
+  url: packages/latoken-packages.yml
+- type: Packages
+  url: packages/latoken-packages.yml
+- type: Authentication
+  url: authentication/latoken-authentication.yml
+- type: DomainSecurity
+  url: security/latoken-domain-security.yml
 - type: Website
   url: https://latoken.com
+- type: Documentation
+  url: https://api.latoken.com/doc/v2/
+- type: APIReference
+  url: https://api.latoken.com/doc/v2/
+- type: Blog
+  url: https://latoken.com/blog
+- type: PrivacyPolicy
+  url: https://latoken.com/privacy-policy
+- type: Support
+  url: https://latoken.zendesk.com/hc/en-us
+- type: GitHubOrganization
+  url: https://github.com/LATOKEN
+- type: Pricing
+  url: https://latoken.com/fees
+
+apis:
+- aid: latoken:latoken-api-v2
+  name: LATOKEN Public API V2
+  description: REST API for the LATOKEN exchange - public market data (currencies, pairs, tickers, order books, trades, candles, time) and signed endpoints (paths under /auth/) for accounts, spot, stop and bulk orders, trades, transfers, transactions and withdrawals. Signed requests carry X-LA-APIKEY and an HMAC X-LA-SIGNATURE.
+  humanURL: https://api.latoken.com/doc/v2/
+  baseURL: https://api.latoken.com/v2
+  tags:
+  - Cryptocurrency
+  - Exchanges
+  - Trading
+  - Market Data
+  properties:
+  - type: OpenAPI
+    url: openapi/latoken-openapi.yml
+  - type: OpenAPI
+    name: OpenAPI (provider-hosted)
+    url: https://api.latoken.com/doc/v2/swagger.json
+  - type: Documentation
+    url: https://api.latoken.com/doc/v2/
+- aid: latoken:latoken-p2p-api
+  name: LATOKEN P2P API
+  description: LATOKEN P2P API v1 (base path /pay/v1) for the exchange's peer-to-peer marketplace, signed with the same X-LA-APIKEY / X-LA-SIGNATURE headers as the REST API.
+  humanURL: https://api.latoken.com/doc/p2p/
+  baseURL: https://api.latoken.com/pay/v1
+  tags:
+  - Cryptocurrency
+  - P2P
+  properties:
+  - type: OpenAPI
+    url: openapi/latoken-p2p-openapi.yml
+  - type: OpenAPI
+    name: OpenAPI (provider-hosted)
+    url: https://api.latoken.com/doc/p2p/swagger.json
+  - type: Documentation
+    url: https://api.latoken.com/doc/p2p/
+- aid: latoken:latoken-websocket-api
+  name: LATOKEN Public WebSocket API
+  description: STOMP-over-WebSocket API at wss://api.latoken.com/stomp with public market-data and private account topics. Documented in prose only; the provider's Swagger file for it carries no paths, and no AsyncAPI is published.
+  humanURL: https://api.latoken.com/doc/ws/
+  baseURL: wss://api.latoken.com/stomp
+  tags:
+  - WebSockets
+  - Market Data
+  properties:
+  - type: Documentation
+    url: https://api.latoken.com/doc/ws/
+x-enrichment:
+  date: '2026-10-13'
+  status: enriched
+  artifacts_added: 14
+  pass: local-v5

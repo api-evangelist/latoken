@@ -1,0 +1,23 @@
+generated: '2026-10-13'
+method: derived
+source: openapi/latoken-openapi.yml, openapi/latoken-p2p-openapi.yml
+summary:
+  types:
+  - apiKey
+  api_key_in:
+  - header
+schemes:
+- name: api_key
+  type: apiKey
+  in: header
+  parameter: X-LA-APIKEY
+  sources:
+  - openapi/latoken-openapi.yml
+  - openapi/latoken-p2p-openapi.yml
+- name: api_signature
+  type: apiKey
+  in: header
+  parameter: X-LA-SIGNATURE
+  sources:
+  - openapi/latoken-openapi.yml
+  - openapi/latoken-p2p-openapi.yml

@@ -1,0 +1,382 @@
+generated: '2026-10-13'
+method: derived
+generator: derive-data-model.py
+source:
+- openapi/latoken-openapi.yml
+- openapi/latoken-p2p-openapi.yml
+notation: has_one = property $ref; has_many = array of $ref; belongs_to = <entity>_id field
+summary:
+  entities: 108
+  entities_in_spec: 108
+  relationships: 28
+entities:
+- name: Appeal
+  fields: 8
+  description: Appeal Entity
+- name: CancelAppealRequest
+  fields: 1
+  description: CancelAppealRequest Entity
+- name: CancelOrderRequest
+  fields: 1
+  description: CancelOrderRequest Entity
+- name: CompleteOrderRequest
+  fields: 1
+  description: CompleteOrderRequest Entity
+- name: Config
+  fields: 0
+  description: Config Entity
+- name: ConfirmOrderRequest
+  fields: 1
+  description: ConfirmOrderRequest Entity
+- name: CreateAppealRequest
+  fields: 4
+  description: CreateAppealRequest Entity
+- name: CreateOfferRequest
+  fields: 10
+  description: CreateOfferRequest Entity
+- name: CreateOrderRequest
+  fields: 4
+  description: CreateOrderRequest Entity
+- name: CreatePaymentMethodRequest
+  fields: 4
+  description: CreatePaymentMethodRequest Entity
+- name: Error
+  fields: 3
+  description: Error Entity
+- name: Offer
+  fields: 15
+  description: Offer Entity
+- name: OffersList
+  fields: 4
+- name: Order
+  fields: 11
+  description: Order Entity
+- name: OrdersList
+  fields: 4
+- name: PaymentMethodPrivate
+  fields: 7
+  description: Payment Method Private Entity
+- name: PaymentMethodPublic
+  fields: 4
+  description: Payment Method Public Entity
+- name: Rates
+  fields: 0
+  description: Rates Entity
+- name: RemoveOfferRequest
+  fields: 1
+  description: RemoveOfferRequest Entity
+- name: RemovePaymentMethodRequest
+  fields: 1
+  description: RemovePaymentMethodRequest Entity
+- name: SendMessageRequest
+  fields: 1
+  description: SendMessageRequest Entity
+- name: ServiceUnavailableError
+  fields: 3
+  description: Service Unavailable Error Entity
+- name: UnauthorizedError
+  fields: 4
+  description: Unauthorized Error Entity
+- name: UpdateOfferRequest
+  fields: 6
+  description: UpdateOfferRequest Entity
+- name: UpdatePaymentMethodRequest
+  fields: 5
+  description: UpdatePaymentMethodRequest Entity
+- name: UserPrivate
+  fields: 7
+  description: User Private Entity
+- name: UserPublic
+  fields: 2
+  description: User Public Entity
+- name: json_400Reply
+  fields: 0
+  description: Base reply 400 for all methods
+- name: json_AllTradesAdapter
+  fields: 6
+- name: json_ApiKeyAdapter
+  fields: 8
+- name: json_BalanceAdapter
+  fields: 7
+- name: json_BindingAdapter
+  fields: 3
+- name: json_BindingAdapter_Transaction
+  fields: 17
+- name: json_BookAdapter
+  fields: 4
+- name: json_CancelAllOrdersReply
+  fields: 0
+  description: Base reply for all methods
+- name: json_CancelAllStopOrdersReply
+  fields: 0
+  description: Base reply for all methods
+- name: json_CancelBulkOrderReply
+  fields: 2
+  description: Base reply for all methods
+- name: json_CancelBulkOrderRequest
+  fields: 1
+- name: json_CancelOrderReply
+  fields: 0
+  description: Base reply for all methods
+- name: json_CancelOrderRequest
+  fields: 1
+- name: json_CancelStopOrderReply
+  fields: 0
+  description: Base reply for all methods
+- name: json_CancelStopOrderRequest
+  fields: 1
+- name: json_CancelWithdrawalRequest
+  fields: 1
+- name: json_CaptchaRequest
+  fields: 1
+- name: json_Charts
+  fields: 0
+- name: json_ConfirmWithdrawalRequest
+  fields: 2
+- name: json_CreateBulkOrderErrorReply
+  fields: 0
+  description: Base reply for all methods
+- name: json_CreateBulkOrderReply
+  fields: 2
+  description: bulk order response
+- name: json_CreateBulkOrderRequest
+  fields: 1
+- name: json_CreateOrderErrorReply
+  fields: 0
+  description: Base reply for all methods
+- name: json_CreateOrderReply
+  fields: 3
+  description: Base reply for all methods
+- name: json_CreateOrderRequest
+  fields: 8
+- name: json_CreateStopOrderReply
+  fields: 0
+  description: Base reply for all methods
+- name: json_CreateStopOrderRequest
+  fields: 8
+- name: json_CrowdsaleAdapter
+  fields: 15
+- name: json_CurrencyAdapter
+  fields: 12
+- name: json_CurrencyProviderAdapter
+  fields: 6
+- name: json_CurrentTimeReply
+  fields: 1
+- name: json_DealAdapter
+  fields: 11
+- name: json_DepositAccountAdapter
+  fields: 2
+- name: json_DepositAddressReply
+  fields: 0
+  description: Base reply for all methods
+- name: json_DepositAddressRequest
+  fields: 1
+- name: json_DepositOrWithdrawSpotAccountRequest
+  fields: 2
+- name: json_FeeAdapter
+  fields: 4
+- name: json_FeeLevelsAdapter
+  fields: 3
+- name: json_GetOrderErrorReply
+  fields: 0
+- name: json_GrantApiKeyReply
+  fields: 0
+  description: Base reply for all methods
+- name: json_GrantApiKeyRequest
+  fields: 0
+- name: json_OrderAdapter
+  fields: 16
+- name: json_OrderBidsOrAsksAdapterInner
+  fields: 2
+- name: json_OverviewTickerAdapter
+  fields: 5
+- name: json_PageAdapterOfCrowdsaleAdapter
+  fields: 6
+- name: json_PageAdapterOfCurrencyProviderAdapter
+  fields: 6
+- name: json_PageAdapterOfDealAdapter
+  fields: 6
+- name: json_PageAdapterOfPaymentProviderAdapter
+  fields: 6
+- name: json_PageAdapterOfTransactionAdapter
+  fields: 5
+- name: json_PageAdapterOfTransferAdapter
+  fields: 6
+- name: json_PageOfCrowdsaleAdapter
+  fields: 2
+- name: json_PageOfCurrencyProviderAdapter
+  fields: 2
+- name: json_PageOfDealAdapter
+  fields: 2
+- name: json_PageOfOrderAdapter
+  fields: 2
+- name: json_PageOfPaymentProviderAdapter
+  fields: 2
+- name: json_PageOfTradeAdapter
+  fields: 2
+- name: json_PageOfTransactionAdapter
+  fields: 2
+- name: json_PageOfTransferAdapter
+  fields: 2
+- name: json_PairAdapter
+  fields: 14
+- name: json_PaymentProviderAdapter
+  fields: 9
+- name: json_PossibleBindingEntity
+  fields: 2
+- name: json_PostDealReply
+  fields: 0
+  description: Base reply for all methods
+- name: json_PostDealRequest
+  fields: 3
+- name: json_PriceLevel
+  fields: 4
+- name: json_ReplyBase
+  fields: 4
+  description: Base reply for all methods
+- name: json_ReplyErrorBase
+  fields: 5
+- name: json_ResendVerificationCodeRequest
+  fields: 1
+- name: json_RevokeApiKeyReply
+  fields: 0
+  description: Base reply for all methods
+- name: json_RevokeApiKeyRequest
+  fields: 0
+- name: json_RoundAdapter
+  fields: 16
+- name: json_StopOrderAdapter
+  fields: 14
+- name: json_TickerAdapter
+  fields: 16
+- name: json_TradeAdapter
+  fields: 12
+- name: json_TransactionAdapter
+  fields: 15
+- name: json_TransferAdapter
+  fields: 18
+- name: json_TransferByEmailRequest
+  fields: 4
+- name: json_TransferByIdRequest
+  fields: 4
+- name: json_TransferByPhoneRequest
+  fields: 4
+- name: json_WeekCharts
+  fields: 2
+- name: json_WithdrawalReceiptAdapter
+  fields: 3
+- name: json_WithdrawalRequest
+  fields: 5
+relationships:
+- from: json_BookAdapter
+  to: json_PriceLevel
+  type: has_many
+  via: ask
+- from: json_BookAdapter
+  to: json_PriceLevel
+  type: has_many
+  via: bid
+- from: json_CancelBulkOrderRequest
+  to: json_CancelOrderRequest
+  type: has_many
+  via: orders
+- from: json_CreateBulkOrderRequest
+  to: json_CreateOrderRequest
+  type: has_many
+  via: orders
+- from: json_CrowdsaleAdapter
+  to: json_RoundAdapter
+  type: has_many
+  via: rounds
+- from: json_DepositAddressReply
+  to: json_DepositAccountAdapter
+  type: has_one
+  via: depositAccount
+- from: json_GrantApiKeyReply
+  to: json_ApiKeyAdapter
+  type: has_one
+  via: apiKey
+- from: json_PageAdapterOfCrowdsaleAdapter
+  to: json_PageOfCrowdsaleAdapter
+  type: has_one
+  via: page
+- from: json_PageAdapterOfCrowdsaleAdapter
+  to: json_CrowdsaleAdapter
+  type: has_many
+  via: content
+- from: json_PageAdapterOfCurrencyProviderAdapter
+  to: json_CurrencyProviderAdapter
+  type: has_many
+  via: content
+- from: json_PageAdapterOfCurrencyProviderAdapter
+  to: json_PageOfCurrencyProviderAdapter
+  type: has_one
+  via: page
+- from: json_PageAdapterOfDealAdapter
+  to: json_PageOfDealAdapter
+  type: has_one
+  via: page
+- from: json_PageAdapterOfDealAdapter
+  to: json_DealAdapter
+  type: has_many
+  via: content
+- from: json_PageAdapterOfPaymentProviderAdapter
+  to: json_PaymentProviderAdapter
+  type: has_many
+  via: content
+- from: json_PageAdapterOfPaymentProviderAdapter
+  to: json_PageOfPaymentProviderAdapter
+  type: has_one
+  via: page
+- from: json_PageAdapterOfTransactionAdapter
+  to: json_TransactionAdapter
+  type: has_many
+  via: content
+- from: json_PageAdapterOfTransferAdapter
+  to: json_TransferAdapter
+  type: has_many
+  via: content
+- from: json_PageAdapterOfTransferAdapter
+  to: json_PageOfTransferAdapter
+  type: has_one
+  via: page
+- from: json_RevokeApiKeyReply
+  to: json_ApiKeyAdapter
+  type: has_one
+  via: apiKey
+- from: json_WithdrawalReceiptAdapter
+  to: json_TransactionAdapter
+  type: has_one
+  via: transaction
+- from: Offer
+  to: UserPublic
+  type: has_one
+  via: merchant
+- from: Offer
+  to: PaymentMethodPublic
+  type: has_one
+  via: method
+- from: Order
+  to: Offer
+  type: has_one
+  via: offer
+- from: Order
+  to: PaymentMethodPublic
+  type: has_one
+  via: method
+- from: Order
+  to: Appeal
+  type: has_one
+  via: appeal
+- from: Order
+  to: UserPublic
+  type: has_one
+  via: user
+- from: OffersList
+  to: Offer
+  type: has_many
+  via: content
+- from: OrdersList
+  to: Order
+  type: has_many
+  via: content

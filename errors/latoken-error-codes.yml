@@ -1,0 +1,108 @@
+generated: '2026-10-13'
+method: searched
+source: https://api.latoken.com/doc/v2/
+format: custom-json
+envelope:
+  example:
+    result: false
+    message: unable to find something somewhere
+    error: NOT_FOUND
+    status: FAILURE
+  code_field: error
+  message_field: message
+problems:
+- status: null
+  title: INTERNAL_ERROR
+  type: INTERNAL_ERROR
+  description: internal server error. You can contact our support to solve this problem.
+  remediation: internal server error. You can contact our support to solve this problem.
+- status: null
+  title: SERVICE_UNAVAILABLE
+  type: SERVICE_UNAVAILABLE
+  description: requested information currently not available. You can contact our support to solve this problem or retry later.
+  remediation: requested information currently not available. You can contact our support to solve this problem or retry later.
+- status: null
+  title: NOT_AUTHORIZED
+  type: NOT_AUTHORIZED
+  description: user's query not authorized. Check if you are logged in.
+  remediation: user's query not authorized. Check if you are logged in.
+- status: null
+  title: FORBIDDEN
+  type: FORBIDDEN
+  description: you don't have enough access rights.
+  remediation: you don't have enough access rights.
+- status: null
+  title: BAD_REQUEST
+  type: BAD_REQUEST
+  description: some bad request, for example bad fields values or something else. Read response message for more information.
+  remediation: some bad request, for example bad fields values or something else. Read response message for more information.
+- status: null
+  title: NOT_FOUND
+  type: NOT_FOUND
+  description: entity not found. Read message for more information.
+  remediation: entity not found. Read message for more information.
+- status: null
+  title: ACCESS_DENIED
+  type: ACCESS_DENIED
+  description: access is denied. Probably you don't have enough access rights, you contact our support.
+  remediation: access is denied. Probably you don't have enough access rights, you contact our support.
+- status: null
+  title: REQUEST_REJECTED
+  type: REQUEST_REJECTED
+  description: user's request rejected for some reasons. Check error message.
+  remediation: user's request rejected for some reasons. Check error message.
+- status: null
+  title: HTTP_MEDIA_TYPE_NOT_SUPPORTED
+  type: HTTP_MEDIA_TYPE_NOT_SUPPORTED
+  description: http media type not supported.
+  remediation: http media type not supported.
+- status: null
+  title: MEDIA_TYPE_NOT_ACCEPTABLE
+  type: MEDIA_TYPE_NOT_ACCEPTABLE
+  description: media type not acceptable
+  remediation: media type not acceptable
+- status: null
+  title: METHOD_ARGUMENT_NOT_VALID
+  type: METHOD_ARGUMENT_NOT_VALID
+  description: one of method argument is invalid. Check argument types and error message for more information.
+  remediation: one of method argument is invalid. Check argument types and error message for more information.
+- status: null
+  title: VALIDATION_ERROR
+  type: VALIDATION_ERROR
+  description: check `errors` field to get reasons.
+  remediation: check `errors` field to get reasons.
+- status: null
+  title: ACCOUNT_EXPIRED
+  type: ACCOUNT_EXPIRED
+  description: restore your account or create a new one.
+  remediation: restore your account or create a new one.
+- status: null
+  title: BAD_CREDENTIALS
+  type: BAD_CREDENTIALS
+  description: invalid username or password.
+  remediation: invalid username or password.
+- status: null
+  title: COOKIE_THEFT
+  type: COOKIE_THEFT
+  description: cookie has been stolen. Let's try reset your cookies.
+  remediation: cookie has been stolen. Let's try reset your cookies.
+- status: null
+  title: CREDENTIALS_EXPIRED
+  type: CREDENTIALS_EXPIRED
+  description: credentials expired.
+  remediation: credentials expired.
+- status: null
+  title: INSUFFICIENT_AUTHENTICATION
+  type: INSUFFICIENT_AUTHENTICATION
+  description: for example, 2FA required.
+  remediation: for example, 2FA required.
+- status: null
+  title: UNKNOWN_LOCATION
+  type: UNKNOWN_LOCATION
+  description: user logged from unusual location, email confirmation required.
+  remediation: user logged from unusual location, email confirmation required.
+- status: null
+  title: TOO_MANY_REQUESTS
+  type: TOO_MANY_REQUESTS
+  description: too many requests at the time. A response header `X-Rate-Limit-Remaining` indicates the number of allowed request per a period.
+  remediation: too many requests at the time. A response header `X-Rate-Limit-Remaining` indicates the number of allowed request per a period.
