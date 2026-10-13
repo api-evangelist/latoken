@@ -1,16 +1,46 @@
 generated: '2026-10-13'
-method: none
+method: searched
 source:
 - https://zapier.com/apps/latoken/integrations
 - https://n8n.io/integrations/latoken/
 - https://composio.dev/toolkits/latoken
 - https://monid.ai/tools/latoken
 checked:
+- https://api.coingecko.com/api/v3/exchanges
 - https://composio.dev/toolkits/latoken
 - https://monid.ai/tools/latoken
 - https://n8n.io/integrations/latoken/
+- https://raw.githubusercontent.com/ccxt/ccxt/master/exchanges.json
 - https://zapier.com/apps/latoken/integrations
 summary: null
 marketplace_apps: []
-edges: []
+edges:
+- partner_name: CCXT
+  partner: null
+  partner_match: null
+  type: coverage
+  channel: open-source-node
+  relationship: connector-coverage
+  direction: partner-built
+  evidence: https://github.com/ccxt/ccxt/blob/master/ts/src/latoken.ts
+  ccxt_id: latoken
+  ccxt_certified: null
+  ccxt_pro: null
+  matched_by: domain:latoken.com
+  partner_gap: no ccxt repo in all/* (catalog gap)
+  detected_by: sweep-crypto.py
+  first_seen: '2026-10-13'
+- partner_name: CoinGecko
+  partner: coingecko
+  partner_match: aggregator
+  channel: partner-built
+  direction: partner-built
+  type: coverage
+  relationship: connector-coverage
+  evidence: https://api.coingecko.com/api/v3/exchanges/latoken
+  matched_by: domain:latoken.com
+  coingecko_id: latoken
+  trust_score: 4
+  detected_by: sweep-crypto.py
+  first_seen: '2026-10-13'
 templates: []
