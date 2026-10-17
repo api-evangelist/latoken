@@ -1,0 +1,127 @@
+openapi: 3.2.0
+info:
+  title: Latoken Chat Controller API
+  version: V1
+  x-logo:
+    url: ./logo.png
+  description: 'Operations tagged ChatController across 2 of this provider''s published API definitions: latoken-p2p-api-swagger.json, latoken-p2p-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: /pay/v1
+- url: https://api.latoken.com/pay/v1
+tags:
+- name: ChatController
+paths:
+  /auth/p2p/order/chat/{id}:
+    post:
+      security:
+      - api_key: []
+        api_signature: []
+      summary: Send Message
+      tags:
+      - ChatController
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: ID of the order
+        schema:
+          type: string
+      responses:
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: User Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '503':
+          description: Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceUnavailableError'
+      x-code-samples:
+      - lang: TypeScript
+        source: "import * as crypto from 'crypto';\nimport axios, { AxiosRequestConfig } from 'axios';\n\nconst apiKey = '<Your API Public Key>';\nconst apiSecret = '<You API Private Key>';\n\nconst baseUrl = 'https://api.latoken.com';\nconst endpoint = '/pay/v1/auth/p2p/order/chat/<Order ID>';\nconst method = 'POST';\n\nconst signature: string = crypto\n  .createHmac('sha256', apiSecret)\n  .update(method + endpoint)\n  .digest('hex');\n\nconst config: AxiosRequestConfig = {\n  headers: {\n    'X-LA-APIKEY': apiKey,\n    'X-LA-SIGNATURE': signature,\n  },\n};\n\nconst params = {\n  message: 'Some message...',\n};\n\naxios\n  .get(baseUrl + endpoint, params, config)\n  .then((result) => console.log(result.data))\n  .catch((error) => console.error(error));\n"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendMessageRequest'
+        required: true
+      operationId: postAuthP2pOrderChatById
+      x-operation-id-source: derived
+    servers:
+    - url: /pay/v1
+components:
+  schemas:
+    Error:
+      type: object
+      title: Error
+      properties:
+        message:
+          type: string
+          example: '...'
+        status:
+          type: string
+          example: FAILURE
+        error:
+          type: string
+          example: INVALID_ARGUMENT
+      description: Error Entity
+    UnauthorizedError:
+      type: object
+      title: Unauthorized Error
+      properties:
+        result:
+          type: boolean
+          example: false
+        message:
+          type: string
+          example: user must be authenticated
+        status:
+          type: string
+          example: FAILURE
+        error:
+          type: string
+          example: UNAUTHORIZED
+      description: Unauthorized Error Entity
+    ServiceUnavailableError:
+      type: object
+      title: Service Unavailable Error
+      properties:
+        message:
+          type: string
+          example: service unavailable
+        status:
+          type: string
+          example: FAILURE
+        error:
+          type: string
+          example: SERVICE_UNAVAILABLE
+      description: Service Unavailable Error Entity
+    SendMessageRequest:
+      type: object
+      title: SendMessageRequest
+      properties:
+        message:
+          type: string
+          example: Some message...
+      description: SendMessageRequest Entity
+  securitySchemes:
+    api_key:
+      type: apiKey
+      name: X-LA-APIKEY
+      in: header
+    api_signature:
+      type: apiKey
+      name: X-LA-SIGNATURE
+      in: header
+x-refined-from:
+- latoken-p2p-api-swagger.json
+- latoken-p2p-openapi.yml

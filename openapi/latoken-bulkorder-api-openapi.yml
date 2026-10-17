@@ -1,0 +1,448 @@
+openapi: 3.2.0
+info:
+  title: Latoken Bulk Order API
+  version: V2
+  x-logo:
+    url: ./logo.png
+    altText: Latoken logo
+  description: 'Operations tagged BulkOrder across 2 of this provider''s published API definitions: latoken-api-v2-swagger.json, latoken-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.latoken.com/
+tags:
+- name: BulkOrder
+paths:
+  /v2/auth/order/placeBulk:
+    post:
+      security:
+      - api_key: []
+        api_signature: []
+      summary: Place an array of orders
+      tags:
+      - BulkOrder
+      description: Place an array of orders. Orders will be placed one by one independently
+      operationId: placeBulkOrder
+      responses:
+        '200':
+          description: Return list of statuses of each order.<br/>Success if order was placed or error description if order place was failed. <br/>If any order in the list had a validation error all orders from the list will not be placed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/json_CreateBulkOrderReply'
+        '400':
+          description: Return 400 when server did not accept the request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/json_CreateBulkOrderErrorReply'
+      x-code-samples:
+      - lang: JavaScript
+        source: "\nconst request = require('request')\nconst crypto = require('crypto')\n\nconst apiKey = 'Your Latoken API key'\nconst apiSecret = 'Your Latoken API secret'\nconst method = 'POST';\nconst baseUrl = 'https://api.latoken.com'\nconst endpoint = '/v2/auth/order/placeBuilk'\n\nconst order_params = [{\n    baseCurrency: 'LA',\n    quoteCurrency: 'USDT',\n    side: 'SELL',\n    condition: 'GTC',\n    type: 'LIMIT',\n    clientOrderId: 'my-wonderful-order-number-71566',\n    price: 0.06909,\n    quantity: 3.21\n    }, \n    {\n    'baseCurrency': 'd663138b-3ec1-436c-9275-b3a161761523',\n    'quoteCurrency': '0c3a106d-bde3-4c13-a26e-3fd2394529e5',\n    'side': 'BUY',\n    'condition': 'IOC',\n    'type': 'MARKET',\n    'clientOrderId': 'my-wonderful-market-order-number-453',\n    'quantity': '50'\n    }]\n\nconst order_params2 = {\n  orders : order_params\n}\nvar order_amount = order_params.length; var bodySignArray = {}; for (var i = 0; i < order_amount; i++) {\n    var orderSignParams = '{'+Object.entries(order_params[i]).map(([key, val]) =>\n       key + '=' + val).join('&')+'}';\n    bodySignArray.push(orderSignParams);\n} const bodySignParams = 'orders=['+bodySignArray.join('&')+']';\nconst signature = crypto\n    .createHmac('sha256', apiSecret)\n    .update(method + endpoint + bodySignParams)\n    .digest('hex')\n\nconst options = {\n    method: method,\n    url: baseUrl + endpoint,\n    headers: {\n        'Content-Type': 'application/json',\n        'X-LA-APIKEY': apiKey,\n        'X-LA-SIGNATURE': signature\n    },\n    body: order_params2\n}\n\nrequest.post(\n    options,\n    function (error, response, responseBody) {\n        console.log('response:', JSON.stringify(responseBody))\n    }\n)\n\n"
+      - lang: Python
+        source: "import requests\nimport datetime\nimport hashlib\nimport hmac\n\napiKey = 'Your Latoken API key'\napiSecret = b'Your Latoken API secret'\nbaseUrl = 'https://api.latoken.com'\nendpoint = '/v2/auth/order/placeBulk'\n\norder_params = [{\n    'baseCurrency': 'LA',\n    'quoteCurrency': 'USDT',\n    'side': 'SELL',\n    'condition': 'GTC',\n    'type': 'LIMIT',\n    'clientOrderId': 'my-wonderful-order-number-71566',\n    'price': '0.06909',\n    'quantity': '3.21',\n    'timestamp': int(datetime.datetime.now().timestamp()*1000)\n    },\n    {\n    'baseCurrency': 'd663138b-3ec1-436c-9275-b3a161761523',\n    'quoteCurrency': '0c3a106d-bde3-4c13-a26e-3fd2394529e5',\n    'side': 'BUY',\n    'condition': 'IOC',\n    'type': 'MARKET',\n    'clientOrderId': 'my-wonderful-market-order-number-453',\n    'quantity': '50',\n    'timestamp': int(datetime.datetime.now().timestamp()*1000)\n    }]\n\norder_params2 = {\n    'orders': order_params\n}\n\nparam_list = [] for order in order_params:\n    serializeFunc = map(lambda it : it[0] + '='+str(it[1]),\n           order.items())\n    orderParams = '&'.join(serializeFunc)\n    param_list.append('{'+orderParams+'}')\nbodyParams = 'orders=['+'&'.join(param_list)+']'\nsignature = hmac.new(\n    apiSecret, \n    ('POST' + endpoint + bodyParams).encode('ascii'), \n    hashlib.sha512\n)\n\nurl = baseUrl + endpoint\n\nresponse = requests.post(\n    url,\n    headers = {\n        'Content-Type': 'application/json',\n        'X-LA-APIKEY': apiKey,\n        'X-LA-SIGNATURE': signature.hexdigest(),\n        'X-LA-DIGEST': 'HMAC-SHA512'\n    },\n    json = order_params2\n)\n\nprint(response.json())"
+      - lang: Php
+        source: "<?php\n\n$apiKey = 'Your Latoken API key';\n$apiSecret = 'Your Latoken API secret';\n$baseUrl = 'https://api.latoken.com';\n$endpoint = '/v2/auth/order/placeBulk';\n$method = 'POST';\n\n$orderParams = [[\n    'baseCurrency' => 'LA',\n    'quoteCurrency' => \"USDT\",\n    'side' => 'SELL',\n    'condition' => 'GTC',\n    'type' => 'LIMIT',\n    'clientOrderId' => 'my-wonderful-order-number-71566',\n    'price' => '0.06909',\n    'quantity' => '3.21',\n    'timestamp' => round(microtime(TRUE)*1000)\n    ],\n    [\n    'baseCurrency' => 'd663138b-3ec1-436c-9275-b3a161761523',\n    'quoteCurrency' => '0c3a106d-bde3-4c13-a26e-3fd2394529e5',\n    'side' => 'BUY',\n    'condition' => 'IOC',\n    'type' => 'MARKET',\n    'clientOrderId' => 'my-wonderful-market-order-number-453',\n    'quantity' => '50',\n    'timestamp' => round(microtime(TRUE)*1000)\n    ]\n];\n$orderParams2 = ['orders' => $orderParams]\n$paramList=[]; foreach ($orderParam in $orderParams) {\n    $orderBody = '{'+join('&', array_map(\n      function($key, $val) { return $key.'='.$val; }, \n      array_keys($orderParam), array_values($orderParam))+'}';\n    $paramList[] = $orderBody\n} $bodyParams = 'orders=['+join('&', $paramList)+']';\n\n\n$signature = hash_hmac('sha256', $method.$endpoint.$bodyParams, $apiSecret, FALSE);\n\n$url = $baseUrl.$endpoint;\n$options = array(\n    'http' => array(\n        'ignore_errors'=> TRUE,\n        'method' => $method,\n        'header' => array(\n             'Content-Type:application/json',\n             'X-LA-APIKEY:'.$apiKey,\n             'X-LA-SIGNATURE:'.$signature\n        ),\n        'content' => json_encode($orderParams2, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT, 1)\n    )\n);\n\n$context = stream_context_create($options);\n$response = file_get_contents($url, FALSE, $context);\n\nvar_dump($response);\n\n?>"
+      - lang: Java
+        source: "package api.client;\n\nimport com.sun.org.apache.xerces.internal.impl.dv.util.HexBin;\nimport javax.crypto.Mac;\nimport javax.crypto.spec.SecretKeySpec;\nimport java.io.IOException;\nimport java.net.URI;\nimport java.net.http.HttpClient;\nimport java.net.http.HttpRequest;\nimport java.net.http.HttpResponse;\nimport java.security.InvalidKeyException;\nimport java.security.NoSuchAlgorithmException;\nimport java.util.HashMap;\nimport java.util.Vector;\n\npublic class RestApiV1 {\n    public static void runSample() throws InvalidKeyException, NoSuchAlgorithmException, IOException, InterruptedException {\n        final String apiKey = \"Your Latoken API key\";\n        final String apiSecret = \"Your Latoken API secret\";\n        final String baseUrl = \"https://api.latoken.com\";\n        final String endpoint = \"/v2/auth/order/place\";\n\n        HashMap<String, String> params = new HashMap<>();\n        params.put(\"baseCurrency\", \"0c3a106d-bde3-4c13-a26e-3fd2394529e5\");\n        params.put(\"quoteCurrency\", \"620f2019-33c0-423b-8a9d-cde4d7f8ef7f\");\n        params.put(\"side\", \"SELL\");\n        params.put(\"condition\", \"GOOD_TILL_CANCELLED\");\n        params.put(\"type\", \"LIMIT\");\n        params.put(\"clientOrderId\", \"myCustomOrder\");\n\t\tparams.put(\"price\", \"131.50\");\n\t\tparams.put(\"quantity\", \"100\");\n\t\t\n\t\t/* Body parameters for request (json) */\n        Vector<String> bodyParams = new Vector<>();\n        params.forEach((key, value) -> bodyParams.add(\"\\\"\" + key + \"\\\": \\\"\" + value + \"\\\"\"));\n        final String bodyContent = \"{\" + String.join(\",\", bodyParams) + \"}\";\n        \n\t\t/* Body parameters for signature */\n        Vector<String> temporaryParams = new Vector<>();\n        params.forEach((key, value) -> temporaryParams.add(key + \"=\" + value));\n        final String signableBodyParams = String.join(\"&\", temporaryParams);\n\n        /* Signature */\n        Mac crypto = Mac.getInstance(\"HmacSHA256\");\n        crypto.init(new SecretKeySpec(apiSecret.getBytes(\"UTF-8\"), \"HmacSHA256\"));\n        String signature = HexBin.encode( crypto.doFinal(\n                              (\"POST\" + endpoint + signableBodyParams).getBytes(\"UTF-8\")\n                           )).toLowerCase();\n\n        /* Requesting */\n        HttpClient client = HttpClient.newHttpClient();\n        HttpRequest request = HttpRequest.newBuilder()\n                .uri(URI.create(baseUrl + endpoint))\n\t\t\t\t.header(\"Content-Type\", \"application/json\")\n                .header(\"X-LA-APIKEY\", apiKey)\n                .header(\"X-LA-SIGNATURE\", signature)\n                .POST(HttpRequest.BodyPublishers.ofString(bodyContent))\n                .build();\n        HttpResponse<String> response =  client.send(request, HttpResponse.BodyHandlers.ofString());\n\n        System.out.println(response.body().toString());\n    }\n}"
+      - lang: C#
+        source: "using System;\nusing System.Collections.Generic;\nusing System.Net;\nusing System.Text;\nusing System.Linq;\nusing System.IO;\n\nusing System.Security.Cryptography;\n\npublic class Program\n{\n\tpublic static void Main()\n\t{\n\t\tvar apiKey = \"Your Latoken API key\";\n\t\tvar apiSecret = \"Your Latoken API secret\";\n\t\tvar baseUrl = \"https://api.latoken.com\";\n\t\tvar endpoint = \"/v2/auth/order/placeBulk\";\n\t\tvar method = \"POST\";\n\n\t\t/* form parameters */\n\t\tvar Dictionary<string, string>[] order_params = new Dictionary<string, string>[]\n\t\t{\n\t\t\tnew Dictionary<string, string>(){\n\t\t\t\t{\"baseCurrency\", \"LA\"},\n\t\t\t\t{\"quoteCurrency\", \"USDT\"},\n\t\t\t\t{\"side\",\"SELL\"},\n\t\t\t\t{\"condition\", \"GTC\"},\n\t\t\t\t{\"type\", \"LIMIT\"},\n\t\t\t\t{\"clientOrderId\", \"my-wonderful-order-number-71566\"},\n\t\t\t\t{\"price\", \"0.06909\"},\n\t\t\t\t{\"quantity\", \"3.21\"},\n\t\t\t\t{\"timestamp\", DateTimeOffset.Now.ToUnixTimeMilliseconds().ToString()}\n\t\t\t\t},\t\t\tnew Dictionary<string, string>(){\n\t\t\t\t{\"baseCurrency\", \"d663138b-3ec1-436c-9275-b3a161761523\"},\n\t\t\t\t\"quoteCurrency\", \"0c3a106d-bde3-4c13-a26e-3fd2394529e5\"},\n\t\t\t\t{\"side\", \"BUY\"},\n\t\t\t\t{\"condition\", \"IOC\"},\n\t\t\t\t{\"type\", \"MARKET\"},\n\t\t\t\t{\"clientOrderId\", \"my-wonderful-market-order-number-453\"},\n\t\t\t\t{\"quantity\", \"50\"},\n\t\t\t\t{\"timestamp\", DateTimeOffset.Now.ToUnixTimeMilliseconds().ToString()}\n\t\t\t\t}\n\t\t};\n\t\tList<string> bodyList = new List<string>();\n\t\tList<string> paramList = new List<string>();\n\t\tforeach (Dictionary<string, string> order_param in order_params)\n\t\t{\n\t\t\tvar bodyParam = \"{\" + string.Join(\",\", parameters.Select(kvp => \"\"\" + kvp.Key + \"\": \"\" + kvp.Value + \"\"\").ToArray()) + \"}\";\n\t\t\tvar signableParam = \"{\"+string.Join(\"&\", order_param.Select(kvp => kvp.Key + \"=\" + kvp.Value).ToArray())+\"}\";\n\t\t\tbodyList.Add(bodyParam);\n\t\t\tparamList.Add(signableParam);\n\t\t};\n\t\tvar signableParams = \"orders=[\"+string.Join(\"&\", paramList)+\"]\";\n\t\tvar bodyContent = \"{\"orders\": [\"+string.Join(\"&\", bodyList)+\"]}\";\n\n\t\t/* sign request */\n\t\tHMAC crypto = new HMACSHA256(Encoding.ASCII.GetBytes(apiSecret));\n\t\tbyte[] signBytes = crypto.ComputeHash(Encoding.ASCII.GetBytes(method + endpoint + signableParams));\n\t\tstring signature = string.Empty;\n\t\tsignBytes.ToList().ForEach(b => signature += b.ToString(\"x2\"));\n\n\t\t/* create request */\n\t\tvar request = HttpWebRequest.CreateHttp(baseUrl + endpoint);\n\t\trequest.Method = method;\n\t\trequest.ContentType = \"application/json\";\n\t\trequest.Headers.Add(\"X-LA-APIKEY\", apiKey);\n\t\trequest.Headers.Add(\"X-LA-SIGNATURE\", signature);\n\t\trequest.ContentLength = bodyContent.Length;\n\t\tvar body = request.GetRequestStream();\n\t\tbody.Write(Encoding.ASCII.GetBytes(bodyContent), 0, bodyContent.Length);\n\t\tbody.Close();\n\n\t\t/* get response */\n\t\ttry\n\t\t{\n\t\t\tvar response = (HttpWebResponse)request.GetResponse();\n\t\t\tvar responseString = new StreamReader(response.GetResponseStream()).ReadToEnd();\n\t\t\tConsole.WriteLine(responseString);\n\t\t}\n\t\tcatch (WebException we)\n\t\t{\n\t\t\tvar errorResponse = we.Response as HttpWebResponse;\n\t\t\tvar responseString = new StreamReader(errorResponse.GetResponseStream()).ReadToEnd();\n\t\t\tConsole.WriteLine(responseString);\n\t\t}\n\t}\n}\n"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              minItems: 1
+              maxItems: 50
+              items:
+                $ref: '#/components/schemas/json_CreateBulkOrderRequest'
+        description: request structure with order params
+  /v2/auth/order/cancelBulk:
+    post:
+      security:
+      - api_key: []
+        api_signature: []
+      summary: Cancel an array of orders
+      tags:
+      - BulkOrder
+      operationId: cancelBulkOrder
+      responses:
+        '200':
+          description: Return list of order status for each order.<br/>Success if order cancel request was accepted or error description otherwise. All order-id's will be accepted to be canceled, even the ones which can't be found. <br/>If any order has validation error all orders from the list will not be cancelled.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/json_CancelBulkOrderReply'
+        '400':
+          description: If request is not valid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/json_400Reply'
+      x-code-samples:
+      - lang: JavaScript
+        source: "\nconst request = require('request')\nconst crypto = require('crypto')\n\nconst apiKey = 'Your Latoken API key'\nconst apiSecret = 'Your Latoken API secret'\nconst method = 'POST';\nconst baseUrl = 'https://api.latoken.com'\nconst endpoint = '/v2/auth/order/cancelBuilk'\n\nconst order_params = [{\n    id: '12609cf4-fca5-43ed-b0ea-b40fb48d3b0d'\n    },\n    {\n    id: '12609cf4-fca5-43ed-b0ea-b40fb48d3b0e'\n    },\n    {\n    id: '12609cf4-fca5-43ed-b0ea-b40fb48d3b0d'\n    }];\n\nconst order_params2 = {\n    orders: order_params\n};\nvar order_amount = order_params.length;  var bodySignArray = {};  for (var i = 0; i < order_amount; i++) {\n   var orderSignParams = '{'+Object.entries(order_params[i]).map(([key, val]) =>\n       key + '=' + val).join('&')+'}';\n   bodySignArray.push(orderSignParams);\n}  const bodySignParams = 'orders=['+bodySignArray.join('&')+']';\nconst signature = crypto\n    .createHmac('sha256', apiSecret)\n    .update(method + endpoint + bodySignParams)\n    .digest('hex')\n\nconst options = {\n    method: method,\n    url: baseUrl + endpoint,\n    headers: {\n        'Content-Type': 'application/json',\n        'X-LA-APIKEY': apiKey,\n        'X-LA-SIGNATURE': signature\n    },\n    bodySignParams: bodySignParams\n}\n\nrequest.post(\n    options,\n    function (error, response, responseBody) {\n        console.log('response:', JSON.stringify(responseBody))\n    }\n)\n\n"
+      - lang: Python
+        source: "import requests\nimport datetime\nimport hashlib\nimport hmac\n\napiKey = 'Your Latoken API key'\napiSecret = b'Your Latoken API secret'\nbaseUrl = 'https://api.latoken.com'\nendpoint = '/v2/auth/order/cancelBulk'\n\norder_params = [{\n    'id': '12609cf4-fca5-43ed-b0ea-b40fb48d3b0d'\n    },\n    {\n    'id': '12609cf4-fca5-43ed-b0ea-b40fb48d3b0e'\n    },\n    {\n    'id': '12609cf4-fca5-43ed-b0ea-b40fb48d3b0d'\n    }]\norder_params2 = {'orders': order_params}\n\nparam_list = [] for order in order_params:\n    serializeFunc = map(lambda it : it[0] + '='+str(it[1]),\n           order.items())\n    orderParams = '&'.join(serializeFunc)\n    param_list.append('{'+orderParams+'}')\nbodyParams = 'orders=['+'&'.join(param_list)+']'\nsignature = hmac.new(\n    apiSecret, \n    ('POST' + endpoint + bodyParams).encode('ascii'), \n    hashlib.sha512\n)\n\nurl = baseUrl + endpoint\n\nresponse = requests.post(\n    url,\n    headers = {\n        'Content-Type': 'application/json',\n        'X-LA-APIKEY': apiKey,\n        'X-LA-SIGNATURE': signature.hexdigest(),\n        'X-LA-DIGEST': 'HMAC-SHA512'\n    },\n    json = order_params2\n)\n\nprint(response.json())"
+      - lang: Php
+        source: "<?php\n\n$apiKey = 'Your Latoken API key';\n$apiSecret = 'Your Latoken API secret';\n$baseUrl = 'https://api.latoken.com';\n$endpoint = '/v2/auth/order/cancelBulk';\n$method = 'POST';\n\n$orderParams = [[\n    'id': '12609cf4-fca5-43ed-b0ea-b40fb48d3b0d'\n    ],\n    [\n    'id': '12609cf4-fca5-43ed-b0ea-b40fb48d3b0e'\n    ],\n    [\n    'id': '12609cf4-fca5-43ed-b0ea-b40fb48d3b0d'\n    ]];\n    \n$orderParams2 = [\n    'orders': $orderParams ];\n\n$paramList=[]; foreach ($orderParam in $orderParams) {\n    $orderBody = '{'+join('&', array_map(\n      function($key, $val) { return $key.'='.$val; }, \n      array_keys($orderParam), array_values($orderParam))+'}';\n    $paramList[] = $orderBody\n} $bodyParams = 'orders=['+join('&', $paramList)+']';\n\n\n$signature = hash_hmac('sha256', $method.$endpoint.$bodyParams, $apiSecret, FALSE);\n\n$url = $baseUrl.$endpoint;\n$options = array(\n    'http' => array(\n        'ignore_errors'=> TRUE,\n        'method' => $method,\n        'header' => array(\n             'Content-Type:application/json',\n             'X-LA-APIKEY:'.$apiKey,\n             'X-LA-SIGNATURE:'.$signature\n        ),\n        'content' => json_encode($orderParams2, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT, 1)\n    )\n);\n\n$context = stream_context_create($options);\n$response = file_get_contents($url, FALSE, $context);\n\nvar_dump($response);\n\n?>"
+      - lang: Java
+        source: "package api.client;\n\nimport com.sun.org.apache.xerces.internal.impl.dv.util.HexBin;\nimport javax.crypto.Mac;\nimport javax.crypto.spec.SecretKeySpec;\nimport java.io.IOException;\nimport java.net.URI;\nimport java.net.http.HttpClient;\nimport java.net.http.HttpRequest;\nimport java.net.http.HttpResponse;\nimport java.security.InvalidKeyException;\nimport java.security.NoSuchAlgorithmException;\nimport java.util.HashMap;\nimport java.util.Vector;\n\npublic class RestApiV1 {\n    public static void runSample() throws InvalidKeyException, NoSuchAlgorithmException, IOException, InterruptedException {\n        final String apiKey = \"Your Latoken API key\";\n        final String apiSecret = \"Your Latoken API secret\";\n        final String baseUrl = \"https://api.latoken.com\";\n        final String endpoint = \"/v2/auth/order/cancelBulk\";\n\n        HashMap<String, String> params = new HashMap<>();\n        params.put(\"baseCurrency\", \"0c3a106d-bde3-4c13-a26e-3fd2394529e5\");\n        params.put(\"quoteCurrency\", \"620f2019-33c0-423b-8a9d-cde4d7f8ef7f\");\n        params.put(\"side\", \"SELL\");\n        params.put(\"condition\", \"GOOD_TILL_CANCELLED\");\n        params.put(\"type\", \"LIMIT\");\n        params.put(\"clientOrderId\", \"myCustomOrder\");\n\t\tparams.put(\"price\", \"131.50\");\n\t\tparams.put(\"quantity\", \"100\");\n\t\t\n\t\t/* Body parameters for request (json) */\n        Vector<String> bodyParams = new Vector<>();\n        params.forEach((key, value) -> bodyParams.add(\"\\\"\" + key + \"\\\": \\\"\" + value + \"\\\"\"));\n        final String bodyContent = \"{\" + String.join(\",\", bodyParams) + \"}\";\n        \n\t\t/* Body parameters for signature */\n        Vector<String> temporaryParams = new Vector<>();\n        params.forEach((key, value) -> temporaryParams.add(key + \"=\" + value));\n        final String signableBodyParams = String.join(\"&\", temporaryParams);\n\n        /* Signature */\n        Mac crypto = Mac.getInstance(\"HmacSHA256\");\n        crypto.init(new SecretKeySpec(apiSecret.getBytes(\"UTF-8\"), \"HmacSHA256\"));\n        String signature = HexBin.encode( crypto.doFinal(\n                              (\"POST\" + endpoint + signableBodyParams).getBytes(\"UTF-8\")\n                           )).toLowerCase();\n\n        /* Requesting */\n        HttpClient client = HttpClient.newHttpClient();\n        HttpRequest request = HttpRequest.newBuilder()\n                .uri(URI.create(baseUrl + endpoint))\n\t\t\t\t.header(\"Content-Type\", \"application/json\")\n                .header(\"X-LA-APIKEY\", apiKey)\n                .header(\"X-LA-SIGNATURE\", signature)\n                .POST(HttpRequest.BodyPublishers.ofString(bodyContent))\n                .build();\n        HttpResponse<String> response =  client.send(request, HttpResponse.BodyHandlers.ofString());\n\n        System.out.println(response.body().toString());\n    }\n}"
+      - lang: C#
+        source: "using System;\nusing System.Collections.Generic;\nusing System.Net;\nusing System.Text;\nusing System.Linq;\nusing System.IO;\n\nusing System.Security.Cryptography;\n\npublic class Program\n{\n\tpublic static void Main()\n\t{\n\t\tvar apiKey = \"Your Latoken API key\";\n\t\tvar apiSecret = \"Your Latoken API secret\";\n\t\tvar baseUrl = \"https://api.latoken.com\";\n\t\tvar endpoint = \"/v2/auth/order/cancelBulk\";\n\t\tvar method = \"POST\";\n\n\t\t/* form parameters */\n\t\tvar Dictionary<string, string>[] order_params = new Dictionary<string, string>[]\n\t\t{\n\t\t\tnew Dictionary<string, string>(){\n\t\t\t\t{\"id\", \"12609cf4-fca5-43ed-b0ea-b40fb48d3b0d\"},\n\t\t\t\t},\t\t\tnew Dictionary<string, string>(){\n\t\t\t\t{\"id\", \"12609cf4-fca5-43ed-b0ea-b40fb48d3b0f\"},\n\t\t\t\t}\n\t\t};\n\t\tList<string> bodyList = new List<string>();\n\t\tList<string> paramList = new List<string>();\n\t\tforeach (Dictionary<string, string> order_param in order_params)\n\t\t{\n\t\t\tvar bodyParam = \"{\" + string.Join(\",\", parameters.Select(kvp => \"\"\" + kvp.Key + \"\": \"\" + kvp.Value + \"\"\").ToArray()) + \"}\";\n\t\t\tvar signableParam = \"{\"+string.Join(\"&\", order_param.Select(kvp => kvp.Key + \"=\" + kvp.Value).ToArray())+\"}\";\n\t\t\tbodyList.Add(bodyParam);\n\t\t\tparamList.Add(signableParam);\n\t\t};\n\t\tvar signableParams = \"orders=[\"+string.Join(\"&\", paramList)+\"]\";\n\t\tvar bodyContent = \"{\"orders\": [\"+string.Join(\"&\", bodyList)+\"]}\";\n\n\t\t/* sign request */\n\t\tHMAC crypto = new HMACSHA256(Encoding.ASCII.GetBytes(apiSecret));\n\t\tbyte[] signBytes = crypto.ComputeHash(Encoding.ASCII.GetBytes(method + endpoint + signableParams));\n\t\tstring signature = string.Empty;\n\t\tsignBytes.ToList().ForEach(b => signature += b.ToString(\"x2\"));\n\n\t\t/* create request */\n\t\tvar request = HttpWebRequest.CreateHttp(baseUrl + endpoint);\n\t\trequest.Method = method;\n\t\trequest.ContentType = \"application/json\";\n\t\trequest.Headers.Add(\"X-LA-APIKEY\", apiKey);\n\t\trequest.Headers.Add(\"X-LA-SIGNATURE\", signature);\n\t\trequest.ContentLength = bodyContent.Length;\n\t\tvar body = request.GetRequestStream();\n\t\tbody.Write(Encoding.ASCII.GetBytes(bodyContent), 0, bodyContent.Length);\n\t\tbody.Close();\n\n\t\t/* get response */\n\t\ttry\n\t\t{\n\t\t\tvar response = (HttpWebResponse)request.GetResponse();\n\t\t\tvar responseString = new StreamReader(response.GetResponseStream()).ReadToEnd();\n\t\t\tConsole.WriteLine(responseString);\n\t\t}\n\t\tcatch (WebException we)\n\t\t{\n\t\t\tvar errorResponse = we.Response as HttpWebResponse;\n\t\t\tvar responseString = new StreamReader(errorResponse.GetResponseStream()).ReadToEnd();\n\t\t\tConsole.WriteLine(responseString);\n\t\t}\n\t}\n}\n"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              minItems: 1
+              maxItems: 50
+              items:
+                $ref: '#/components/schemas/json_CancelBulkOrderRequest'
+        description: request structure with order params
+components:
+  schemas:
+    json_CancelBulkOrderRequest:
+      type: object
+      title: Cancel BulkOrder Request
+      properties:
+        orders:
+          type: array
+          items:
+            $ref: '#/components/schemas/json_CancelOrderRequest'
+    json_400Reply:
+      type: object
+      title: 400Reply
+      allOf:
+      - $ref: '#/components/schemas/json_ReplyErrorBase'
+      example:
+        message: Bad Request
+        status: FAILURE
+        error: BAD_REQUEST
+        errors:
+          property1: Wrong property 1
+          property2: Wrong property 2
+      description: Base reply 400 for all methods
+    json_CreateBulkOrderErrorReply:
+      type: object
+      title: CreateBulkOrderErrorReply
+      allOf:
+      - $ref: '#/components/schemas/json_ReplyErrorBase'
+      example:
+        message: Can't find currency with id = 5f7ba397-624f-44f0-9926-0fcafd0bb679
+        status: FAILURE
+        error: NOT_FOUND
+        errors: null
+        result: false
+      description: Base reply for all methods
+    json_CancelOrderRequest:
+      type: object
+      title: CancelOrderRequest
+      required:
+      - id
+      properties:
+        id:
+          maxLength: 200
+          minLength: 0
+          readOnly: false
+          description: Order ID
+          type: string
+      example:
+        id: 12609cf4-fca5-43ed-b0ea-b40fb48d3b0d
+      description: ''
+    json_CreateOrderRequest:
+      type: object
+      title: CreateOrderRequest
+      required:
+      - baseCurrency
+      - quoteCurrency
+      - side
+      - condition
+      - type
+      - quantity
+      properties:
+        baseCurrency:
+          example: LA
+          maxLength: 20
+          minLength: 1
+          readOnly: false
+          description: id or tag of base currency
+          type: string
+        quoteCurrency:
+          example: USDT
+          maxLength: 20
+          minLength: 1
+          readOnly: false
+          description: id or tag of quote currency
+          type: string
+        side:
+          example: BID
+          maxLength: 10
+          minLength: 1
+          readOnly: false
+          description: buy or sell
+          type: string
+          enum:
+          - BUY
+          - SELL
+        condition:
+          example: GTC
+          maxLength: 30
+          minLength: 1
+          readOnly: false
+          description: '• GTC: good till cancelled<br/>• IOC: immediate or cancel<br/>• FOK: fill or kill'
+          type: string
+          enum:
+          - GTC
+          - IOC
+          - FOK
+        type:
+          example: LIMIT
+          maxLength: 30
+          minLength: 1
+          readOnly: false
+          description: '• LIMIT: buy or sell at specified price<br/>• MARKET: buy or sell at market price'
+          type: string
+          enum:
+          - LIMIT
+          - MARKET
+        clientOrderId:
+          example: my-wonderful-order-number-71566
+          maxLength: 50
+          minLength: 0
+          readOnly: false
+          description: client's custom order id (free field for your convenience)
+          type: string
+        price:
+          example: '0.0020019'
+          minimum: 0
+          maxLength: 50
+          minLength: 0
+          readOnly: false
+          description: decimal number, will be ignored for MARKET order type, however required for LIMIT order type
+          type: string
+        quantity:
+          example: '3.21'
+          maxLength: 50
+          minLength: 1
+          readOnly: false
+          description: decimal number
+          type: string
+          exclusiveMinimum: 0
+      example:
+      - baseCurrency: LA
+        quoteCurrency: USDT
+        side: SELL
+        condition: GTC
+        type: LIMIT
+        clientOrderId: my-wonderful-order-number-71566
+        price: '0.06909'
+        quantity: '3.21'
+        timestamp: 1568185507
+      - baseCurrency: d663138b-3ec1-436c-9275-b3a161761523
+        quoteCurrency: 0c3a106d-bde3-4c13-a26e-3fd2394529e5
+        side: BUY
+        condition: IOC
+        type: MARKET
+        clientOrderId: my-wonderful-market-order-number-453
+        quantity: '50'
+        timestamp: 1568185507
+      description: ''
+    json_ReplyErrorBase:
+      type: object
+      title: ReplyErrorBase
+      properties:
+        message:
+          example: Validation errors
+          readOnly: false
+          description: Short error description of what went wrong
+          type: string
+        status:
+          example: FAILURE
+          readOnly: false
+          description: status description, can only be "FAILURE"
+          type: string
+        error:
+          readOnly: false
+          enum:
+          - VALIDATION_ERROR
+          - FORBIDDEN
+          - NOT_FOUND
+          - UNAVAILABLE_FOR_LEGAL_REASONS
+          - UNAVAILABLE
+          description: error codes, present if status is not SUCCESS
+          type: string
+        errors:
+          readOnly: false
+          description: more verbose description of which request fields are not valid, present if status is not SUCCESS
+          type: object
+          additionalProperties:
+            type: string
+        result:
+          type: boolean
+          description: request result, can only be "false"
+          example: false
+    json_CancelBulkOrderReply:
+      type: object
+      title: CancelBulkOrderReply
+      properties:
+        status:
+          type: string
+          description: operation status, can only be "SUCCESS", means server has accepted a request
+        message:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                description: UUID of the cancelled order
+                example: ea8330dc-d9a1-48fd-80e6-b7f48be32c74
+              message:
+                example: Validation errors
+                readOnly: false
+                description: Short description of cancelling operation
+                type: string
+              status:
+                example: FAILURE
+                enum:
+                - FAILURE
+                - SUCCESS
+                description: status description
+                type: string
+              error:
+                readOnly: false
+                enum:
+                - VALIDATION_ERROR
+                - NOT_FOUND
+                description: error codes, present if status is not SUCCESS
+                type: string
+              errors:
+                readOnly: false
+                description: more verbose description of which request fields are not valid, present if status is not SUCCESS
+                type: object
+                additionalProperties:
+                  type: string
+      example:
+        All orders cancelled:
+        - message:
+          - id: 32434058-a010-4330-820b-2fbe82321c91
+            message: cancellation request successfully submitted
+            status: SUCCESS
+          - id: 81c09e54-da43-4ad6-88bf-07c4348dd587
+            message: cancellation request successfully submitted
+            status: SUCCESS
+          status: SUCCESS
+        If any order is not valid:
+        - message:
+          - id: c9865516-ab5b-4c2a-947c-2606d1b501dd
+            message: Order cancellation aborted due to invalid request in the bulk
+            error: VALIDATION_ERROR
+            status: FAILURE
+          - id: null
+            message: Validation errors
+            error: VALIDATION_ERROR
+            errors:
+              id: must not be blank,must not be null
+            status: FAILURE
+          status: SUCCESS
+      description: Base reply for all methods
+    json_CreateBulkOrderReply:
+      type: object
+      title: CreateBulkOrderReply
+      properties:
+        status:
+          type: string
+          description: operation status, can only be "SUCCESS", means server has accepted a request
+        message:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                description: UUID of the created order, present if order was placed
+                example: ea8330dc-d9a1-48fd-80e6-b7f48be32c74
+              clientOrderId:
+                example: dc2b96c0-a266-45ad-80ce-6e1f8d2a5241
+                type: string
+                description: Client's custom order id. May be used to identify the order if it was declined
+              message:
+                example: Validation errors
+                readOnly: false
+                description: Short description of placing of exact order
+                type: string
+              status:
+                example: FAILURE
+                enum:
+                - FAILURE
+                - SUCCESS
+                description: status description
+                type: string
+              error:
+                readOnly: false
+                enum:
+                - VALIDATION_ERROR
+                - ORDER_VALIDATION
+                - NOT_FOUND
+                - BAD_TICKS
+                description: error codes, present if status is not SUCCESS
+                type: string
+              errors:
+                readOnly: false
+                description: more verbose description of which request fields are not valid, present if status is not SUCCESS
+                type: object
+                additionalProperties:
+                  type: string
+      example:
+      - message:
+        - clientOrderId: b6bd6a36-79e0-42df-b5db-9d50172ab4d7
+          id: c3c224b6-12fe-48ca-968a-479d2ed26d0b
+          message: order accepted for placing
+          status: SUCCESS
+        - clientOrderId: 253afd65-dbb5-4d51-a5cf-992d368bca2c
+          id: 583da358-e354-4d6f-bbd7-3b97120bf6f3
+          message: order accepted for placing
+          status: SUCCESS
+        status: SUCCESS
+      - message:
+        - clientOrderId: 0aa08405-e3d4-4b67-9b79-c189c8c294d3
+          id: 444a0c60-0ea4-4f92-a15d-08db270ec51d
+          message: order accepted for placing
+          status: SUCCESS
+        - clientOrderId: 0201e3e4-80a4-4f3f-a888-60b3446e4c4a
+          message: Not enough balance on the spot account for currency (USDT), need (11)
+          error: INSUFFICIENT_FUNDS
+          status: FAILURE
+        status: SUCCESS
+      - message:
+        - clientOrderId: 05adffec-f199-4d64-b807-0e0bc64819ea
+          message: Validation errors
+          error: VALIDATION_ERROR
+          errors:
+            side: size must be between 0 and 10,must be one of [BUY, BID, SELL, ASK]
+          status: FAILURE
+        - clientOrderId: bb677246-1c9a-491a-b4f3-328917746927
+          message: Order placement aborted due to invalid request in the bulk
+          error: VALIDATION_ERROR
+          status: FAILURE
+        status: SUCCESS
+      description: bulk order response
+    json_CreateBulkOrderRequest:
+      type: object
+      title: Create BulkOrder Request
+      properties:
+        orders:
+          type: array
+          items:
+            $ref: '#/components/schemas/json_CreateOrderRequest'
+  securitySchemes:
+    api_key:
+      type: apiKey
+      name: X-LA-APIKEY
+      in: header
+    api_signature:
+      type: apiKey
+      name: X-LA-SIGNATURE
+      in: header
+x-refined-from:
+- latoken-api-v2-swagger.json
+- latoken-openapi.yml

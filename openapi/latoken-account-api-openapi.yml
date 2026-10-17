@@ -1,0 +1,219 @@
+openapi: 3.2.0
+info:
+  title: Latoken Account API
+  version: V2
+  x-logo:
+    url: ./logo.png
+    altText: Latoken logo
+  description: 'Operations tagged Account across 2 of this provider''s published API definitions: latoken-api-v2-swagger.json, latoken-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.latoken.com/
+tags:
+- name: Account
+paths:
+  /v2/auth/account:
+    get:
+      security:
+      - api_key: []
+        api_signature: []
+      summary: Get balances
+      tags:
+      - Account
+      description: Request all accounts of current user
+      operationId: getBalancesByUser
+      parameters:
+      - name: zeros
+        in: query
+        required: true
+        description: whether to include accounts with zero value
+        schema:
+          type: boolean
+          default: 'false'
+      responses:
+        '200':
+          description: on success
+          content:
+            application/json:
+              schema:
+                description: on success
+                type: array
+                items:
+                  $ref: '#/components/schemas/json_BalanceAdapter'
+        '400':
+          description: if request is invalid
+      x-code-samples:
+      - lang: JavaScript
+        source: "const request = require('request')\nconst crypto = require('crypto')\n\nconst apiKey = 'Your Latoken API key'\nconst apiSecret = 'Your Latoken API secret'\nconst baseUrl = 'https://api.latoken.com'\nconst endpoint = '/v2/auth/account'\nconst method = 'GET';\n\nconst params = {\n    zeros: 'true'\n}\nconst queryParams = Object.entries(params).map(([key, val]) => key + '=' + val).join('&');\n\nconst signature = crypto\n    .createHmac('sha256', apiSecret)\n    .update(method + endpoint + queryParams)\n    .digest('hex')\n\nconst options = {\n    method: method,\n    url: baseUrl + endpoint + '?' + queryParams,\n    headers: {\n        'X-LA-APIKEY': apiKey,\n        'X-LA-SIGNATURE': signature\n    }\n}\n\nrequest.get(\n    options,\n    function (error, response, responseBody) {\n        console.log('response:', JSON.stringify(responseBody))\n    }\n)\n"
+      - lang: Python
+        source: "import requests\nimport hashlib\nimport hmac\n\napiKey = 'Your Latoken API key'\napiSecret = b'Your Latoken API secret'\nbaseUrl = 'https://api.latoken.com'\nendpoint = '/v2/auth/account'\n\nparams = {\n    'zeros': 'true'\n}\nserializeFunc = map(lambda it : it[0] + '=' + str(it[1]), params.items())\nqueryParams = '&'.join(serializeFunc)\n                  \nsignature = hmac.new(\n    apiSecret, \n    ('GET' + endpoint + queryParams).encode('ascii'), \n    hashlib.sha512\n)\n\nurl = baseUrl + endpoint + '?' + queryParams\n\nresponse = requests.get(\n    url,\n    headers = {\n        'X-LA-APIKEY': apiKey,\n        'X-LA-SIGNATURE': signature.hexdigest(),\n        'X-LA-DIGEST': 'HMAC-SHA512'\n    }\n)\n\nprint(response.json())"
+      - lang: Php
+        source: "<?php\n\n$apiKey = 'Your Latoken API key';\n$apiSecret = 'Your Latoken API secret';\n$baseUrl = 'https://api.latoken.com';\n$endpoint = '/v2/auth/account';\n$method = 'GET';\n\n$params = [\n    'zeros' => 'true'\n];\n\n$queryParams = join('&', array_map(\n    function($key, $val) { return $key.'='.$val; }, \n    array_keys($params), array_values($params))\n);\n\n$signature = hash_hmac('sha256', $method.$endpoint.$queryParams, $apiSecret, FALSE);\n\n$url = $baseUrl.$endpoint.'?'.$queryParams;\n$options = array(\n    'http' => array(\n        'ignore_errors'=> TRUE,\n        'method' => $method,\n        'header' => array(\n             'X-LA-APIKEY:'.$apiKey,\n             'X-LA-SIGNATURE:'.$signature\n        )\n    )\n);\n\n$context = stream_context_create($options);\n$response = file_get_contents($url, FALSE, $context);\n\nvar_dump($response);\n\n?>"
+      - lang: Java
+        source: "package api.client;\n\nimport com.sun.org.apache.xerces.internal.impl.dv.util.HexBin;\nimport javax.crypto.Mac;\nimport javax.crypto.spec.SecretKeySpec;\nimport java.io.IOException;\nimport java.net.URI;\nimport java.net.http.HttpClient;\nimport java.net.http.HttpRequest;\nimport java.net.http.HttpResponse;\nimport java.security.InvalidKeyException;\nimport java.security.NoSuchAlgorithmException;\nimport java.util.HashMap;\nimport java.util.Vector;\n\npublic class RestApiV1 {\n    public static void runSample() throws InvalidKeyException, NoSuchAlgorithmException, IOException, InterruptedException {\n        final String apiKey = \"Your Latoken API key\";\n        final String apiSecret = \"Your Latoken API secret\";\n        final String baseUrl = \"https://api.latoken.com\";\n        final String endpoint = \"/v2/auth/account\";\n\n        HashMap<String, String> params = new HashMap<>();\n\t\tparams.put(\"zeros\", \"true\");\n\n\t\t/* Body parameters for signature */\n        Vector<String> temporaryParams = new Vector<>();\n        params.forEach((key, value) -> temporaryParams.add(key + \"=\" + value));\n        final String queryParams = String.join(\"&\", temporaryParams);\n\n        /* Signature */\n        Mac crypto = Mac.getInstance(\"HmacSHA256\");\n        crypto.init(new SecretKeySpec(apiSecret.getBytes(\"UTF-8\"), \"HmacSHA256\"));\n        String signature = HexBin.encode( crypto.doFinal(\n                              (\"GET\" + endpoint + queryParams).getBytes(\"UTF-8\")\n                           )).toLowerCase();\n\n        /* Requesting */\n        HttpClient client = HttpClient.newHttpClient();\n        HttpRequest request = HttpRequest.newBuilder()\n                .uri(URI.create(baseUrl + endpoint + \"?\" + queryParams))\n                .header(\"X-LA-APIKEY\", apiKey)\n                .header(\"X-LA-SIGNATURE\", signature)\n                .GET()\n                .build();\n        HttpResponse<String> response =  client.send(request, HttpResponse.BodyHandlers.ofString());\n\n        System.out.println(response.body().toString());\n    }\n}"
+      - lang: C#
+        source: "using System;\nusing System.Collections.Generic;\nusing System.Net;\nusing System.Text;\nusing System.Linq;\nusing System.IO;\n\nusing System.Security.Cryptography;\n\npublic class Program\n{\n\tpublic static void Main()\n\t{\n\t\tvar apiKey = \"Your Latoken API key\";\n\t\tvar apiSecret = \"Your Latoken API secret\";\n\t\tvar baseUrl = \"https://api.latoken.com\";\n\t\tvar endpoint = \"/v2/auth/account\";\n\t\tvar method = \"GET\";\n\n\t\t/* form parameters */\n\t\tvar parameters = new Dictionary<string, string>(){\n\t\t\t{\"zeros\", \"true\"}\n\t\t};\n\t\tvar queryParams = string.Join(\"&\", parameters.Select(kvp => kvp.Key + \"=\" + kvp.Value).ToArray());\n\n\t\t/* sign request */\n\t\tHMAC crypto = new HMACSHA256(Encoding.ASCII.GetBytes(apiSecret));\n\t\tbyte[] signBytes = crypto.ComputeHash(Encoding.ASCII.GetBytes(method + endpoint + queryParams));\n\t\tstring signature = string.Empty;\n\t\tsignBytes.ToList().ForEach(b => signature += b.ToString(\"x2\"));\n\n\t\t/* create request */\n\t\tvar request = HttpWebRequest.CreateHttp(baseUrl + endpoint + \"?\" + queryParams);\n\t\trequest.Method = method;\n\t\trequest.Headers.Add(\"X-LA-APIKEY\", apiKey);\n\t\trequest.Headers.Add(\"X-LA-SIGNATURE\", signature);\n\n\t\t/* get response */\n\t\ttry\n\t\t{\n\t\t\tvar response = (HttpWebResponse)request.GetResponse();\n\t\t\tvar responseString = new StreamReader(response.GetResponseStream()).ReadToEnd();\n\t\t\tConsole.WriteLine(responseString);\n\t\t}\n\t\tcatch (WebException we)\n\t\t{\n\t\t\tvar errorResponse = we.Response as HttpWebResponse;\n\t\t\tvar responseString = new StreamReader(errorResponse.GetResponseStream()).ReadToEnd();\n\t\t\tConsole.WriteLine(responseString);\n\t\t}\n\t}\n}\n"
+  /v2/auth/account/currency/{currency}/{type}:
+    get:
+      security:
+      - api_key: []
+        api_signature: []
+      summary: Get balances by currency
+      tags:
+      - Account
+      description: Request balance of a specific account by currency and type
+      operationId: getBalancesByCurrency
+      parameters:
+      - name: currency
+        in: path
+        required: true
+        description: id or tag of currency
+        schema:
+          type: string
+      - name: type
+        in: path
+        required: true
+        description: type of account
+        schema:
+          type: string
+          enum:
+          - ACCOUNT_TYPE_WALLET
+          - ACCOUNT_TYPE_SPOT
+          - ACCOUNT_TYPE_FUTURES
+          - ACCOUNT_TYPE_GLOBAL_MARKETS
+      responses:
+        '200':
+          description: on success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/json_BalanceAdapter'
+                description: on success
+        '400':
+          description: if request is invalid
+        '404':
+          description: if there is no such account
+  /v2/auth/account/filtered:
+    get:
+      security:
+      - api_key: []
+        api_signature: []
+      summary: Get balances of current user, filtered by currencies and account types
+      tags:
+      - Account
+      description: Request account balances of current user, filtered by currency and account type
+      operationId: getBalancesByUserCurrenciesAndTypes
+      parameters:
+      - name: currency
+        in: query
+        required: true
+        description: 'Currency tag(s) or id(s) separated by commas. Example: 0c3a106d-bde3-4c13-a26e-3fd2394529e5,USDT'
+        schema:
+          type: array
+          items:
+            type: string
+      - name: type
+        in: query
+        required: true
+        description: 'Account type(s) separated by commas. Example: ACCOUNT_TYPE_WALLET,ACCOUNT_TYPE_SPOT'
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - ACCOUNT_TYPE_WALLET
+            - ACCOUNT_TYPE_SPOT
+            - ACCOUNT_TYPE_FUTURES
+            - ACCOUNT_TYPE_GLOBAL_MARKETS
+      responses:
+        '200':
+          description: on success
+          content:
+            application/json:
+              schema:
+                description: on success
+                type: array
+                items:
+                  $ref: '#/components/schemas/json_BalanceAdapter'
+        '400':
+          description: if request is invalid
+      x-code-samples:
+      - lang: JavaScript
+        source: "const request = require('request')\nconst crypto = require('crypto')\n\nconst apiKey = 'Your Latoken API key'\nconst apiSecret = 'Your Latoken API secret'\nconst baseUrl = 'https://api.latoken.com'\nconst endpoint = '/v2/auth/account/filtered'\nconst method = 'GET';\n\nconst params = {\n    currency: '0c3a106d-bde3-4c13-a26e-3fd2394529e5,BTC'\n    type: 'ACCOUNT_TYPE_WALLET'\n}\nconst queryParams = Object.entries(params).map(([key, val]) => key + '=' + val).join('&');\n\nconst signature = crypto\n    .createHmac('sha256', apiSecret)\n    .update(method + endpoint + queryParams)\n    .digest('hex')\n\nconst options = {\n    method: method,\n    url: baseUrl + endpoint + '?' + queryParams,\n    headers: {\n        'X-LA-APIKEY': apiKey,\n        'X-LA-SIGNATURE': signature\n    }\n}\n\nrequest.get(\n    options,\n    function (error, response, responseBody) {\n        console.log('response:', JSON.stringify(responseBody))\n    }\n)\n"
+      - lang: Python
+        source: "import requests\nimport hashlib\nimport hmac\n\napiKey = 'Your Latoken API key'\napiSecret = b'Your Latoken API secret'\nbaseUrl = 'https://api.latoken.com'\nendpoint = '/v2/auth/account/filtered'\n\nparams = {\n    'currency': '0c3a106d-bde3-4c13-a26e-3fd2394529e5,BTC',\n    'type': 'ACCOUNT_TYPE_WALLET'\n}\nserializeFunc = map(lambda it : it[0] + '=' + str(it[1]), params.items())\nqueryParams = '&'.join(serializeFunc)\n                  \nsignature = hmac.new(\n    apiSecret, \n    ('GET' + endpoint + queryParams).encode('ascii'), \n    hashlib.sha512\n)\n\nurl = baseUrl + endpoint + '?' + queryParams\n\nresponse = requests.get(\n    url,\n    headers = {\n        'X-LA-APIKEY': apiKey,\n        'X-LA-SIGNATURE': signature.hexdigest(),\n        'X-LA-DIGEST': 'HMAC-SHA512'\n    }\n)\n\nprint(response.json())"
+      - lang: Php
+        source: "<?php\n\n$apiKey = 'Your Latoken API key';\n$apiSecret = 'Your Latoken API secret';\n$baseUrl = 'https://api.latoken.com';\n$endpoint = '/v2/auth/account/filtered';\n$method = 'GET';\n\n$params = [\n    'currency' => '0c3a106d-bde3-4c13-a26e-3fd2394529e5,BTC'\n    'type' => 'ACCOUNT_TYPE_WALLET'\n];\n\n$queryParams = join('&', array_map(\n    function($key, $val) { return $key.'='.$val; }, \n    array_keys($params), array_values($params))\n);\n\n$signature = hash_hmac('sha256', $method.$endpoint.$queryParams, $apiSecret, FALSE);\n\n$url = $baseUrl.$endpoint.'?'.$queryParams;\n$options = array(\n    'http' => array(\n        'ignore_errors'=> TRUE,\n        'method' => $method,\n        'header' => array(\n             'X-LA-APIKEY:'.$apiKey,\n             'X-LA-SIGNATURE:'.$signature\n        )\n    )\n);\n\n$context = stream_context_create($options);\n$response = file_get_contents($url, FALSE, $context);\n\nvar_dump($response);\n?>"
+      - lang: Java
+        source: "package api.client;\n\nimport com.sun.org.apache.xerces.internal.impl.dv.util.HexBin;\nimport javax.crypto.Mac;\nimport javax.crypto.spec.SecretKeySpec;\nimport java.io.IOException;\nimport java.net.URI;\nimport java.net.http.HttpClient;\nimport java.net.http.HttpRequest;\nimport java.net.http.HttpResponse;\nimport java.security.InvalidKeyException;\nimport java.security.NoSuchAlgorithmException;\nimport java.util.HashMap;\nimport java.util.Vector;\n\npublic class RestApiV1 {\n    public static void runSample() throws InvalidKeyException, NoSuchAlgorithmException, IOException, InterruptedException {\n        final String apiKey = \"Your Latoken API key\";\n        final String apiSecret = \"Your Latoken API secret\";\n        final String baseUrl = \"https://api.latoken.com\";\n        final String endpoint = \"/v2/auth/account/filtered\";\n\n        HashMap<String, String> params = new HashMap<>();\n\t\tparams.put(\"currency\", \"0c3a106d-bde3-4c13-a26e-3fd2394529e5,BTC\");\n\t\tparams.put(\"type\", \"ACCOUNT_TYPE_WALLET\");\n\n\t\t/* Body parameters for signature */\n        Vector<String> temporaryParams = new Vector<>();\n        params.forEach((key, value) -> temporaryParams.add(key + \"=\" + value));\n        final String queryParams = String.join(\"&\", temporaryParams);\n\n        /* Signature */\n        Mac crypto = Mac.getInstance(\"HmacSHA256\");\n        crypto.init(new SecretKeySpec(apiSecret.getBytes(\"UTF-8\"), \"HmacSHA256\"));\n        String signature = HexBin.encode( crypto.doFinal(\n                              (\"GET\" + endpoint + queryParams).getBytes(\"UTF-8\")\n                           )).toLowerCase();\n\n        /* Requesting */\n        HttpClient client = HttpClient.newHttpClient();\n        HttpRequest request = HttpRequest.newBuilder()\n                .uri(URI.create(baseUrl + endpoint + \"?\" + queryParams))\n                .header(\"X-LA-APIKEY\", apiKey)\n                .header(\"X-LA-SIGNATURE\", signature)\n                .GET()\n                .build();\n        HttpResponse<String> response =  client.send(request, HttpResponse.BodyHandlers.ofString());\n\n        System.out.println(response.body().toString());\n    }\n}"
+      - lang: C#
+        source: "using System;\nusing System.Collections.Generic;\nusing System.Net;\nusing System.Text;\nusing System.Linq;\nusing System.IO;\n\nusing System.Security.Cryptography;\n\npublic class Program\n{\n\tpublic static void Main()\n\t{\n\t\tvar apiKey = \"Your Latoken API key\";\n\t\tvar apiSecret = \"Your Latoken API secret\";\n\t\tvar baseUrl = \"https://api.latoken.com\";\n\t\tvar endpoint = \"/v2/auth/account/filtered\";\n\t\tvar method = \"GET\";\n\n\t\t/* form parameters */\n\t\tvar parameters = new Dictionary<string, string>(){\n\t\t\t{\"currency\", \"0c3a106d-bde3-4c13-a26e-3fd2394529e5,BTC\"},\n\t\t\t{\"type\", \"ACCOUNT_TYPE_WALLET\"}\n\t\t};\n\t\tvar queryParams = string.Join(\"&\", parameters.Select(kvp => kvp.Key + \"=\" + kvp.Value).ToArray());\n\n\t\t/* sign request */\n\t\tHMAC crypto = new HMACSHA256(Encoding.ASCII.GetBytes(apiSecret));\n\t\tbyte[] signBytes = crypto.ComputeHash(Encoding.ASCII.GetBytes(method + endpoint + queryParams));\n\t\tstring signature = string.Empty;\n\t\tsignBytes.ToList().ForEach(b => signature += b.ToString(\"x2\"));\n\n\t\t/* create request */\n\t\tvar request = HttpWebRequest.CreateHttp(baseUrl + endpoint + \"?\" + queryParams);\n\t\trequest.Method = method;\n\t\trequest.Headers.Add(\"X-LA-APIKEY\", apiKey);\n\t\trequest.Headers.Add(\"X-LA-SIGNATURE\", signature);\n\n\t\t/* get response */\n\t\ttry\n\t\t{\n\t\t\tvar response = (HttpWebResponse)request.GetResponse();\n\t\t\tvar responseString = new StreamReader(response.GetResponseStream()).ReadToEnd();\n\t\t\tConsole.WriteLine(responseString);\n\t\t}\n\t\tcatch (WebException we)\n\t\t{\n\t\t\tvar errorResponse = we.Response as HttpWebResponse;\n\t\t\tvar responseString = new StreamReader(errorResponse.GetResponseStream()).ReadToEnd();\n\t\t\tConsole.WriteLine(responseString);\n\t\t}\n\t}\n}\n"
+components:
+  schemas:
+    json_BalanceAdapter:
+      type: object
+      title: BalanceAdapter
+      properties:
+        id:
+          example: 1e200836-a037-4475-825e-f202dd0b0e92
+          readOnly: false
+          description: ''
+          type: string
+        status:
+          example: ACCOUNT_STATUS_ACTIVE
+          readOnly: false
+          description: ''
+          type: string
+        type:
+          example: ACCOUNT_TYPE_WALLET
+          readOnly: false
+          description: ''
+          type: string
+          enum:
+          - ACCOUNT_TYPE_WALLET
+          - ACCOUNT_TYPE_SPOT
+          - ACCOUNT_TYPE_FUTURES
+          - ACCOUNT_TYPE_GLOBAL_MARKETS
+        timestamp:
+          example: 1566408522980
+          readOnly: false
+          description: ''
+          type: integer
+          format: int64
+        currency:
+          example: 6ae140a9-8e75-4413-b157-8dd95c711b23
+          readOnly: false
+          description: ''
+          type: string
+        available:
+          example: '898849.3300'
+          readOnly: false
+          description: ''
+          type: string
+        blocked:
+          example: '4581.9510'
+          readOnly: false
+          description: ''
+          type: string
+      example:
+        id: 1e200836-a037-4475-825e-f202dd0b0e92
+        status: ACCOUNT_STATUS_ACTIVE
+        type: ACCOUNT_TYPE_WALLET
+        timestamp: 1566408522980
+        currency: 6ae140a9-8e75-4413-b157-8dd95c711b23
+        available: '898849.3300'
+        blocked: '4581.9510'
+      description: ''
+  securitySchemes:
+    api_key:
+      type: apiKey
+      name: X-LA-APIKEY
+      in: header
+    api_signature:
+      type: apiKey
+      name: X-LA-SIGNATURE
+      in: header
+x-refined-from:
+- latoken-api-v2-swagger.json
+- latoken-openapi.yml

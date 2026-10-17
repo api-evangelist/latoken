@@ -1,0 +1,421 @@
+openapi: 3.2.0
+info:
+  title: Latoken Payment Method Controller API
+  version: V1
+  x-logo:
+    url: ./logo.png
+  description: 'Operations tagged PaymentMethodController across 2 of this provider''s published API definitions: latoken-p2p-api-swagger.json, latoken-p2p-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: /pay/v1
+- url: https://api.latoken.com/pay/v1
+tags:
+- name: PaymentMethodController
+paths:
+  /auth/p2p/paymentMethods:
+    post:
+      security:
+      - api_key: []
+        api_signature: []
+      summary: Create new Payment Method
+      tags:
+      - PaymentMethodController
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentMethodPrivate'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: User Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '503':
+          description: Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceUnavailableError'
+      x-code-samples:
+      - lang: TypeScript
+        source: "import * as crypto from 'crypto';\nimport axios, { AxiosRequestConfig } from 'axios';\n\nconst apiKey = '<Your API Public Key>';\nconst apiSecret = '<You API Private Key>';\n\nconst baseUrl = 'https://api.latoken.com';\nconst endpoint = '/pay/v1/auth/p2p/paymentMethods';\nconst method = 'POST';\n\nconst signature: string = crypto\n  .createHmac('sha256', apiSecret)\n  .update(method + endpoint)\n  .digest('hex');\n\nconst config: AxiosRequestConfig = {\n  headers: {\n    'X-LA-APIKEY': apiKey,\n    'X-LA-SIGNATURE': signature,\n  },\n};\n\nconst params = {\n  type: 'PAYMENT_TYPE_BANK_TRANSFER',\n  bank: 'BANK NAME',\n  account: '1234123412341234',\n  name: 'NAME SURNAME',\n};\n\naxios\n  .post(baseUrl + endpoint, params, config)\n  .then((result) => console.log(result.data))\n  .catch((error) => console.error(error));\n"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePaymentMethodRequest'
+        required: true
+      operationId: postAuthP2pPaymentMethods
+      x-operation-id-source: derived
+    get:
+      security:
+      - api_key: []
+        api_signature: []
+      summary: List Payment Methods
+      tags:
+      - PaymentMethodController
+      parameters:
+      - in: query
+        name: page
+        description: Number of the page
+        schema:
+          type: integer
+          default: 1
+          minimum: 1
+      - in: query
+        name: size
+        description: Count of entities in the set
+        schema:
+          type: integer
+          default: 50
+          minimum: 1
+      - in: query
+        name: sort
+        description: Property for sorting
+        schema:
+          type: string
+          default: updatedAt
+      - in: query
+        name: direction
+        description: Sorting direction
+        schema:
+          type: string
+          enum:
+          - ASC
+          - DESC
+          default: DESC
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentMethodsList'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: User Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '503':
+          description: Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceUnavailableError'
+      x-code-samples:
+      - lang: TypeScript
+        source: "import * as crypto from 'crypto';\nimport axios, { AxiosRequestConfig } from 'axios';\n\nconst apiKey = '<Your API Public Key>';\nconst apiSecret = '<You API Private Key>';\n\nconst baseUrl = 'https://api.latoken.com';\nconst endpoint = '/pay/v1/auth/p2p/paymentMethods';\nconst method = 'GET';\n\nconst signature: string = crypto\n  .createHmac('sha256', apiSecret)\n  .update(method + endpoint)\n  .digest('hex');\n\nconst config: AxiosRequestConfig = {\n  headers: {\n    'X-LA-APIKEY': apiKey,\n    'X-LA-SIGNATURE': signature,\n  },\n};\n\naxios\n  .get(baseUrl + endpoint, config)\n  .then((result) => console.log(result.data))\n  .catch((error) => console.error(error));\n"
+      operationId: getAuthP2pPaymentMethods
+      x-operation-id-source: derived
+    servers:
+    - url: /pay/v1
+  /auth/p2p/paymentMethods/update:
+    post:
+      security:
+      - api_key: []
+        api_signature: []
+      summary: Update Payment Method
+      tags:
+      - PaymentMethodController
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentMethodPrivate'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: User Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '503':
+          description: Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceUnavailableError'
+      x-code-samples:
+      - lang: TypeScript
+        source: "import * as crypto from 'crypto';\nimport axios, { AxiosRequestConfig } from 'axios';\n\nconst apiKey = '<Your API Public Key>';\nconst apiSecret = '<You API Private Key>';\n\nconst baseUrl = 'https://api.latoken.com';\nconst endpoint = '/pay/v1/auth/p2p/paymentMethods/update';\nconst method = 'POST';\n\nconst signature: string = crypto\n  .createHmac('sha256', apiSecret)\n  .update(method + endpoint)\n  .digest('hex');\n\nconst config: AxiosRequestConfig = {\n  headers: {\n    'X-LA-APIKEY': apiKey,\n    'X-LA-SIGNATURE': signature,\n  },\n};\n\nconst params = {\n  id: '1c18d0bb-511d-41c5-8fb2-66626531d59d',\n  type: 'PAYMENT_TYPE_BANK_TRANSFER',\n  bank: 'BANK NAME',\n  account: '1234123412341234',\n  name: 'NAME SURNAME',\n};\n\naxios\n  .post(baseUrl + endpoint, params, config)\n  .then((result) => console.log(result.data))\n  .catch((error) => console.error(error));\n"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePaymentMethodRequest'
+        required: true
+      operationId: postAuthP2pPaymentMethodsUpdate
+      x-operation-id-source: derived
+    servers:
+    - url: /pay/v1
+  /auth/p2p/paymentMethods/remove:
+    post:
+      security:
+      - api_key: []
+        api_signature: []
+      summary: Remove Payment Method
+      tags:
+      - PaymentMethodController
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentMethodPrivate'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: User Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '503':
+          description: Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceUnavailableError'
+      x-code-samples:
+      - lang: TypeScript
+        source: "import * as crypto from 'crypto';\nimport axios, { AxiosRequestConfig } from 'axios';\n\nconst apiKey = '<Your API Public Key>';\nconst apiSecret = '<You API Private Key>';\n\nconst baseUrl = 'https://api.latoken.com';\nconst endpoint = '/pay/v1/auth/p2p/paymentMethods/update';\nconst method = 'POST';\n\nconst signature: string = crypto\n  .createHmac('sha256', apiSecret)\n  .update(method + endpoint)\n  .digest('hex');\n\nconst config: AxiosRequestConfig = {\n  headers: {\n    'X-LA-APIKEY': apiKey,\n    'X-LA-SIGNATURE': signature,\n  },\n};\n\nconst params = {\n  id: '1c18d0bb-511d-41c5-8fb2-66626531d59d',\n};\n\naxios\n  .post(baseUrl + endpoint, params, config)\n  .then((result) => console.log(result.data))\n  .catch((error) => console.error(error));\n"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RemovePaymentMethodRequest'
+        required: true
+      operationId: postAuthP2pPaymentMethodsRemove
+      x-operation-id-source: derived
+    servers:
+    - url: /pay/v1
+  /auth/p2p/paymentMethods/{id}:
+    get:
+      security:
+      - api_key: []
+        api_signature: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: ID of the method
+        schema:
+          type: string
+      summary: Get Payment Method by Id
+      tags:
+      - PaymentMethodController
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentMethodPrivate'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: User Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '503':
+          description: Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceUnavailableError'
+      x-code-samples:
+      - lang: TypeScript
+        source: "import * as crypto from 'crypto';\nimport axios, { AxiosRequestConfig } from 'axios';\n\nconst apiKey = '<Your API Public Key>';\nconst apiSecret = '<You API Private Key>';\n\nconst baseUrl = 'https://api.latoken.com';\nconst endpoint = '/pay/v1/auth/p2p/paymentMethods/<Payment Method ID>';\nconst method = 'GET';\n\nconst signature: string = crypto\n  .createHmac('sha256', apiSecret)\n  .update(method + endpoint)\n  .digest('hex');\n\nconst config: AxiosRequestConfig = {\n  headers: {\n    'X-LA-APIKEY': apiKey,\n    'X-LA-SIGNATURE': signature,\n  },\n};\n\naxios\n  .get(baseUrl + endpoint, config)\n  .then((result) => console.log(result.data))\n  .catch((error) => console.error(error));\n"
+      operationId: getAuthP2pPaymentMethodsById
+      x-operation-id-source: derived
+    servers:
+    - url: /pay/v1
+components:
+  schemas:
+    CreatePaymentMethodRequest:
+      type: object
+      title: CreatePaymentMethodRequest
+      properties:
+        type:
+          type: string
+          enum:
+          - PAYMENT_TYPE_UNSPECIFIED
+          - PAYMENT_TYPE_BANK_TRANSFER
+          - PAYMENT_TYPE_BKASH
+          - PAYMENT_TYPE_ROCKET
+          - PAYMENT_TYPE_NAGAD
+          - PAYMENT_TYPE_UPI
+          example: PAYMENT_TYPE_BANK_TRANSFER
+        bank:
+          type: string
+          example: BANK NAME
+        account:
+          type: string
+          example: '1234123412341234'
+        name:
+          type: string
+          example: NAME SURNAME
+      description: CreatePaymentMethodRequest Entity
+    Error:
+      type: object
+      title: Error
+      properties:
+        message:
+          type: string
+          example: '...'
+        status:
+          type: string
+          example: FAILURE
+        error:
+          type: string
+          example: INVALID_ARGUMENT
+      description: Error Entity
+    UpdatePaymentMethodRequest:
+      type: object
+      title: UpdatePaymentMethodRequest
+      properties:
+        id:
+          type: string
+          example: 1c18d0bb-511d-41c5-8fb2-66626531d59d
+        type:
+          type: string
+          enum:
+          - PAYMENT_TYPE_UNSPECIFIED
+          - PAYMENT_TYPE_BANK_TRANSFER
+          - PAYMENT_TYPE_BKASH
+          - PAYMENT_TYPE_ROCKET
+          - PAYMENT_TYPE_NAGAD
+          - PAYMENT_TYPE_UPI
+          example: PAYMENT_TYPE_BANK_TRANSFER
+        bank:
+          type: string
+          example: BANK NAME
+        account:
+          type: string
+          example: 1234123412341234
+        name:
+          type: string
+          example: NAME SURNAME
+      description: UpdatePaymentMethodRequest Entity
+    PaymentMethodsList:
+      type: array
+      title: Payment Methods List
+      items:
+        $ref: '#/components/schemas/PaymentMethodPrivate'
+    PaymentMethodPrivate:
+      type: object
+      title: Payment Method Private
+      properties:
+        id:
+          type: string
+          example: 3d7e1b02-c7f7-49c2-912e-5f4dc9460f8e
+        type:
+          type: string
+          enum:
+          - PAYMENT_TYPE_UNSPECIFIED
+          - PAYMENT_TYPE_BANK_TRANSFER
+          - PAYMENT_TYPE_BKASH
+          - PAYMENT_TYPE_ROCKET
+          - PAYMENT_TYPE_NAGAD
+          - PAYMENT_TYPE_UPI
+          example: PAYMENT_TYPE_BANK_TRANSFER
+        bank:
+          type: string
+          example: BANK NAME
+        account:
+          type: string
+          example: 1234123412341234
+        name:
+          type: string
+          example: NAME SURNAME
+        createdAt:
+          type: string
+          example: '2021-08-19T15:56:16.323Z'
+        updatedAt:
+          type: string
+          example: '2021-08-19T15:56:16.323Z'
+      description: Payment Method Private Entity
+    RemovePaymentMethodRequest:
+      type: object
+      title: RemovePaymentMethodRequest
+      properties:
+        id:
+          type: string
+          example: 1c18d0bb-511d-41c5-8fb2-66626531d59d
+      description: RemovePaymentMethodRequest Entity
+    UnauthorizedError:
+      type: object
+      title: Unauthorized Error
+      properties:
+        result:
+          type: boolean
+          example: false
+        message:
+          type: string
+          example: user must be authenticated
+        status:
+          type: string
+          example: FAILURE
+        error:
+          type: string
+          example: UNAUTHORIZED
+      description: Unauthorized Error Entity
+    ServiceUnavailableError:
+      type: object
+      title: Service Unavailable Error
+      properties:
+        message:
+          type: string
+          example: service unavailable
+        status:
+          type: string
+          example: FAILURE
+        error:
+          type: string
+          example: SERVICE_UNAVAILABLE
+      description: Service Unavailable Error Entity
+  securitySchemes:
+    api_key:
+      type: apiKey
+      name: X-LA-APIKEY
+      in: header
+    api_signature:
+      type: apiKey
+      name: X-LA-SIGNATURE
+      in: header
+x-refined-from:
+- latoken-p2p-api-swagger.json
+- latoken-p2p-openapi.yml

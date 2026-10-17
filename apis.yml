@@ -86,43 +86,12 @@ common:
   url: https://latoken.com/fees
 
 apis:
-- aid: latoken:latoken-api-v2
-  name: LATOKEN Public API V2
-  description: REST API for the LATOKEN exchange - public market data (currencies, pairs, tickers, order books, trades, candles, time) and signed endpoints (paths under /auth/) for accounts, spot, stop and bulk orders, trades, transfers, transactions and withdrawals. Signed requests carry X-LA-APIKEY and an HMAC X-LA-SIGNATURE.
-  humanURL: https://api.latoken.com/doc/v2/
-  baseURL: https://api.latoken.com/v2
-  tags:
-  - Cryptocurrency
-  - Exchanges
-  - Trading
-  - Market Data
-  properties:
-  - type: OpenAPI
-    url: openapi/latoken-openapi.yml
-  - type: OpenAPI
-    name: OpenAPI (provider-hosted)
-    url: https://api.latoken.com/doc/v2/swagger.json
-  - type: Documentation
-    url: https://api.latoken.com/doc/v2/
-- aid: latoken:latoken-p2p-api
-  name: LATOKEN P2P API
-  description: LATOKEN P2P API v1 (base path /pay/v1) for the exchange's peer-to-peer marketplace, signed with the same X-LA-APIKEY / X-LA-SIGNATURE headers as the REST API.
-  humanURL: https://api.latoken.com/doc/p2p/
-  baseURL: https://api.latoken.com/pay/v1
-  tags:
-  - Cryptocurrency
-  - P2P
-  properties:
-  - type: OpenAPI
-    url: openapi/latoken-p2p-openapi.yml
-  - type: OpenAPI
-    name: OpenAPI (provider-hosted)
-    url: https://api.latoken.com/doc/p2p/swagger.json
-  - type: Documentation
-    url: https://api.latoken.com/doc/p2p/
 - aid: latoken:latoken-websocket-api
   name: LATOKEN Public WebSocket API
-  description: STOMP-over-WebSocket API at wss://api.latoken.com/stomp with public market-data and private account topics. Documented in prose only; the provider's Swagger file for it carries no paths, and no AsyncAPI is published.
+  description: >-
+    STOMP-over-WebSocket API at wss://api.latoken.com/stomp with public market-data and private account
+    topics. Documented in prose only; the provider's Swagger file for it carries no paths, and no AsyncAPI
+    is published.
   humanURL: https://api.latoken.com/doc/ws/
   baseURL: wss://api.latoken.com/stomp
   tags:
@@ -131,6 +100,287 @@ apis:
   properties:
   - type: Documentation
     url: https://api.latoken.com/doc/ws/
+- aid: latoken:latoken-account-api
+  name: LATOKEN Account API
+  description: The Account API from LATOKEN — 3 operation(s) for account.
+  humanURL: https://api.latoken.com/doc/v2/
+  baseURL: https://api.latoken.com/v2
+  tags:
+  - Account
+  properties:
+  - type: OpenAPI
+    url: openapi/latoken-account-api-openapi.yml
+  - type: Documentation
+    url: https://api.latoken.com/doc/v2/
+  - type: Documentation
+    url: https://api.latoken.com/doc/p2p/
+- aid: latoken:latoken-appealcontroller-api
+  name: LATOKEN Appeal Controller API
+  description: The AppealController API from LATOKEN — 2 operation(s) for appealcontroller.
+  humanURL: https://api.latoken.com/doc/v2/
+  baseURL: https://api.latoken.com/v2
+  tags:
+  - AppealController
+  properties:
+  - type: OpenAPI
+    url: openapi/latoken-appealcontroller-api-openapi.yml
+  - type: Documentation
+    url: https://api.latoken.com/doc/v2/
+  - type: Documentation
+    url: https://api.latoken.com/doc/p2p/
+- aid: latoken:latoken-bulkorder-api
+  name: LATOKEN Bulk Order API
+  description: The BulkOrder API from LATOKEN — 2 operation(s) for bulkorder.
+  humanURL: https://api.latoken.com/doc/v2/
+  baseURL: https://api.latoken.com/v2
+  tags:
+  - BulkOrder
+  properties:
+  - type: OpenAPI
+    url: openapi/latoken-bulkorder-api-openapi.yml
+  - type: Documentation
+    url: https://api.latoken.com/doc/v2/
+  - type: Documentation
+    url: https://api.latoken.com/doc/p2p/
+- aid: latoken:latoken-chart-api
+  name: LATOKEN Chart API
+  description: The Chart API from LATOKEN — 2 operation(s) for chart.
+  humanURL: https://api.latoken.com/doc/v2/
+  baseURL: https://api.latoken.com/v2
+  tags:
+  - Chart
+  properties:
+  - type: OpenAPI
+    url: openapi/latoken-chart-api-openapi.yml
+  - type: Documentation
+    url: https://api.latoken.com/doc/v2/
+  - type: Documentation
+    url: https://api.latoken.com/doc/p2p/
+- aid: latoken:latoken-chatcontroller-api
+  name: LATOKEN Chat Controller API
+  description: The ChatController API from LATOKEN — 1 operation(s) for chatcontroller.
+  humanURL: https://api.latoken.com/doc/v2/
+  baseURL: https://api.latoken.com/v2
+  tags:
+  - ChatController
+  properties:
+  - type: OpenAPI
+    url: openapi/latoken-chatcontroller-api-openapi.yml
+  - type: Documentation
+    url: https://api.latoken.com/doc/v2/
+  - type: Documentation
+    url: https://api.latoken.com/doc/p2p/
+- aid: latoken:latoken-currency-api
+  name: LATOKEN Currency API
+  description: The Currency API from LATOKEN — 4 operation(s) for currency.
+  humanURL: https://api.latoken.com/doc/v2/
+  baseURL: https://api.latoken.com/v2
+  tags:
+  - Currency
+  properties:
+  - type: OpenAPI
+    url: openapi/latoken-currency-api-openapi.yml
+  - type: Documentation
+    url: https://api.latoken.com/doc/v2/
+  - type: Documentation
+    url: https://api.latoken.com/doc/p2p/
+- aid: latoken:latoken-offercontroller-api
+  name: LATOKEN Offer Controller API
+  description: The OfferController API from LATOKEN — 7 operation(s) for offercontroller.
+  humanURL: https://api.latoken.com/doc/v2/
+  baseURL: https://api.latoken.com/v2
+  tags:
+  - OfferController
+  properties:
+  - type: OpenAPI
+    url: openapi/latoken-offercontroller-api-openapi.yml
+  - type: Documentation
+    url: https://api.latoken.com/doc/v2/
+  - type: Documentation
+    url: https://api.latoken.com/doc/p2p/
+- aid: latoken:latoken-order-api
+  name: LATOKEN Order API
+  description: The Order API from LATOKEN — 9 operation(s) for order.
+  humanURL: https://api.latoken.com/doc/v2/
+  baseURL: https://api.latoken.com/v2
+  tags:
+  - Order
+  properties:
+  - type: OpenAPI
+    url: openapi/latoken-order-api-openapi.yml
+  - type: Documentation
+    url: https://api.latoken.com/doc/v2/
+  - type: Documentation
+    url: https://api.latoken.com/doc/p2p/
+- aid: latoken:latoken-ordercontroller-api
+  name: LATOKEN Order Controller API
+  description: The OrderController API from LATOKEN — 7 operation(s) for ordercontroller.
+  humanURL: https://api.latoken.com/doc/v2/
+  baseURL: https://api.latoken.com/v2
+  tags:
+  - OrderController
+  properties:
+  - type: OpenAPI
+    url: openapi/latoken-ordercontroller-api-openapi.yml
+  - type: Documentation
+    url: https://api.latoken.com/doc/v2/
+  - type: Documentation
+    url: https://api.latoken.com/doc/p2p/
+- aid: latoken:latoken-pair-api
+  name: LATOKEN Pair API
+  description: The Pair API from LATOKEN — 2 operation(s) for pair.
+  humanURL: https://api.latoken.com/doc/v2/
+  baseURL: https://api.latoken.com/v2
+  tags:
+  - Pair
+  properties:
+  - type: OpenAPI
+    url: openapi/latoken-pair-api-openapi.yml
+  - type: Documentation
+    url: https://api.latoken.com/doc/v2/
+  - type: Documentation
+    url: https://api.latoken.com/doc/p2p/
+- aid: latoken:latoken-paymentmethodcontroller-api
+  name: LATOKEN Payment Method Controller API
+  description: >-
+    The PaymentMethodController API from LATOKEN — 4 operation(s) for paymentmethodcontroller.
+  humanURL: https://api.latoken.com/doc/v2/
+  baseURL: https://api.latoken.com/v2
+  tags:
+  - PaymentMethodController
+  properties:
+  - type: OpenAPI
+    url: openapi/latoken-paymentmethodcontroller-api-openapi.yml
+  - type: Documentation
+    url: https://api.latoken.com/doc/v2/
+  - type: Documentation
+    url: https://api.latoken.com/doc/p2p/
+- aid: latoken:latoken-spot-api
+  name: LATOKEN Spot API
+  description: The Spot API from LATOKEN — 2 operation(s) for spot.
+  humanURL: https://api.latoken.com/doc/v2/
+  baseURL: https://api.latoken.com/v2
+  tags:
+  - Spot
+  properties:
+  - type: OpenAPI
+    url: openapi/latoken-spot-api-openapi.yml
+  - type: Documentation
+    url: https://api.latoken.com/doc/v2/
+  - type: Documentation
+    url: https://api.latoken.com/doc/p2p/
+- aid: latoken:latoken-stoporder-api
+  name: LATOKEN Stop Order API
+  description: The StopOrder API from LATOKEN — 8 operation(s) for stoporder.
+  humanURL: https://api.latoken.com/doc/v2/
+  baseURL: https://api.latoken.com/v2
+  tags:
+  - StopOrder
+  properties:
+  - type: OpenAPI
+    url: openapi/latoken-stoporder-api-openapi.yml
+  - type: Documentation
+    url: https://api.latoken.com/doc/v2/
+  - type: Documentation
+    url: https://api.latoken.com/doc/p2p/
+- aid: latoken:latoken-ticker-api
+  name: LATOKEN Ticker API
+  description: The Ticker API from LATOKEN — 2 operation(s) for ticker.
+  humanURL: https://api.latoken.com/doc/v2/
+  baseURL: https://api.latoken.com/v2
+  tags:
+  - Ticker
+  properties:
+  - type: OpenAPI
+    url: openapi/latoken-ticker-api-openapi.yml
+  - type: Documentation
+    url: https://api.latoken.com/doc/v2/
+  - type: Documentation
+    url: https://api.latoken.com/doc/p2p/
+- aid: latoken:latoken-time-api
+  name: LATOKEN Time API
+  description: The Time API from LATOKEN — 1 operation(s) for time.
+  humanURL: https://api.latoken.com/doc/v2/
+  baseURL: https://api.latoken.com/v2
+  tags:
+  - Time
+  properties:
+  - type: OpenAPI
+    url: openapi/latoken-time-api-openapi.yml
+  - type: Documentation
+    url: https://api.latoken.com/doc/v2/
+  - type: Documentation
+    url: https://api.latoken.com/doc/p2p/
+- aid: latoken:latoken-trade-api
+  name: LATOKEN Trade API
+  description: The Trade API from LATOKEN — 6 operation(s) for trade.
+  humanURL: https://api.latoken.com/doc/v2/
+  baseURL: https://api.latoken.com/v2
+  tags:
+  - Trade
+  properties:
+  - type: OpenAPI
+    url: openapi/latoken-trade-api-openapi.yml
+  - type: Documentation
+    url: https://api.latoken.com/doc/v2/
+  - type: Documentation
+    url: https://api.latoken.com/doc/p2p/
+- aid: latoken:latoken-transaction-api
+  name: LATOKEN Transaction API
+  description: The Transaction API from LATOKEN — 10 operation(s) for transaction.
+  humanURL: https://api.latoken.com/doc/v2/
+  baseURL: https://api.latoken.com/v2
+  tags:
+  - Transaction
+  properties:
+  - type: OpenAPI
+    url: openapi/latoken-transaction-api-openapi.yml
+  - type: Documentation
+    url: https://api.latoken.com/doc/v2/
+  - type: Documentation
+    url: https://api.latoken.com/doc/p2p/
+- aid: latoken:latoken-transfer-api
+  name: LATOKEN Transfer API
+  description: The Transfer API from LATOKEN — 4 operation(s) for transfer.
+  humanURL: https://api.latoken.com/doc/v2/
+  baseURL: https://api.latoken.com/v2
+  tags:
+  - Transfer
+  properties:
+  - type: OpenAPI
+    url: openapi/latoken-transfer-api-openapi.yml
+  - type: Documentation
+    url: https://api.latoken.com/doc/v2/
+  - type: Documentation
+    url: https://api.latoken.com/doc/p2p/
+- aid: latoken:latoken-usercontroller-api
+  name: LATOKEN User Controller API
+  description: The UserController API from LATOKEN — 2 operation(s) for usercontroller.
+  humanURL: https://api.latoken.com/doc/v2/
+  baseURL: https://api.latoken.com/v2
+  tags:
+  - UserController
+  properties:
+  - type: OpenAPI
+    url: openapi/latoken-usercontroller-api-openapi.yml
+  - type: Documentation
+    url: https://api.latoken.com/doc/v2/
+  - type: Documentation
+    url: https://api.latoken.com/doc/p2p/
+- aid: latoken:latoken-orderbook-api
+  name: LATOKEN Orderbook API
+  description: The Orderbook API from LATOKEN — 1 operation(s) for orderbook.
+  humanURL: https://api.latoken.com/doc/ws/
+  baseURL: wss://api.latoken.com/stomp
+  tags:
+  - Orderbook
+  properties:
+  - type: OpenAPI
+    url: openapi/latoken-orderbook-api-openapi.yml
+  - type: Documentation
+    url: https://api.latoken.com/doc/v2/
+  - type: Documentation
+    url: https://api.latoken.com/doc/p2p/
 x-enrichment:
   date: '2026-10-13'
   status: enriched

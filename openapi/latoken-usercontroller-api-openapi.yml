@@ -1,0 +1,202 @@
+openapi: 3.2.0
+info:
+  title: Latoken User Controller API
+  version: V1
+  x-logo:
+    url: ./logo.png
+  description: 'Operations tagged UserController across 2 of this provider''s published API definitions: latoken-p2p-api-swagger.json, latoken-p2p-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: /pay/v1
+- url: https://api.latoken.com/pay/v1
+tags:
+- name: UserController
+paths:
+  /auth/p2p/user/register:
+    post:
+      security:
+      - api_key: []
+        api_signature: []
+      summary: Register and Accept Agreement
+      tags:
+      - UserController
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserPrivate'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: User Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '503':
+          description: Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceUnavailableError'
+      x-code-samples:
+      - lang: TypeScript
+        source: "import * as crypto from 'crypto';\nimport axios, { AxiosRequestConfig } from 'axios';\n\nconst apiKey = '<Your API Public Key>';\nconst apiSecret = '<You API Private Key>';\n\nconst baseUrl = 'https://api.latoken.com';\nconst endpoint = '/pay/v1/auth/p2p/user/register';\nconst method = 'POST';\n\nconst signature: string = crypto\n  .createHmac('sha256', apiSecret)\n  .update(method + endpoint)\n  .digest('hex');\n\nconst config: AxiosRequestConfig = {\n  headers: {\n    'X-LA-APIKEY': apiKey,\n    'X-LA-SIGNATURE': signature,\n  },\n};\n\naxios\n  .post(baseUrl + endpoint, {}, config)\n  .then((result) => console.log(result.data))\n  .catch((error) => console.error(error));\n"
+      operationId: postAuthP2pUserRegister
+      x-operation-id-source: derived
+    servers:
+    - url: /pay/v1
+  /auth/p2p/user:
+    get:
+      security:
+      - api_key: []
+        api_signature: []
+      summary: Get your User
+      tags:
+      - UserController
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserPrivate'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: User Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '503':
+          description: Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceUnavailableError'
+      x-code-samples:
+      - lang: TypeScript
+        source: "import * as crypto from 'crypto';\nimport axios, { AxiosRequestConfig } from 'axios';\n\nconst apiKey = '<Your API Public Key>';\nconst apiSecret = '<You API Private Key>';\n\nconst baseUrl = 'https://api.latoken.com';\nconst endpoint = '/pay/v1/auth/p2p/user';\nconst method = 'GET';\n\nconst signature: string = crypto\n  .createHmac('sha256', apiSecret)\n  .update(method + endpoint)\n  .digest('hex');\n\nconst config: AxiosRequestConfig = {\n  headers: {\n    'X-LA-APIKEY': apiKey,\n    'X-LA-SIGNATURE': signature,\n  },\n};\n\naxios\n  .get(baseUrl + endpoint, config)\n  .then((result) => console.log(result.data))\n  .catch((error) => console.error(error));\n"
+      operationId: getAuthP2pUser
+      x-operation-id-source: derived
+    servers:
+    - url: /pay/v1
+components:
+  schemas:
+    UserPrivate:
+      type: object
+      title: User Private
+      properties:
+        id:
+          type: string
+          example: 3d7e1b02-c7f7-49c2-912e-5f4dc9460f8e
+        type:
+          type: string
+          enum:
+          - USER_TYPE_USER
+          - USER_TYPE_MERCHANT
+          example: USER_TYPE_USER
+        status:
+          type: string
+          enum:
+          - USER_STATUS_ACTIVE
+          - USER_STATUS_BANNED
+          example: USER_STATUS_ACTIVE
+        details:
+          type: object
+          properties:
+            kyc:
+              type: boolean
+              example: true
+            twoFa:
+              type: boolean
+              example: true
+            online:
+              type: boolean
+              example: true
+        info:
+          type: object
+          properties:
+            nickname:
+              type: string
+              example: cointrader
+            firstname:
+              type: string
+              example: Rick
+            lastname:
+              type: string
+              example: Cooper
+        createdAt:
+          type: string
+          example: '2021-08-19T15:56:16.323Z'
+        updatedAt:
+          type: string
+          example: '2021-08-19T15:56:16.323Z'
+      description: User Private Entity
+    Error:
+      type: object
+      title: Error
+      properties:
+        message:
+          type: string
+          example: '...'
+        status:
+          type: string
+          example: FAILURE
+        error:
+          type: string
+          example: INVALID_ARGUMENT
+      description: Error Entity
+    UnauthorizedError:
+      type: object
+      title: Unauthorized Error
+      properties:
+        result:
+          type: boolean
+          example: false
+        message:
+          type: string
+          example: user must be authenticated
+        status:
+          type: string
+          example: FAILURE
+        error:
+          type: string
+          example: UNAUTHORIZED
+      description: Unauthorized Error Entity
+    ServiceUnavailableError:
+      type: object
+      title: Service Unavailable Error
+      properties:
+        message:
+          type: string
+          example: service unavailable
+        status:
+          type: string
+          example: FAILURE
+        error:
+          type: string
+          example: SERVICE_UNAVAILABLE
+      description: Service Unavailable Error Entity
+  securitySchemes:
+    api_key:
+      type: apiKey
+      name: X-LA-APIKEY
+      in: header
+    api_signature:
+      type: apiKey
+      name: X-LA-SIGNATURE
+      in: header
+x-refined-from:
+- latoken-p2p-api-swagger.json
+- latoken-p2p-openapi.yml

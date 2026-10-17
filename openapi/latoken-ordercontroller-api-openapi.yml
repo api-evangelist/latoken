@@ -1,0 +1,718 @@
+openapi: 3.2.0
+info:
+  title: Latoken Order Controller API
+  version: V1
+  x-logo:
+    url: ./logo.png
+  description: 'Operations tagged OrderController across 2 of this provider''s published API definitions: latoken-p2p-api-swagger.json, latoken-p2p-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: /pay/v1
+- url: https://api.latoken.com/pay/v1
+tags:
+- name: OrderController
+paths:
+  /auth/p2p/order:
+    post:
+      security:
+      - api_key: []
+        api_signature: []
+      summary: Create Order
+      tags:
+      - OrderController
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: User Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '503':
+          description: Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceUnavailableError'
+      x-code-samples:
+      - lang: TypeScript
+        source: "import * as crypto from 'crypto';\nimport axios, { AxiosRequestConfig } from 'axios';\n\nconst apiKey = '<Your API Public Key>';\nconst apiSecret = '<You API Private Key>';\n\nconst baseUrl = 'https://api.latoken.com';\nconst endpoint = '/pay/v1/auth/p2p/order';\nconst method = 'POST';\n\nconst signature: string = crypto\n  .createHmac('sha256', apiSecret)\n  .update(method + endpoint)\n  .digest('hex');\n\nconst config: AxiosRequestConfig = {\n  headers: {\n    'X-LA-APIKEY': apiKey,\n    'X-LA-SIGNATURE': signature,\n  },\n};\n\nconst params = {\n  offer: '32ba928f-02c3-4d62-a455-1e36dc1d6b64',\n  amountCrypto: '0.5',\n  amountFiat: '100',\n  paymentMethod: '1c18d0bb-511d-41c5-8fb2-66626531d59d',\n};\n\naxios\n  .post(baseUrl + endpoint, params, config)\n  .then((result) => console.log(result.data))\n  .catch((error) => console.error(error));\n"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrderRequest'
+        required: true
+      operationId: postAuthP2pOrder
+      x-operation-id-source: derived
+    servers:
+    - url: /pay/v1
+  /auth/p2p/order/{id}:
+    get:
+      security:
+      - api_key: []
+        api_signature: []
+      summary: Get Order by Id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: ID of the order
+        schema:
+          type: string
+      tags:
+      - OrderController
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: User Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '503':
+          description: Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceUnavailableError'
+      x-code-samples:
+      - lang: TypeScript
+        source: "import * as crypto from 'crypto';\nimport axios, { AxiosRequestConfig } from 'axios';\n\nconst apiKey = '<Your API Public Key>';\nconst apiSecret = '<You API Private Key>';\n\nconst baseUrl = 'https://api.latoken.com';\nconst endpoint = '/pay/v1/auth/p2p/order/<Payment Method ID>';\nconst method = 'GET';\n\nconst signature: string = crypto\n  .createHmac('sha256', apiSecret)\n  .update(method + endpoint)\n  .digest('hex');\n\nconst config: AxiosRequestConfig = {\n  headers: {\n    'X-LA-APIKEY': apiKey,\n    'X-LA-SIGNATURE': signature,\n  },\n};\n\naxios\n  .get(baseUrl + endpoint, config)\n  .then((result) => console.log(result.data))\n  .catch((error) => console.error(error));\n"
+      operationId: getAuthP2pOrderById
+      x-operation-id-source: derived
+    servers:
+    - url: /pay/v1
+  /auth/p2p/orders:
+    get:
+      security:
+      - api_key: []
+        api_signature: []
+      summary: List User Orders
+      parameters:
+      - in: query
+        name: page
+        description: Number of the page
+        schema:
+          type: integer
+          default: 1
+          minimum: 1
+      - in: query
+        name: size
+        description: Count of entities in the set
+        schema:
+          type: integer
+          default: 50
+          minimum: 1
+      - in: query
+        name: sort
+        description: Property for sorting
+        schema:
+          type: string
+          default: updatedAt
+      - in: query
+        name: direction
+        description: Sorting direction
+        schema:
+          type: string
+          enum:
+          - ASC
+          - DESC
+          default: DESC
+      tags:
+      - OrderController
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrdersList'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: User Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '503':
+          description: Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceUnavailableError'
+      x-code-samples:
+      - lang: TypeScript
+        source: "import * as crypto from 'crypto';\nimport axios, { AxiosRequestConfig } from 'axios';\n\nconst apiKey = '<Your API Public Key>';\nconst apiSecret = '<You API Private Key>';\n\nconst baseUrl = 'https://api.latoken.com';\nconst endpoint = '/pay/v1/auth/p2p/orders';\nconst method = 'GET';\n\nconst signature: string = crypto\n  .createHmac('sha256', apiSecret)\n  .update(method + endpoint)\n  .digest('hex');\n\nconst config: AxiosRequestConfig = {\n  headers: {\n    'X-LA-APIKEY': apiKey,\n    'X-LA-SIGNATURE': signature,\n  },\n};\n\naxios\n  .get(baseUrl + endpoint, config)\n  .then((result) => console.log(result.data))\n  .catch((error) => console.error(error));\n"
+      operationId: getAuthP2pOrders
+      x-operation-id-source: derived
+    servers:
+    - url: /pay/v1
+  /auth/p2p/merchant/orders:
+    get:
+      security:
+      - api_key: []
+        api_signature: []
+      summary: List Merchant Orders
+      parameters:
+      - in: query
+        name: page
+        description: Number of the page
+        schema:
+          type: integer
+          default: 1
+          minimum: 1
+      - in: query
+        name: size
+        description: Count of entities in the set
+        schema:
+          type: integer
+          default: 50
+          minimum: 1
+      - in: query
+        name: sort
+        description: Property for sorting
+        schema:
+          type: string
+          default: updatedAt
+      - in: query
+        name: direction
+        description: Sorting direction
+        schema:
+          type: string
+          enum:
+          - ASC
+          - DESC
+          default: DESC
+      - in: query
+        name: type
+        description: Type of order
+        schema:
+          type: string
+          enum:
+          - ORDER_TYPE_UNSPECIFIED
+          - ORDER_TYPE_SELL
+          - ORDER_TYPE_BUY
+          default: ORDER_TYPE_UNSPECIFIED
+      - in: query
+        name: status
+        description: Status of order
+        schema:
+          type: string
+          enum:
+          - ORDER_STATUS_UNSPECIFIED
+          - ORDER_STATUS_CREATED
+          - ORDER_STATUS_CANCELED
+          - ORDER_STATUS_PAID
+          - ORDER_STATUS_APPEAL
+          - ORDER_STATUS_COMPLETED
+          default: ORDER_STATUS_UNSPECIFIED
+      - in: query
+        name: order
+        description: Search by order's id
+        schema:
+          type: string
+          default: ''
+      tags:
+      - OrderController
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrdersList'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: User Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '503':
+          description: Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceUnavailableError'
+      x-code-samples:
+      - lang: TypeScript
+        source: "import * as crypto from 'crypto';\nimport axios, { AxiosRequestConfig } from 'axios';\n\nconst apiKey = '<Your API Public Key>';\nconst apiSecret = '<You API Private Key>';\n\nconst baseUrl = 'https://api.latoken.com';\nconst endpoint = '/pay/v1/auth/p2p/merchant/orders';\nconst method = 'GET';\nconst query = 'status=ORDER_STATUS_CREATED';\n\nconst signature: string = crypto\n  .createHmac('sha256', apiSecret)\n  .update(method + endpoint + query)\n  .digest('hex');\n\nconst config: AxiosRequestConfig = {\n  headers: {\n    'X-LA-APIKEY': apiKey,\n    'X-LA-SIGNATURE': signature,\n  },\n};\n\naxios\n  .get(baseUrl + endpoint + '?' + query, config)\n  .then((result) => console.log(result.data))\n  .catch((error) => console.error(error));\n"
+      operationId: getAuthP2pMerchantOrders
+      x-operation-id-source: derived
+    servers:
+    - url: /pay/v1
+  /auth/p2p/order/confirm:
+    post:
+      security:
+      - api_key: []
+        api_signature: []
+      summary: Confirm Order
+      tags:
+      - OrderController
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: User Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '503':
+          description: Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceUnavailableError'
+      x-code-samples:
+      - lang: TypeScript
+        source: "import * as crypto from 'crypto';\nimport axios, { AxiosRequestConfig } from 'axios';\n\nconst apiKey = '<Your API Public Key>';\nconst apiSecret = '<You API Private Key>';\n\nconst baseUrl = 'https://api.latoken.com';\nconst endpoint = '/pay/v1/auth/p2p/order/confirm';\nconst method = 'POST';\n\nconst signature: string = crypto\n  .createHmac('sha256', apiSecret)\n  .update(method + endpoint)\n  .digest('hex');\n\nconst config: AxiosRequestConfig = {\n  headers: {\n    'X-LA-APIKEY': apiKey,\n    'X-LA-SIGNATURE': signature,\n  },\n};\n\nconst params = {\n  order: '53e8911a-caf6-4fb6-92dd-ced31b0eaf90',\n};\n\naxios\n  .post(baseUrl + endpoint, params, config)\n  .then((result) => console.log(result.data))\n  .catch((error) => console.error(error));\n"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConfirmOrderRequest'
+        required: true
+      operationId: postAuthP2pOrderConfirm
+      x-operation-id-source: derived
+    servers:
+    - url: /pay/v1
+  /auth/p2p/order/complete:
+    post:
+      security:
+      - api_key: []
+        api_signature: []
+      summary: Complete Order
+      tags:
+      - OrderController
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: User Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '503':
+          description: Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceUnavailableError'
+      x-code-samples:
+      - lang: TypeScript
+        source: "import * as crypto from 'crypto';\nimport axios, { AxiosRequestConfig } from 'axios';\n\nconst apiKey = '<Your API Public Key>';\nconst apiSecret = '<You API Private Key>';\n\nconst baseUrl = 'https://api.latoken.com';\nconst endpoint = '/pay/v1/auth/p2p/order/complete';\nconst method = 'POST';\n\nconst signature: string = crypto\n  .createHmac('sha256', apiSecret)\n  .update(method + endpoint)\n  .digest('hex');\n\nconst config: AxiosRequestConfig = {\n  headers: {\n    'X-LA-APIKEY': apiKey,\n    'X-LA-SIGNATURE': signature,\n  },\n};\n\nconst params = {\n  order: '53e8911a-caf6-4fb6-92dd-ced31b0eaf90',\n};\n\naxios\n  .post(baseUrl + endpoint, params, config)\n  .then((result) => console.log(result.data))\n  .catch((error) => console.error(error));\n"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CompleteOrderRequest'
+        required: true
+      operationId: postAuthP2pOrderComplete
+      x-operation-id-source: derived
+    servers:
+    - url: /pay/v1
+  /auth/p2p/order/cancel:
+    post:
+      security:
+      - api_key: []
+        api_signature: []
+      summary: Cancel Order
+      tags:
+      - OrderController
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: User Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '503':
+          description: Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceUnavailableError'
+      x-code-samples:
+      - lang: TypeScript
+        source: "import * as crypto from 'crypto';\nimport axios, { AxiosRequestConfig } from 'axios';\n\nconst apiKey = '<Your API Public Key>';\nconst apiSecret = '<You API Private Key>';\n\nconst baseUrl = 'https://api.latoken.com';\nconst endpoint = '/pay/v1/auth/p2p/order/cancel';\nconst method = 'POST';\n\nconst signature: string = crypto\n  .createHmac('sha256', apiSecret)\n  .update(method + endpoint)\n  .digest('hex');\n\nconst config: AxiosRequestConfig = {\n  headers: {\n    'X-LA-APIKEY': apiKey,\n    'X-LA-SIGNATURE': signature,\n  },\n};\n\nconst params = {\n  order: '53e8911a-caf6-4fb6-92dd-ced31b0eaf90',\n};\n\naxios\n  .post(baseUrl + endpoint, params, config)\n  .then((result) => console.log(result.data))\n  .catch((error) => console.error(error));\n"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CancelOrderRequest'
+        required: true
+      operationId: postAuthP2pOrderCancel
+      x-operation-id-source: derived
+    servers:
+    - url: /pay/v1
+components:
+  schemas:
+    PaymentMethodPublic:
+      type: object
+      title: Payment Method Public
+      properties:
+        type:
+          type: string
+          enum:
+          - PAYMENT_TYPE_UNSPECIFIED
+          - PAYMENT_TYPE_BANK_TRANSFER
+          - PAYMENT_TYPE_BKASH
+          - PAYMENT_TYPE_ROCKET
+          - PAYMENT_TYPE_NAGAD
+          - PAYMENT_TYPE_UPI
+          example: PAYMENT_TYPE_BANK_TRANSFER
+        bank:
+          type: string
+          example: BANK NAME
+        account:
+          type: string
+          example: 1234123412341234
+        name:
+          type: string
+          example: NAME SURNAME
+      description: Payment Method Public Entity
+    Error:
+      type: object
+      title: Error
+      properties:
+        message:
+          type: string
+          example: '...'
+        status:
+          type: string
+          example: FAILURE
+        error:
+          type: string
+          example: INVALID_ARGUMENT
+      description: Error Entity
+    ConfirmOrderRequest:
+      type: object
+      title: ConfirmOrderRequest
+      properties:
+        order:
+          type: string
+          example: 53e8911a-caf6-4fb6-92dd-ced31b0eaf90
+      description: ConfirmOrderRequest Entity
+    UserPublic:
+      type: object
+      title: User Public
+      properties:
+        online:
+          type: boolean
+          example: true
+        nickname:
+          type: string
+          example: cointrader
+      description: User Public Entity
+    CompleteOrderRequest:
+      type: object
+      title: CompleteOrderRequest
+      properties:
+        order:
+          type: string
+          example: 53e8911a-caf6-4fb6-92dd-ced31b0eaf90
+      description: CompleteOrderRequest Entity
+    OrdersList:
+      type: object
+      title: Orders List
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/Order'
+        currentPage:
+          example: 1
+          minimum: 1
+          type: integer
+        lastPage:
+          example: 1
+          minimum: 1
+          type: integer
+        size:
+          example: 50
+          minimum: 1
+          type: integer
+    CreateOrderRequest:
+      type: object
+      title: CreateOrderRequest
+      properties:
+        offer:
+          type: string
+          example: 32ba928f-02c3-4d62-a455-1e36dc1d6b64
+        amountCrypto:
+          type: string
+          example: 0.5
+        amountFiat:
+          type: string
+          example: 100
+        paymentMethod:
+          type: string
+          example: 1c18d0bb-511d-41c5-8fb2-66626531d59d
+      description: CreateOrderRequest Entity
+    Order:
+      type: object
+      title: Order
+      properties:
+        id:
+          type: string
+          example: 3d7e1b02-c7f7-49c2-912e-5f4dc9460f8e
+        amountCrypto:
+          type: string
+          example: '0.345678956789000000'
+        amountFiat:
+          type: string
+          example: '1000.000000000000000000'
+        offer:
+          $ref: '#/components/schemas/Offer'
+        status:
+          type: string
+          enum:
+          - ORDER_STATUS_UNSPECIFIED
+          - ORDER_STATUS_CREATED
+          - ORDER_STATUS_CANCELED
+          - ORDER_STATUS_PAID
+          - ORDER_STATUS_APPEAL
+          - ORDER_STATUS_COMPLETED
+          example: ORDER_STATUS_PAID
+        method:
+          $ref: '#/components/schemas/PaymentMethodPublic'
+        appeal:
+          $ref: '#/components/schemas/Appeal'
+        user:
+          $ref: '#/components/schemas/UserPublic'
+        type:
+          type: string
+          enum:
+          - ORDER_TYPE_UNSPECIFIED
+          - ORDER_TYPE_SELL
+          - ORDER_TYPE_BUY
+          example: ORDER_TYPE_BUY
+        createdAt:
+          type: string
+          example: '2021-08-19T15:56:16.323Z'
+        updatedAt:
+          type: string
+          example: '2021-08-19T15:56:16.323Z'
+      description: Order Entity
+    CancelOrderRequest:
+      type: object
+      title: CancelOrderRequest
+      properties:
+        order:
+          type: string
+          example: 53e8911a-caf6-4fb6-92dd-ced31b0eaf90
+      description: CancelOrderRequest Entity
+    Offer:
+      type: object
+      title: Offer
+      properties:
+        id:
+          type: string
+          example: 3d7e1b02-c7f7-49c2-912e-5f4dc9460f8e
+        cryptoTag:
+          type: string
+          example: BTC
+        fiatTag:
+          type: string
+          example: USD
+        amount:
+          type: string
+          example: '0.500368396618455100'
+        availableAmount:
+          type: string
+          example: '0.400368396618455140'
+        limits:
+          type: object
+          properties:
+            min:
+              type: string
+              example: '0.000100000000000000'
+            max:
+              type: string
+              example: '0.005000000000000000'
+        rate:
+          type: object
+          properties:
+            type:
+              type: string
+              enum:
+              - RATE_TYPE_FIXED
+              - RATE_TYPE_FLOAT_PERCENT
+              - RATE_TYPE_FLOAT_VALUE
+              - RATE_TYPE_FLOAT_PERCENT_AND_VALUE
+              example: RATE_TYPE_FLOAT_PERCENT
+            value:
+              type: string
+              example: '24703558.793020000000000000'
+        merchant:
+          $ref: '#/components/schemas/UserPublic'
+        type:
+          type: string
+          enum:
+          - OFFER_TYPE_UNSPECIFIED
+          - OFFER_TYPE_SELL
+          - OFFER_TYPE_BUY
+          example: OFFER_TYPE_BUY
+        status:
+          type: string
+          enum:
+          - OFFER_STATUS_UNSPECIFIED
+          - OFFER_STATUS_ACTIVE
+          - OFFER_STATUS_NOT_ACTIVE
+          - OFFER_STATUS_DELETED
+          example: OFFER_STATUS_ACTIVE
+        terms:
+          type: string
+          example: Buy bitcoin
+        method:
+          $ref: '#/components/schemas/PaymentMethodPublic'
+        acceptableMethod:
+          type: string
+          example: null
+        createdAt:
+          type: string
+          example: '2021-08-19T15:56:16.323Z'
+        updatedAt:
+          type: string
+          example: '2021-08-20T17:12:30.332Z'
+      description: Offer Entity
+    UnauthorizedError:
+      type: object
+      title: Unauthorized Error
+      properties:
+        result:
+          type: boolean
+          example: false
+        message:
+          type: string
+          example: user must be authenticated
+        status:
+          type: string
+          example: FAILURE
+        error:
+          type: string
+          example: UNAUTHORIZED
+      description: Unauthorized Error Entity
+    ServiceUnavailableError:
+      type: object
+      title: Service Unavailable Error
+      properties:
+        message:
+          type: string
+          example: service unavailable
+        status:
+          type: string
+          example: FAILURE
+        error:
+          type: string
+          example: SERVICE_UNAVAILABLE
+      description: Service Unavailable Error Entity
+    Appeal:
+      type: object
+      title: Appeal
+      properties:
+        id:
+          type: string
+          example: 3d7e1b02-c7f7-49c2-912e-5f4dc9460f8e
+        appealer:
+          type: string
+          example: 5b144930-5da9-42af-9038-cd95b87eeb84
+        reason:
+          type: string
+          example: Did not receive funds
+        description:
+          type: string
+          example: Sent fiat, but merchant didn't complete order
+        proof:
+          type: array
+          items:
+            type: string
+            example: https://url.to.your/proof
+        status:
+          type: string
+          example: APPEAL_STATUS_PENDING
+        createdAt:
+          type: string
+          example: '2021-08-19T15:56:16.323Z'
+        updatedAt:
+          type: string
+          example: '2021-08-19T15:56:16.323Z'
+      description: Appeal Entity
+  securitySchemes:
+    api_key:
+      type: apiKey
+      name: X-LA-APIKEY
+      in: header
+    api_signature:
+      type: apiKey
+      name: X-LA-SIGNATURE
+      in: header
+x-refined-from:
+- latoken-p2p-api-swagger.json
+- latoken-p2p-openapi.yml

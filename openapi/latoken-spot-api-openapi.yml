@@ -1,0 +1,201 @@
+openapi: 3.2.0
+info:
+  title: Latoken Spot API
+  version: V2
+  x-logo:
+    url: ./logo.png
+    altText: Latoken logo
+  description: 'Operations tagged Spot across 2 of this provider''s published API definitions: latoken-api-v2-swagger.json, latoken-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.latoken.com/
+tags:
+- name: Spot
+paths:
+  /v2/auth/spot/deposit:
+    post:
+      security:
+      - api_key: []
+        api_signature: []
+      summary: Deposit spot account
+      tags:
+      - Spot
+      operationId: depositSpotAccount
+      responses:
+        '201':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/json_TransferAdapter'
+      x-code-samples:
+      - lang: JavaScript
+        source: "\nconst request = require('request')\nconst crypto = require('crypto')\n\nconst apiKey = 'Your Latoken API key'\nconst apiSecret = 'Your Latoken API secret'\nconst method = 'POST';\nconst baseUrl = 'https://api.latoken.com'\nconst endpoint = '/v2/auth/spot/deposit'\n\nconst params = {\n    value: '2000',\n    currency: '0c3a106d-bde3-4c13-a26e-3fd2394529e5'\n}\nconst body = JSON.stringify(params);\nconst bodySignParams = Object.entries(params).map(([key, val]) => key + '=' + val).join('&');\n\nconst signature = crypto\n    .createHmac('sha256', apiSecret)\n    .update(method + endpoint + bodySignParams)\n    .digest('hex')\n\nconst options = {\n    method: method,\n    url: baseUrl + endpoint,\n    headers: {\n        'Content-Type': 'application/json',\n        'X-LA-APIKEY': apiKey,\n        'X-LA-SIGNATURE': signature\n    },\n    body: body\n}\n\nrequest.post(\n    options,\n    function (error, response, responseBody) {\n        console.log('response:', JSON.stringify(responseBody))\n    }\n)\n\n"
+      - lang: Python
+        source: "import requests\nimport datetime\nimport hashlib\nimport hmac\n\napiKey = 'Your Latoken API key'\napiSecret = b'Your Latoken API secret'\nbaseUrl = 'https://api.latoken.com'\nendpoint = '/v2/auth/spot/deposit'\n\nparams = {\n    'value': '2000',\n    'currency': '0c3a106d-bde3-4c13-a26e-3fd2394529e5'\n}\nserializeFunc = map(lambda it : it[0] + '=' + str(it[1]), params.items())\nbodyParams = '&'.join(serializeFunc)\n                  \nsignature = hmac.new(\n    apiSecret, \n    ('POST' + endpoint + bodyParams).encode('ascii'), \n    hashlib.sha512\n)\n\nurl = baseUrl + endpoint\n\nresponse = requests.post(\n    url,\n    headers = {\n        'Content-Type': 'application/json',\n        'X-LA-APIKEY': apiKey,\n        'X-LA-SIGNATURE': signature.hexdigest(),\n        'X-LA-DIGEST': 'HMAC-SHA512'\n    },\n    json = params\n)\n\nprint(response.json())"
+      - lang: Php
+        source: "<?php\n\n$apiKey = 'Your Latoken API key';\n$apiSecret = 'Your Latoken API secret';\n$baseUrl = 'https://api.latoken.com';\n$endpoint = '/v2/auth/spot/deposit';\n$method = 'POST';\n\n$params = [\n    'value' => '2000',\n    'currency' => '0c3a106d-bde3-4c13-a26e-3fd2394529e5'\n];\n\n$bodyParams = join('&', array_map(\n    function($key, $val) { return $key.'='.$val; }, \n    array_keys($params), array_values($params))\n);\n\n$signature = hash_hmac('sha256', $method.$endpoint.$bodyParams, $apiSecret, FALSE);\n\n$url = $baseUrl.$endpoint;\n$options = array(\n    'http' => array(\n        'ignore_errors'=> TRUE,\n        'method' => $method,\n        'header' => array(\n             'Content-Type:application/json',\n             'X-LA-APIKEY:'.$apiKey,\n             'X-LA-SIGNATURE:'.$signature\n        ),\n        'content' => json_encode($params, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT, 1)\n    )\n);\n\n$context = stream_context_create($options);\n$response = file_get_contents($url, FALSE, $context);\n\nvar_dump($response);\n\n?>"
+      - lang: Java
+        source: "package api.client;\n\nimport com.sun.org.apache.xerces.internal.impl.dv.util.HexBin;\nimport javax.crypto.Mac;\nimport javax.crypto.spec.SecretKeySpec;\nimport java.io.IOException;\nimport java.net.URI;\nimport java.net.http.HttpClient;\nimport java.net.http.HttpRequest;\nimport java.net.http.HttpResponse;\nimport java.security.InvalidKeyException;\nimport java.security.NoSuchAlgorithmException;\nimport java.util.HashMap;\nimport java.util.Vector;\n\npublic class RestApiV1 {\n    public static void runSample() throws InvalidKeyException, NoSuchAlgorithmException, IOException, InterruptedException {\n        final String apiKey = \"Your Latoken API key\";\n        final String apiSecret = \"Your Latoken API secret\";\n        final String baseUrl = \"https://api.latoken.com\";\n        final String endpoint = \"/v2/auth/spot/deposit\";\n\n        HashMap<String, String> params = new HashMap<>();\n\t\tparams.put(\"value\", \"2000\");\n        params.put(\"currency\", \"0c3a106d-bde3-4c13-a26e-3fd2394529e5\");\n\t\t\n\t\t/* Body parameters for request (json) */\n        Vector<String> bodyParams = new Vector<>();\n        params.forEach((key, value) -> bodyParams.add(\"\\\"\" + key + \"\\\": \\\"\" + value + \"\\\"\"));\n        final String bodyContent = \"{\" + String.join(\",\", bodyParams) + \"}\";\n        \n\t\t/* Body parameters for signature */\n        Vector<String> temporaryParams = new Vector<>();\n        params.forEach((key, value) -> temporaryParams.add(key + \"=\" + value));\n        final String signableBodyParams = String.join(\"&\", temporaryParams);\n\n        /* Signature */\n        Mac crypto = Mac.getInstance(\"HmacSHA256\");\n        crypto.init(new SecretKeySpec(apiSecret.getBytes(\"UTF-8\"), \"HmacSHA256\"));\n        String signature = HexBin.encode( crypto.doFinal(\n                              (\"POST\" + endpoint + signableBodyParams).getBytes(\"UTF-8\")\n                           )).toLowerCase();\n\n        /* Requesting */\n        HttpClient client = HttpClient.newHttpClient();\n        HttpRequest request = HttpRequest.newBuilder()\n                .uri(URI.create(baseUrl + endpoint))\n\t\t\t\t.header(\"Content-Type\", \"application/json\")\n                .header(\"X-LA-APIKEY\", apiKey)\n                .header(\"X-LA-SIGNATURE\", signature)\n                .POST(HttpRequest.BodyPublishers.ofString(bodyContent))\n                .build();\n        HttpResponse<String> response =  client.send(request, HttpResponse.BodyHandlers.ofString());\n\n        System.out.println(response.body().toString());\n    }\n}"
+      - lang: C#
+        source: "using System;\nusing System.Collections.Generic;\nusing System.Net;\nusing System.Text;\nusing System.Linq;\nusing System.IO;\n\nusing System.Security.Cryptography;\n\npublic class Program\n{\n\tpublic static void Main()\n\t{\n\t\tvar apiKey = \"Your Latoken API key\";\n\t\tvar apiSecret = \"Your Latoken API secret\";\n\t\tvar baseUrl = \"https://api.latoken.com\";\n\t\tvar endpoint = \"/v2/auth/spot/deposit\";\n\t\tvar method = \"POST\";\n\n\t\t/* form parameters */\n\t\tvar parameters = new Dictionary<string, string>(){\n\t\t\t{\"value\", \"2000\"},\n\t\t\t{\"currency\", \"0c3a106d-bde3-4c13-a26e-3fd2394529e5\"}\n\t\t};\n\t\tvar bodyContent = \"{\" + string.Join(\",\", parameters.Select(kvp => \"\\\"\" + kvp.Key + \"\\\": \\\"\" + kvp.Value + \"\\\"\").ToArray()) + \"}\";\n\t\tvar signableParams = string.Join(\"&\", parameters.Select(kvp => kvp.Key + \"=\" + kvp.Value).ToArray());\n\n\t\t/* sign request */\n\t\tHMAC crypto = new HMACSHA256(Encoding.ASCII.GetBytes(apiSecret));\n\t\tbyte[] signBytes = crypto.ComputeHash(Encoding.ASCII.GetBytes(method + endpoint + signableParams));\n\t\tstring signature = string.Empty;\n\t\tsignBytes.ToList().ForEach(b => signature += b.ToString(\"x2\"));\n\n\t\t/* create request */\n\t\tvar request = HttpWebRequest.CreateHttp(baseUrl + endpoint);\n\t\trequest.Method = method;\n\t\trequest.ContentType = \"application/json\";\n\t\trequest.Headers.Add(\"X-LA-APIKEY\", apiKey);\n\t\trequest.Headers.Add(\"X-LA-SIGNATURE\", signature);\n\t\trequest.ContentLength = bodyContent.Length;\n\t\tvar body = request.GetRequestStream();\n\t\tbody.Write(Encoding.ASCII.GetBytes(bodyContent), 0, bodyContent.Length);\n\t\tbody.Close();\n\n\t\t/* get response */\n\t\ttry\n\t\t{\n\t\t\tvar response = (HttpWebResponse)request.GetResponse();\n\t\t\tvar responseString = new StreamReader(response.GetResponseStream()).ReadToEnd();\n\t\t\tConsole.WriteLine(responseString);\n\t\t}\n\t\tcatch (WebException we)\n\t\t{\n\t\t\tvar errorResponse = we.Response as HttpWebResponse;\n\t\t\tvar responseString = new StreamReader(errorResponse.GetResponseStream()).ReadToEnd();\n\t\t\tConsole.WriteLine(responseString);\n\t\t}\n\t}\n}\n"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/json_DepositOrWithdrawSpotAccountRequest'
+  /v2/auth/spot/withdraw:
+    post:
+      security:
+      - api_key: []
+        api_signature: []
+      summary: Withdraw spot account
+      tags:
+      - Spot
+      operationId: withdrawSpotAccount
+      responses:
+        '201':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/json_TransferAdapter'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/json_DepositOrWithdrawSpotAccountRequest'
+components:
+  schemas:
+    json_TransferAdapter:
+      type: object
+      title: TransferAdapter
+      properties:
+        id:
+          readOnly: false
+          description: Transfer ID
+          type: string
+        status:
+          readOnly: false
+          description: Transfer status (one of TRANSFER_STATUS_PENDING, TRANSFER_STATUS_COMPLETED, TRANSFER_STATUS_REJECTED, TRANSFER_STATUS_UNVERIFIED, TRANSFER_STATUS_CANCELLED)
+          type: string
+        type:
+          readOnly: false
+          description: Transfer type (one of TRANSFER_TYPE_DEPOSIT_SPOT, TRANSFER_TYPE_WITHDRAW_SPOT)
+          type: string
+        fromAccount:
+          readOnly: false
+          description: Wallet ID from which transfer was transferred
+          type: string
+        toAccount:
+          readOnly: false
+          description: Wallet ID for which transfer was received
+          type: string
+        transferringFunds:
+          readOnly: false
+          description: Transfer amount in Currency
+          type: string
+        usdValue:
+          readOnly: false
+          description: Transfer amount in USD
+          type: string
+        rejectReason:
+          readOnly: false
+          description: If transfer is rejected then here is a reason
+          type: string
+        timestamp:
+          readOnly: false
+          description: Transfer timestamp
+          type: integer
+          format: int64
+        direction:
+          $ref: '#/components/schemas/json_Direction'
+        method:
+          readOnly: false
+          description: Transfer method (one of TRANSFER_METHOD_EMAIL, TRANSFER_METHOD_DIRECT, TRANSFER_METHOD_PHONE)
+          type: string
+        recipient:
+          readOnly: false
+          description: Recipient ID
+          type: string
+        sender:
+          readOnly: false
+          description: Sender ID
+          type: string
+        currency:
+          readOnly: false
+          description: Currency which used for transfer
+          type: string
+        codeRequired:
+          readOnly: false
+          description: 2FA code is required
+        fromUser:
+          readOnly: false
+          description: ID of user
+        toUser:
+          readOnly: false
+          description: ID of user
+        fee:
+          readOnly: false
+          description: fee from this transfer
+      example:
+        id: e6fc4ace-7750-44e4-b7e9-6af038ac7107
+        status: TRANSFER_STATUS_COMPLETED
+        type: TRANSFER_TYPE_DEPOSIT_SPOT
+        fromAccount: 3bf61015-bf32-47a6-b237-c9f70df772ad
+        toAccount: 355eb279-7c7e-4515-814a-575a49dc0325
+        transferringFunds: '500000.000000000000000000'
+        usdValue: '0.000000000000000000'
+        rejectReason: ''
+        timestamp: 1576844438402
+        direction: INTERNAL
+        method: TRANSFER_METHOD_UNKNOWN
+        recipient: ''
+        sender: ''
+        currency: 40af7879-a8cc-4576-a42d-7d2749821b58
+        codeRequired: false
+        fromUser: cd555555-666d-46fb-9ae6-487f66738073
+        toUser: cd555555-666d-46fb-9ae6-487f66738073
+        fee: 0
+      description: ''
+    json_Direction:
+      type: string
+      title: Direction
+      enum:
+      - INTERNAL
+      - OUTCOME
+      - INCOME
+      description: ''
+    json_DepositOrWithdrawSpotAccountRequest:
+      type: object
+      title: DepositOrWithdrawSpotAccountRequest
+      required:
+      - value
+      - currency
+      properties:
+        value:
+          minimum: 0
+          readOnly: false
+          description: Currency quantity
+          type: string
+        currency:
+          maxLength: 50
+          minLength: 0
+          readOnly: false
+          description: Currency ID
+          type: string
+      example:
+        value: '10000.0'
+        currency: 23fa548b-f887-4f48-9b9b-7dd2c7de5ed0
+      description: ''
+  securitySchemes:
+    api_key:
+      type: apiKey
+      name: X-LA-APIKEY
+      in: header
+    api_signature:
+      type: apiKey
+      name: X-LA-SIGNATURE
+      in: header
+x-refined-from:
+- latoken-api-v2-swagger.json
+- latoken-openapi.yml

@@ -1,0 +1,109 @@
+openapi: 3.2.0
+info:
+  title: Latoken Chart API
+  version: V2
+  x-logo:
+    url: ./logo.png
+    altText: Latoken logo
+  description: 'Operations tagged Chart across 2 of this provider''s published API definitions: latoken-api-v2-swagger.json, latoken-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.latoken.com/
+tags:
+- name: Chart
+paths:
+  /v2/chart/week:
+    get:
+      summary: Get all weekly charts
+      tags:
+      - Chart
+      operationId: getAllWeeklyCharts
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/json_WeekCharts'
+  /v2/chart/week/{currency}/{quote}:
+    get:
+      summary: Get last week charts by trading pair
+      tags:
+      - Chart
+      operationId: getWeeklyCharts
+      parameters:
+      - name: currency
+        in: path
+        required: true
+        description: ''
+        schema:
+          type: string
+      - name: quote
+        in: path
+        required: true
+        description: ''
+        schema:
+          type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/json_Charts'
+components:
+  schemas:
+    json_WeekCharts:
+      type: object
+      title: WeekChart
+      properties:
+        Currency ID 1:
+          example: 263d5e99-1413-47e4-9215-ce4f5dec3556
+          readOnly: true
+          description: Array of first chart data
+          type: array
+          items:
+            $ref: '#/components/schemas/json_WeekChartValue'
+        Currency ID N:
+          example: 263d5e99-1413-47e4-9215-ce4f5dec3556
+          readOnly: true
+          description: Array of N chart data
+          type: array
+          items:
+            $ref: '#/components/schemas/json_WeekChartValue'
+      example:
+        ac6f8802-bd7f-4a24-92d8-2e7f4f9025e4:
+        - 0
+        - 1
+        - 0
+        896f8802-bd7f-4a24-92d8-2e7f4f907777:
+        - 0
+        - 0
+        776f8802-bd7f-4a24-92d8-2e7f4f907788:
+        - 1
+        - 0
+        - 0.1
+    json_Charts:
+      type: object
+      title: Chart
+      items:
+        $ref: '#/components/schemas/json_WeekChartValue'
+      example:
+      - 0
+      - 1
+      - 0
+    json_WeekChartValue:
+      type: number
+      title: Data
+      example: '0.0'
+  securitySchemes:
+    api_key:
+      type: apiKey
+      name: X-LA-APIKEY
+      in: header
+    api_signature:
+      type: apiKey
+      name: X-LA-SIGNATURE
+      in: header
+x-refined-from:
+- latoken-api-v2-swagger.json
+- latoken-openapi.yml

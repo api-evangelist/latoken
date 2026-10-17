@@ -1,0 +1,175 @@
+openapi: 3.2.0
+info:
+  title: Latoken Ticker API
+  version: V2
+  x-logo:
+    url: ./logo.png
+    altText: Latoken logo
+  description: 'Operations tagged Ticker across 2 of this provider''s published API definitions: latoken-api-v2-swagger.json, latoken-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.latoken.com/
+tags:
+- name: Ticker
+paths:
+  /v2/ticker:
+    get:
+      summary: Get all tickers
+      tags:
+      - Ticker
+      description: Request tickers for all pairs
+      operationId: getAllTickers
+      responses:
+        '200':
+          description: on success
+          content:
+            application/json:
+              schema:
+                description: on success
+                type: array
+                items:
+                  $ref: '#/components/schemas/json_TickerAdapter'
+  /v2/ticker/{base}/{quote}:
+    get:
+      summary: Get ticker for pair
+      tags:
+      - Ticker
+      description: Request ticker for pair
+      operationId: getTicker
+      parameters:
+      - name: base
+        in: path
+        required: true
+        description: id of base currency
+        schema:
+          type: string
+      - name: quote
+        in: path
+        required: true
+        description: id of quote currency
+        schema:
+          type: string
+      responses:
+        '200':
+          description: on success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/json_TickerAdapter'
+        '404':
+          description: if there is no such pair
+components:
+  schemas:
+    json_TickerAdapter:
+      type: object
+      title: TickerAdapter
+      properties:
+        symbol:
+          example: ETH/USDT
+          readOnly: false
+          description: ''
+          type: string
+        baseCurrency:
+          example: 23fa548b-f887-4f48-9b9b-7dd2c7de5ed0
+          readOnly: false
+          description: ''
+          type: string
+        quoteCurrency:
+          example: d721fcf2-cf87-4626-916a-da50548fe5b3
+          readOnly: false
+          description: ''
+          type: string
+        volume24h:
+          example: '450.29'
+          readOnly: false
+          description: ''
+          type: string
+        volume7d:
+          example: '3410.23'
+          readOnly: false
+          description: ''
+          type: string
+        change24h:
+          example: '-5.2100'
+          readOnly: false
+          description: In percent
+          type: string
+        change7d:
+          example: '1.1491'
+          readOnly: false
+          description: In percent
+          type: string
+        amount24h:
+          example: '25.2100'
+          readOnly: false
+          description: ''
+          type: string
+        amount7d:
+          example: '111.1491'
+          readOnly: false
+          description: ''
+          type: string
+        lastPrice:
+          example: '10034.14'
+          readOnly: false
+          description: ''
+          type: string
+        lastQuantity:
+          example: '10034.14'
+          readOnly: false
+          description: ''
+          type: string
+        bestBid:
+          example: '105.1445'
+          readOnly: false
+          description: ''
+          type: string
+        bestBidQuantity:
+          example: '198789.14'
+          readOnly: false
+          description: ''
+          type: string
+        bestAsk:
+          example: '10021.14'
+          readOnly: false
+          description: ''
+          type: string
+        bestAskQuantity:
+          example: '1054034.14'
+          readOnly: false
+          description: ''
+          type: string
+        updateTimestamp:
+          example: 100341454655423
+          readOnly: false
+          description: ''
+          type: number
+      example:
+        symbol: ETH/USDT
+        baseCurrency: 23fa548b-f887-4f48-9b9b-7dd2c7de5ed0
+        quoteCurrency: d721fcf2-cf87-4626-916a-da50548fe5b3
+        volume24h: '450.29'
+        volume7d: '3410.23'
+        change24h: '-5.2100'
+        change7d: '1.1491'
+        amount24h: '25.2100'
+        amount7d: '111.1491'
+        lastPrice: '10034.14'
+        lastQuantity: '10034.14'
+        bestBid: '105.1445'
+        bestBidQuantity: '198789.14'
+        bestAsk: '10021.14'
+        bestAskQuantity: '1054034.14'
+        updateTimestamp: 100341454655423
+      description: ''
+  securitySchemes:
+    api_key:
+      type: apiKey
+      name: X-LA-APIKEY
+      in: header
+    api_signature:
+      type: apiKey
+      name: X-LA-SIGNATURE
+      in: header
+x-refined-from:
+- latoken-api-v2-swagger.json
+- latoken-openapi.yml

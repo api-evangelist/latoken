@@ -1,0 +1,155 @@
+openapi: 3.2.0
+info:
+  title: Latoken Pair API
+  version: V2
+  x-logo:
+    url: ./logo.png
+    altText: Latoken logo
+  description: 'Operations tagged Pair across 2 of this provider''s published API definitions: latoken-api-v2-swagger.json, latoken-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.latoken.com/
+tags:
+- name: Pair
+paths:
+  /v2/pair:
+    get:
+      summary: Get active pairs
+      tags:
+      - Pair
+      description: Request list of all active trading pairs
+      operationId: getActivePairs
+      responses:
+        '200':
+          description: on success
+          content:
+            application/json:
+              schema:
+                description: on success
+                type: array
+                items:
+                  $ref: '#/components/schemas/json_PairAdapter'
+  /v2/pair/available:
+    get:
+      summary: Get available pairs
+      tags:
+      - Pair
+      description: Request list of all trading pairs
+      operationId: getAvailablePairs
+      responses:
+        '200':
+          description: on success
+          content:
+            application/json:
+              schema:
+                description: on success
+                type: array
+                items:
+                  $ref: '#/components/schemas/json_PairAdapter'
+components:
+  schemas:
+    json_PairAdapter:
+      type: object
+      title: PairAdapter
+      properties:
+        id:
+          example: 263d5e99-1413-47e4-9215-ce4f5dec3556
+          readOnly: false
+          description: ''
+          type: string
+        status:
+          example: PAIR_STATUS_ACTIVE
+          readOnly: false
+          description: ''
+          type: string
+        baseCurrency:
+          example: 6ae140a9-8e75-4413-b157-8dd95c711b23
+          readOnly: false
+          description: ''
+          type: string
+        quoteCurrency:
+          example: 23fa548b-f887-4f48-9b9b-7dd2c7de5ed0
+          readOnly: false
+          description: ''
+          type: string
+        priceTick:
+          example: '0.010000000'
+          readOnly: false
+          description: ''
+          type: string
+        priceDecimals:
+          example: 2
+          readOnly: false
+          description: ''
+          type: integer
+          format: int32
+        quantityTick:
+          example: '0.010000000'
+          readOnly: false
+          description: ''
+          type: string
+        quantityDecimals:
+          example: 2
+          readOnly: false
+          description: ''
+          type: integer
+          format: int32
+        costDisplayDecimals:
+          example: 3
+          readOnly: false
+          description: ''
+          type: integer
+          format: int32
+        created:
+          example: 1571333313871
+          readOnly: false
+          description: ''
+          type: integer
+          format: int64
+        minOrderQuantity:
+          example: 0
+          readOnly: false
+          description: ''
+          type: string
+        maxOrderCostUsd:
+          example: 1000000000000000000
+          readOnly: false
+          description: ''
+          type: string
+        minOrderCostUsd:
+          example: 0
+          readOnly: false
+          description: ''
+          type: string
+        externalSymbol:
+          example: null
+          readOnly: false
+          description: ''
+          type: string
+      example:
+        id: 263d5e99-1413-47e4-9215-ce4f5dec3556
+        status: PAIR_STATUS_ACTIVE
+        baseCurrency: 6ae140a9-8e75-4413-b157-8dd95c711b23
+        quoteCurrency: 23fa548b-f887-4f48-9b9b-7dd2c7de5ed0
+        priceTick: '0.010000000'
+        priceDecimals: 2
+        quantityTick: '0.010000000'
+        quantityDecimals: 2
+        costDisplayDecimals: 3
+        created: 1571333313871
+        minOrderQuantity: '0'
+        maxOrderCostUsd: '999999999999999999'
+        minOrderCostUsd: '0'
+        externalSymbol: ''
+      description: ''
+  securitySchemes:
+    api_key:
+      type: apiKey
+      name: X-LA-APIKEY
+      in: header
+    api_signature:
+      type: apiKey
+      name: X-LA-SIGNATURE
+      in: header
+x-refined-from:
+- latoken-api-v2-swagger.json
+- latoken-openapi.yml

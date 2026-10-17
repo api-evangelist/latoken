@@ -1,0 +1,222 @@
+openapi: 3.2.0
+info:
+  title: Latoken Appeal Controller API
+  version: V1
+  x-logo:
+    url: ./logo.png
+  description: 'Operations tagged AppealController across 2 of this provider''s published API definitions: latoken-p2p-api-swagger.json, latoken-p2p-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: /pay/v1
+- url: https://api.latoken.com/pay/v1
+tags:
+- name: AppealController
+paths:
+  /auth/p2p/order/appeal:
+    post:
+      security:
+      - api_key: []
+        api_signature: []
+      summary: Create Appeal
+      tags:
+      - AppealController
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Appeal'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: User Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '503':
+          description: Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceUnavailableError'
+      x-code-samples:
+      - lang: TypeScript
+        source: "import * as crypto from 'crypto';\nimport axios, { AxiosRequestConfig } from 'axios';\n\nconst apiKey = '<Your API Public Key>';\nconst apiSecret = '<You API Private Key>';\n\nconst baseUrl = 'https://api.latoken.com';\nconst endpoint = '/pay/v1/auth/p2p/order/appeal';\nconst method = 'POST';\n\nconst signature: string = crypto\n  .createHmac('sha256', apiSecret)\n  .update(method + endpoint)\n  .digest('hex');\n\nconst config: AxiosRequestConfig = {\n  headers: {\n    'X-LA-APIKEY': apiKey,\n    'X-LA-SIGNATURE': signature,\n  },\n};\n\nconst params = {\n  order: '53e8911a-caf6-4fb6-92dd-ced31b0eaf90',\n  reason: 'Did not receive funds',\n  description: 'Sent fiat, but merchant did not complete order',\n  proof: ['https://url.to.your/proof'],\n};\n\naxios\n  .post(baseUrl + endpoint, params, config)\n  .then((result) => console.log(result.data))\n  .catch((error) => console.error(error));\n"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAppealRequest'
+        required: true
+      operationId: postAuthP2pOrderAppeal
+      x-operation-id-source: derived
+    servers:
+    - url: /pay/v1
+  /auth/p2p/order/appeal/cancel:
+    post:
+      security:
+      - api_key: []
+        api_signature: []
+      summary: Cancel Appeal
+      tags:
+      - AppealController
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Appeal'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: User Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '503':
+          description: Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceUnavailableError'
+      x-code-samples:
+      - lang: TypeScript
+        source: "import * as crypto from 'crypto';\nimport axios, { AxiosRequestConfig } from 'axios';\n\nconst apiKey = '<Your API Public Key>';\nconst apiSecret = '<You API Private Key>';\n\nconst baseUrl = 'https://api.latoken.com';\nconst endpoint = '/pay/v1/auth/p2p/order/appeal/cancel';\nconst method = 'POST';\n\nconst signature: string = crypto\n  .createHmac('sha256', apiSecret)\n  .update(method + endpoint)\n  .digest('hex');\n\nconst config: AxiosRequestConfig = {\n  headers: {\n    'X-LA-APIKEY': apiKey,\n    'X-LA-SIGNATURE': signature,\n  },\n};\n\nconst params = {\n  order: '53e8911a-caf6-4fb6-92dd-ced31b0eaf90',\n};\n\naxios\n  .post(baseUrl + endpoint, params, config)\n  .then((result) => console.log(result.data))\n  .catch((error) => console.error(error));\n"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CancelAppealRequest'
+        required: true
+      operationId: postAuthP2pOrderAppealCancel
+      x-operation-id-source: derived
+    servers:
+    - url: /pay/v1
+components:
+  schemas:
+    Error:
+      type: object
+      title: Error
+      properties:
+        message:
+          type: string
+          example: '...'
+        status:
+          type: string
+          example: FAILURE
+        error:
+          type: string
+          example: INVALID_ARGUMENT
+      description: Error Entity
+    CancelAppealRequest:
+      type: object
+      title: CancelAppealRequest
+      properties:
+        order:
+          type: string
+          example: 53e8911a-caf6-4fb6-92dd-ced31b0eaf90
+      description: CancelAppealRequest Entity
+    CreateAppealRequest:
+      type: object
+      title: CreateAppealRequest
+      properties:
+        order:
+          type: string
+          example: 53e8911a-caf6-4fb6-92dd-ced31b0eaf90
+        reason:
+          type: string
+          example: Did not receive funds
+        description:
+          type: string
+          example: Sent fiat, but merchant didn't complete order
+        proof:
+          type: array
+          items:
+            type: string
+            example: https://url.to.your/proof
+      description: CreateAppealRequest Entity
+    UnauthorizedError:
+      type: object
+      title: Unauthorized Error
+      properties:
+        result:
+          type: boolean
+          example: false
+        message:
+          type: string
+          example: user must be authenticated
+        status:
+          type: string
+          example: FAILURE
+        error:
+          type: string
+          example: UNAUTHORIZED
+      description: Unauthorized Error Entity
+    ServiceUnavailableError:
+      type: object
+      title: Service Unavailable Error
+      properties:
+        message:
+          type: string
+          example: service unavailable
+        status:
+          type: string
+          example: FAILURE
+        error:
+          type: string
+          example: SERVICE_UNAVAILABLE
+      description: Service Unavailable Error Entity
+    Appeal:
+      type: object
+      title: Appeal
+      properties:
+        id:
+          type: string
+          example: 3d7e1b02-c7f7-49c2-912e-5f4dc9460f8e
+        appealer:
+          type: string
+          example: 5b144930-5da9-42af-9038-cd95b87eeb84
+        reason:
+          type: string
+          example: Did not receive funds
+        description:
+          type: string
+          example: Sent fiat, but merchant didn't complete order
+        proof:
+          type: array
+          items:
+            type: string
+            example: https://url.to.your/proof
+        status:
+          type: string
+          example: APPEAL_STATUS_PENDING
+        createdAt:
+          type: string
+          example: '2021-08-19T15:56:16.323Z'
+        updatedAt:
+          type: string
+          example: '2021-08-19T15:56:16.323Z'
+      description: Appeal Entity
+  securitySchemes:
+    api_key:
+      type: apiKey
+      name: X-LA-APIKEY
+      in: header
+    api_signature:
+      type: apiKey
+      name: X-LA-SIGNATURE
+      in: header
+x-refined-from:
+- latoken-p2p-api-swagger.json
+- latoken-p2p-openapi.yml

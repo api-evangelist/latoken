@@ -1,0 +1,137 @@
+openapi: 3.2.0
+info:
+  title: Latoken Order Book API
+  version: V2
+  x-logo:
+    url: ./logo.png
+    altText: Latoken logo
+  description: 'Operations tagged Order Book across 2 of this provider''s published API definitions: latoken-api-v2-swagger.json, latoken-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.latoken.com/
+tags:
+- name: Orderbook
+paths:
+  /v2/book/{currency}/{quote}:
+    get:
+      summary: Request order book by trading pair
+      tags:
+      - Orderbook
+      description: Book can be fetched by currency ID and currency TAG
+      operationId: getOrderBook
+      parameters:
+      - name: currency
+        in: path
+        required: true
+        description: id of base currency
+        schema:
+          type: string
+      - name: quote
+        in: path
+        required: true
+        description: id of quote currency
+        schema:
+          type: string
+      - name: limit
+        in: query
+        description: limit on order book depth (max 1000)
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: if orderbook was successfully delivered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/json_BookAdapter'
+        '400':
+          description: if request is not valid (e.g. negative limit)
+components:
+  schemas:
+    json_PriceLevel:
+      type: object
+      title: PriceLevel
+      properties:
+        price:
+          example: '123.321'
+          readOnly: false
+          description: Price of this price level as fixed point decimal number
+          type: string
+        quantity:
+          example: '0.12'
+          readOnly: false
+          description: Quantity of this price level as fixed point decimal number
+          type: string
+        cost:
+          example: '14.79852'
+          readOnly: false
+          description: Cost of this price level as fixed point decimal number
+          type: string
+        accumulated:
+          example: '14.79852'
+          readOnly: false
+          description: Total cost of all orders from the edge of book to current price level
+          type: string
+      example:
+        price: '123.321'
+        quantity: '0.12'
+        cost: '14.79852'
+        accumulated: '14.79852'
+      description: ''
+    json_BookAdapter:
+      type: object
+      title: BookAdapter
+      properties:
+        ask:
+          readOnly: false
+          description: List of asks (sell orders)
+          type: array
+          items:
+            $ref: '#/components/schemas/json_PriceLevel'
+        bid:
+          readOnly: false
+          description: List of bids (buy orders)
+          type: array
+          items:
+            $ref: '#/components/schemas/json_PriceLevel'
+        totalAsk:
+          readOnly: false
+          description: Total ask (sell) amount
+          type: string
+        totalBid:
+          readOnly: false
+          description: Total bid (buy) amount
+          type: string
+      example:
+        ask:
+        - price: '123.321'
+          quantity: '0.12'
+          cost: '14.79852'
+          accumulated: '14.79852'
+        - price: '123.321'
+          quantity: '0.12'
+          cost: '14.79852'
+          accumulated: '14.79852'
+        bid:
+        - price: '123.321'
+          quantity: '0.12'
+          cost: '14.79852'
+          accumulated: '14.79852'
+        - price: '123.321'
+          quantity: '0.12'
+          cost: '14.79852'
+          accumulated: '14.79852'
+        totalAsk: '...'
+        totalBid: '...'
+      description: ''
+  securitySchemes:
+    api_key:
+      type: apiKey
+      name: X-LA-APIKEY
+      in: header
+    api_signature:
+      type: apiKey
+      name: X-LA-SIGNATURE
+      in: header
+x-refined-from:
+- latoken-api-v2-swagger.json
+- latoken-openapi.yml

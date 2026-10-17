@@ -1,0 +1,206 @@
+openapi: 3.2.0
+info:
+  title: Latoken Currency API
+  version: V2
+  x-logo:
+    url: ./logo.png
+    altText: Latoken logo
+  description: 'Operations tagged Currency across 2 of this provider''s published API definitions: latoken-api-v2-swagger.json, latoken-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.latoken.com/
+tags:
+- name: Currency
+paths:
+  /v2/currency:
+    get:
+      summary: Get active currencies
+      tags:
+      - Currency
+      description: Request list of active currencies
+      operationId: getActiveCurrencies
+      responses:
+        '200':
+          description: on success
+          content:
+            application/json:
+              schema:
+                description: on success
+                type: array
+                items:
+                  $ref: '#/components/schemas/json_CurrencyAdapter'
+      x-code-samples:
+      - lang: JavaScript
+        source: "\nconst request = require('request')\n\nconst baseUrl = 'https://api.latoken.com'\nconst endpoint = '/v2/currency'\nconst method = 'GET';\n\nconst options = {\n    method: method,\n    url: baseUrl + endpoint\n}\n\nrequest.get(\n    options,\n    function (error, response, responseBody) {\n        console.log('response:', JSON.stringify(responseBody))\n    }\n)\n"
+      - lang: Python
+        source: 'import requests
+
+
+          baseUrl = ''https://api.latoken.com''
+
+          endpoint = ''/v2/currency''
+
+
+          url = baseUrl + endpoint
+
+
+          response = requests.get(url)
+
+
+          print(response.json())'
+      - lang: Php
+        source: "<?php\n\n$baseUrl = 'https://api.latoken.com';\n$endpoint = '/v2/currency';\n$method = 'GET';\n\n$url = $baseUrl.$endpoint;\n$options = array(\n    'http' => array(\n        'ignore_errors'=> TRUE,\n        'method' => $method\n    )\n);\n\n$context = stream_context_create($options);\n$response = file_get_contents($url, FALSE, $context);\n\nvar_dump($response);\n\n?>"
+      - lang: Java
+        source: "package api.client;\n\nimport java.io.IOException;\nimport java.net.URI;\nimport java.net.http.HttpClient;\nimport java.net.http.HttpRequest;\nimport java.net.http.HttpResponse;\n\npublic class RestApiV1 {\n    public static void runSample() throws IOException, InterruptedException {\n        final String baseUrl = \"https://api.latoken.com\";\n        final String endpoint = \"/v2/currency\";\n\n        /* Requesting */\n        HttpClient client = HttpClient.newHttpClient();\n        HttpRequest request = HttpRequest.newBuilder()\n                .uri(URI.create(baseUrl + endpoint))\n                .GET()\n                .build();\n        HttpResponse<String> response =  client.send(request, HttpResponse.BodyHandlers.ofString());\n\n        System.out.println(response.body().toString());\n    }\n}"
+      - lang: C#
+        source: "using System;\nusing System.Net;\nusing System.IO;\n\npublic class Program\n{\n\tpublic static void Main()\n\t{\n\t\tvar baseUrl = \"https://api.latoken.com\";\n\t\tvar endpoint = \"/v2/currency\";\n\t\tvar method = \"GET\";\n\n\t\t/* create request */\n\t\tvar request = HttpWebRequest.CreateHttp(baseUrl + endpoint);\n\t\trequest.Method = method;\n\n\t\t/* get response */\n\t\ttry\n\t\t{\n\t\t\tvar response = (HttpWebResponse)request.GetResponse();\n\t\t\tvar responseString = new StreamReader(response.GetResponseStream()).ReadToEnd();\n\t\t\tConsole.WriteLine(responseString);\n\t\t}\n\t\tcatch (WebException we)\n\t\t{\n\t\t\tvar errorResponse = we.Response as HttpWebResponse;\n\t\t\tvar responseString = new StreamReader(errorResponse.GetResponseStream()).ReadToEnd();\n\t\t\tConsole.WriteLine(responseString);\n\t\t}\n\t}\n}\n"
+  /v2/currency/available:
+    get:
+      summary: Get available currencies
+      tags:
+      - Currency
+      description: Request list of available currencies
+      operationId: getAvailableCurrencies
+      responses:
+        '200':
+          description: on success
+          content:
+            application/json:
+              schema:
+                description: on success
+                type: array
+                items:
+                  $ref: '#/components/schemas/json_CurrencyAdapter'
+  /v2/currency/quotes:
+    get:
+      summary: Get quote currencies
+      tags:
+      - Currency
+      description: Request list of all currencies that occur in some trading pair as quote currency
+      operationId: getQuoteCurrencies
+      responses:
+        '200':
+          description: on success
+          content:
+            application/json:
+              schema:
+                description: on success
+                type: array
+                items:
+                  type: string
+                  example: d663138b-3ec1-436c-9275-b3a161761523
+  /v2/currency/{currency}:
+    get:
+      summary: Get a currency by id or tag
+      tags:
+      - Currency
+      description: Request detailed information about currency
+      operationId: getCurrencies
+      parameters:
+      - name: currency
+        in: path
+        required: true
+        description: id or tag of currency
+        schema:
+          type: string
+      responses:
+        '200':
+          description: on success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/json_CurrencyAdapter'
+        '404':
+          description: if currency is not found
+components:
+  schemas:
+    json_CurrencyAdapter:
+      type: object
+      title: CurrencyAdapter
+      properties:
+        id:
+          example: d663138b-3ec1-436c-9275-b3a161761523
+          readOnly: false
+          description: Currency id
+          type: string
+        status:
+          example: CURRENCY_STATUS_ACTIVE
+          readOnly: false
+          description: Currency status
+          type: string
+        type:
+          example: CURRENCY_TYPE_CRYPTO
+          readOnly: false
+          description: Currency type
+          type: string
+        name:
+          example: Latoken
+          readOnly: false
+          description: Full name of currency
+          type: string
+        tag:
+          example: LA
+          readOnly: false
+          description: Short tag of currency
+          type: string
+        description:
+          example: LATOKEN is a cutting edge exchange which makes investing and payments easy and safe worldwide.
+          readOnly: false
+          description: Textual description
+          type: string
+        logo:
+          example: https://static.dev-mid.nekotal.tech/icons/color/la.svg
+          readOnly: false
+          description: URL of currency logo
+          type: string
+        decimals:
+          example: 9
+          readOnly: false
+          description: How much decimals is supported by trading for this currency
+          type: integer
+          format: int32
+        created:
+          example: 1571333563712
+          readOnly: false
+          description: Start of currency trading
+          type: integer
+          format: int64
+        tier:
+          example: 1
+          readOnly: false
+          type: integer
+          format: int64
+        assetClass:
+          example: ASSET_CLASS_UNKNOWN
+          readOnly: false
+          type: string
+        minTransferAmount:
+          example: 0
+          readOnly: false
+          type: integer
+          format: int64
+      example:
+        id: d663138b-3ec1-436c-9275-b3a161761523
+        status: CURRENCY_STATUS_ACTIVE
+        type: CURRENCY_TYPE_CRYPTO
+        name: Latoken
+        tag: LA
+        description: LATOKEN is a cutting edge exchange which makes investing and payments easy and safe worldwide.
+        logo: https://static.dev-mid.nekotal.tech/icons/color/la.svg
+        decimals: 9
+        created: 1571333563712
+        tier: 1
+        assetClass: ASSET_CLASS_UNKNOWN
+        minTransferAmount: 0
+      description: ''
+  securitySchemes:
+    api_key:
+      type: apiKey
+      name: X-LA-APIKEY
+      in: header
+    api_signature:
+      type: apiKey
+      name: X-LA-SIGNATURE
+      in: header
+x-refined-from:
+- latoken-api-v2-swagger.json
+- latoken-openapi.yml

@@ -1,0 +1,859 @@
+openapi: 3.2.0
+info:
+  title: Latoken Transaction API
+  version: V2
+  x-logo:
+    url: ./logo.png
+    altText: Latoken logo
+  description: 'Operations tagged Transaction across 2 of this provider''s published API definitions: latoken-api-v2-swagger.json, latoken-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.latoken.com/
+tags:
+- name: Transaction
+paths:
+  /v2/auth/transaction:
+    get:
+      security:
+      - api_key: []
+        api_signature: []
+      summary: Request deposits and withdrawals
+      tags:
+      - Transaction
+      operationId: getUserTransactions
+      parameters:
+      - name: page
+        in: query
+        description: Request deposits and withdrawals
+        schema:
+          type: string
+      - name: size
+        in: query
+        description: Request deposits and withdrawals
+        schema:
+          type: string
+      responses:
+        '200':
+          description: on success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/json_PageAdapterOfTransactionAdapter'
+        '400':
+          description: if request is not valid
+  /v2/auth/transaction/bindings:
+    get:
+      security:
+      - api_key: []
+        api_signature: []
+      summary: Request all currencies that have active bindings
+      tags:
+      - Transaction
+      operationId: getCurrenciesBindings
+      responses:
+        '200':
+          description: on success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/json_PossibleBindingEntity'
+  /v2/auth/transaction/bindings/{currency}:
+    get:
+      security:
+      - api_key: []
+        api_signature: []
+      summary: Request bindings for specific currency
+      tags:
+      - Transaction
+      operationId: getCurrencyBindings
+      parameters:
+      - name: currency
+        in: path
+        required: true
+        description: id of currency
+        schema:
+          type: string
+      responses:
+        '200':
+          description: on success
+          content:
+            application/json:
+              schema:
+                description: on success
+                type: array
+                items:
+                  $ref: '#/components/schemas/json_BindingAdapter_Transaction'
+        '400':
+          description: if request is invalid
+        '404':
+          description: if there is no such currency
+  /v2/auth/transaction/depositAddress:
+    post:
+      security:
+      - api_key: []
+        api_signature: []
+      summary: Request deposit address to make deposit
+      tags:
+      - Transaction
+      operationId: generateDepositAddress
+      responses:
+        '200':
+          description: on success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/json_DepositAddressReply'
+        '400':
+          description: if request is invalid
+        '404':
+          description: if there is no such currency or binding
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/json_DepositAddressRequest'
+        description: request with details about currency and input method
+  /v2/auth/transaction/withdraw:
+    post:
+      security:
+      - api_key: []
+        api_signature: []
+      summary: Request withdrawal
+      tags:
+      - Transaction
+      operationId: withdrawMoney
+      responses:
+        '200':
+          description: on success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/json_WithdrawalReceiptAdapter'
+        '400':
+          description: if request is invalid
+        '404':
+          description: if there is no currency or binding
+      x-code-samples:
+      - lang: JavaScript
+        source: "\nconst request = require('request')\nconst crypto = require('crypto')\n\nconst apiKey = 'Your Latoken API key'\nconst apiSecret = 'Your Latoken API secret'\nconst method = 'POST';\nconst baseUrl = 'https://api.latoken.com'\nconst endpoint = '/v2/auth/transaction/withdraw'\n\nconst params = {\n    twoFaCode: '123456',\n    currencyBinding: '620f2019-33c0-423b-8a9d-cde4d7f8ef7f',\n    amount: '100.50',\n    recipientAddress: '0xdf12d43f23d4f23d4fd23f4d2f3d4f23d4f',\n    memo: 'additional_field'\n}\nconst body = JSON.stringify(params);\nconst bodySignParams = Object.entries(params).map(([key, val]) => key + '=' + val).join('&');\n\nconst signature = crypto\n    .createHmac('sha256', apiSecret)\n    .update(method + endpoint + bodySignParams)\n    .digest('hex')\n\nconst options = {\n    method: method,\n    url: baseUrl + endpoint,\n    headers: {\n        'Content-Type': 'application/json',\n        'X-LA-APIKEY': apiKey,\n        'X-LA-SIGNATURE': signature\n    },\n    body: body\n}\n\nrequest.post(\n    options,\n    function (error, response, responseBody) {\n        console.log('response:', JSON.stringify(responseBody))\n    }\n)\n\n"
+      - lang: Python
+        source: "import requests\nimport datetime\nimport hashlib\nimport hmac\n\napiKey = 'Your Latoken API key'\napiSecret = b'Your Latoken API secret'\nbaseUrl = 'https://api.latoken.com'\nendpoint = '/v2/auth/transaction/withdraw'\n\nparams = {\n    'twoFaCode': '123456',\n    'currencyBinding': '620f2019-33c0-423b-8a9d-cde4d7f8ef7f',\n    'amount': '100.50',\n    'recipientAddress': '0x34d3f4d3f4d3f4d3f4d3f4d3f4d'\n}\nserializeFunc = map(lambda it : it[0] + '=' + str(it[1]), params.items())\nbodyParams = '&'.join(serializeFunc)\n                  \nsignature = hmac.new(\n    apiSecret, \n    ('POST' + endpoint + bodyParams).encode('ascii'), \n    hashlib.sha512\n)\n\nurl = baseUrl + endpoint\n\nresponse = requests.post(\n    url,\n    headers = {\n        'Content-Type': 'application/json',\n        'X-LA-APIKEY': apiKey,\n        'X-LA-SIGNATURE': signature.hexdigest(),\n        'X-LA-DIGEST': 'HMAC-SHA512'\n    },\n    json = params\n)\n\nprint(response.json())"
+      - lang: Php
+        source: "<?php\n\n$apiKey = '4737b23b-06fc-4e47-b55f-b872e00dee4b';\n$apiSecret = 'N2NjNWE1OTktOTFkMi00MWMzLTkwZDYtY2UxNjAyMzg0NGZj';\n$baseUrl = 'https://api.k8s-dev1.nekotal.tech';\n$endpoint = '/v2/auth/transaction/withdraw';\n$method = 'POST';\n\n$params = [\n    'twoFaCode' => '142097',\n    'currencyBinding' => '620f2019-33c0-423b-8a9d-cde4d7f8ef7f',\n    'amount' => 100.50,\n    'recipientAddress' => '0xdf12d43f23d4f23d4fd23f4d2f3d4f23d4f',\n    'memo' => 'some additional information'\n];\n\n$bodyParams = join('&', array_map(\n    function($key, $val) { return $key.'='.$val; }, \n    array_keys($params), array_values($params))\n);\n\n$signature = hash_hmac('sha256', $method.$endpoint.$bodyParams, $apiSecret, FALSE);\n\n$url = $baseUrl.$endpoint;\n$options = array(\n    'http' => array(\n        'ignore_errors'=> TRUE,\n        'method' => $method,\n        'header' => array(\n             'Content-Type:application/json',\n             'X-LA-APIKEY:'.$apiKey,\n             'X-LA-SIGNATURE:'.$signature\n        ),\n        'content' => json_encode($params, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT, 1)\n    )\n);\nvar_dump($bodyParams);\nvar_dump(json_encode($params, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT, 1));\n$context = stream_context_create($options);\n$response = file_get_contents($url, FALSE, $context);\n\nvar_dump($response);\n\n?>"
+      - lang: Java
+        source: "package api.client;\n\nimport com.sun.org.apache.xerces.internal.impl.dv.util.HexBin;\nimport javax.crypto.Mac;\nimport javax.crypto.spec.SecretKeySpec;\nimport java.io.IOException;\nimport java.net.URI;\nimport java.net.http.HttpClient;\nimport java.net.http.HttpRequest;\nimport java.net.http.HttpResponse;\nimport java.security.InvalidKeyException;\nimport java.security.NoSuchAlgorithmException;\nimport java.util.HashMap;\nimport java.util.Vector;\n\npublic class RestApiV1 {\n    public static void runSample() throws InvalidKeyException, NoSuchAlgorithmException, IOException, InterruptedException {\n        final String apiKey = \"Your Latoken API key\";\n        final String apiSecret = \"Your Latoken API secret\";\n        final String baseUrl = \"https://api.latoken.com\";\n        final String endpoint = \"/v2/auth/transaction/withdraw\";\n\n        HashMap<String, String> params = new HashMap<>();\n        params.put(\"twoFaCode\", \"123456\");\n        params.put(\"currencyBinding\", \"620f2019-33c0-423b-8a9d-cde4d7f8ef7f\");\n        params.put(\"amount\", \"100.50\");\n        params.put(\"recipientAddress\", \"0x32df234df23d4f32d4f23d4f2d34fd23f4\");\n        params.put(\"memo\", \"...\");\n\t\t\n\t\t/* Body parameters for request (json) */\n        Vector<String> bodyParams = new Vector<>();\n        params.forEach((key, value) -> bodyParams.add(\"\\\"\" + key + \"\\\": \\\"\" + value + \"\\\"\"));\n        final String bodyContent = \"{\" + String.join(\",\", bodyParams) + \"}\";\n        \n\t\t/* Body parameters for signature */\n        Vector<String> temporaryParams = new Vector<>();\n        params.forEach((key, value) -> temporaryParams.add(key + \"=\" + value));\n        final String signableBodyParams = String.join(\"&\", temporaryParams);\n\n        /* Signature */\n        Mac crypto = Mac.getInstance(\"HmacSHA256\");\n        crypto.init(new SecretKeySpec(apiSecret.getBytes(\"UTF-8\"), \"HmacSHA256\"));\n        String signature = HexBin.encode( crypto.doFinal(\n                              (\"POST\" + endpoint + signableBodyParams).getBytes(\"UTF-8\")\n                           )).toLowerCase();\n\n        /* Requesting */\n        HttpClient client = HttpClient.newHttpClient();\n        HttpRequest request = HttpRequest.newBuilder()\n                .uri(URI.create(baseUrl + endpoint))\n\t\t\t\t.header(\"Content-Type\", \"application/json\")\n                .header(\"X-LA-APIKEY\", apiKey)\n                .header(\"X-LA-SIGNATURE\", signature)\n                .POST(HttpRequest.BodyPublishers.ofString(bodyContent))\n                .build();\n        HttpResponse<String> response =  client.send(request, HttpResponse.BodyHandlers.ofString());\n\n        System.out.println(response.body().toString());\n    }\n}"
+      - lang: C#
+        source: "using System;\nusing System.Collections.Generic;\nusing System.Net;\nusing System.Text;\nusing System.Linq;\nusing System.IO;\n\nusing System.Security.Cryptography;\n\npublic class Program\n{\n\tpublic static void Main()\n\t{\n\t\tvar apiKey = \"Your Latoken API key\";\n\t\tvar apiSecret = \"Your Latoken API secret\";\n\t\tvar baseUrl = \"https://api.latoken.com\";\n\t\tvar endpoint = \"/v2/auth/transaction/withdraw\";\n\t\tvar method = \"POST\";\n\n\t\t/* form parameters */\n\t\tvar parameters = new Dictionary<string, string>(){\n\t\t\t{\"twoFaCode\", \"123456\"},\n\t\t\t{\"currencyBinding\", \"620f2019-33c0-423b-8a9d-cde4d7f8ef7f\"},\n\t\t\t{\"amount\", \"100.50\"},\n\t\t\t{\"recipientAddress\", \"0x23d4f2d34f23d4f2d34fd23f4d2f34d\"},\n\t\t\t{\"memo\", \"additional_info\"}\n\t\t};\n\t\tvar bodyContent = \"{\" + string.Join(\",\", parameters.Select(kvp => \"\\\"\" + kvp.Key + \"\\\": \\\"\" + kvp.Value + \"\\\"\").ToArray()) + \"}\";\n\t\tvar signableParams = string.Join(\"&\", parameters.Select(kvp => kvp.Key + \"=\" + kvp.Value).ToArray());\n\n\t\t/* sign request */\n\t\tHMAC crypto = new HMACSHA256(Encoding.ASCII.GetBytes(apiSecret));\n\t\tbyte[] signBytes = crypto.ComputeHash(Encoding.ASCII.GetBytes(method + endpoint + signableParams));\n\t\tstring signature = string.Empty;\n\t\tsignBytes.ToList().ForEach(b => signature += b.ToString(\"x2\"));\n\n\t\t/* create request */\n\t\tvar request = HttpWebRequest.CreateHttp(baseUrl + endpoint);\n\t\trequest.Method = method;\n\t\trequest.ContentType = \"application/json\";\n\t\trequest.Headers.Add(\"X-LA-APIKEY\", apiKey);\n\t\trequest.Headers.Add(\"X-LA-SIGNATURE\", signature);\n\t\trequest.ContentLength = bodyContent.Length;\n\t\tvar body = request.GetRequestStream();\n\t\tbody.Write(Encoding.ASCII.GetBytes(bodyContent), 0, bodyContent.Length);\n\t\tbody.Close();\n\n\t\t/* get response */\n\t\ttry\n\t\t{\n\t\t\tvar response = (HttpWebResponse)request.GetResponse();\n\t\t\tvar responseString = new StreamReader(response.GetResponseStream()).ReadToEnd();\n\t\t\tConsole.WriteLine(responseString);\n\t\t}\n\t\tcatch (WebException we)\n\t\t{\n\t\t\tvar errorResponse = we.Response as HttpWebResponse;\n\t\t\tvar responseString = new StreamReader(errorResponse.GetResponseStream()).ReadToEnd();\n\t\t\tConsole.WriteLine(responseString);\n\t\t}\n\t}\n}\n"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/json_WithdrawalRequest'
+        description: request with withdrawal details
+  /v2/auth/transaction/withdraw/cancel:
+    post:
+      security:
+      - api_key: []
+        api_signature: []
+      summary: Cancel withdrawal
+      tags:
+      - Transaction
+      operationId: cancelWithdrawal
+      responses:
+        '200':
+          description: on success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/json_ReplyBase'
+        '400':
+          description: if request is invalid
+        '404':
+          description: if there is no such withdrawal
+      x-code-samples:
+      - lang: JavaScript
+        source: "\nconst request = require('request')\nconst crypto = require('crypto')\n\nconst apiKey = 'Your Latoken API key'\nconst apiSecret = 'Your Latoken API secret'\nconst method = 'POST';\nconst baseUrl = 'https://api.latoken.com'\nconst endpoint = '/v2/auth/transaction/withdraw/cancel'\n\nconst params = {\n    id: '0c3a106d-bde3-4c13-a26e-3fd2394529e5'\n}\nconst body = JSON.stringify(params);\nconst bodySignParams = Object.entries(params).map(([key, val]) => key + '=' + val).join('&');\n\nconst signature = crypto\n    .createHmac('sha256', apiSecret)\n    .update(method + endpoint + bodySignParams)\n    .digest('hex')\n\nconst options = {\n    method: method,\n    url: baseUrl + endpoint,\n    headers: {\n        'Content-Type': 'application/json',\n        'X-LA-APIKEY': apiKey,\n        'X-LA-SIGNATURE': signature\n    },\n    body: body\n}\n\nrequest.post(\n    options,\n    function (error, response, responseBody) {\n        console.log('response:', JSON.stringify(responseBody))\n    }\n)\n\n"
+      - lang: Python
+        source: "import requests\nimport datetime\nimport hashlib\nimport hmac\n\napiKey = 'Your Latoken API key'\napiSecret = b'Your Latoken API secret'\nbaseUrl = 'https://api.latoken.com'\nendpoint = '/v2/auth/transaction/withdraw/cancel'\n\nparams = {\n    'id': '0c3a106d-bde3-4c13-a26e-3fd2394529e5'\n}\nserializeFunc = map(lambda it : it[0] + '=' + str(it[1]), params.items())\nbodyParams = '&'.join(serializeFunc)\n                  \nsignature = hmac.new(\n    apiSecret, \n    ('POST' + endpoint + bodyParams).encode('ascii'), \n    hashlib.sha512\n)\n\nurl = baseUrl + endpoint\n\nresponse = requests.post(\n    url,\n    headers = {\n        'Content-Type': 'application/json',\n        'X-LA-APIKEY': apiKey,\n        'X-LA-SIGNATURE': signature.hexdigest(),\n        'X-LA-DIGEST': 'HMAC-SHA512'\n    },\n    json = params\n)\n\nprint(response.json())"
+      - lang: Php
+        source: "<?php\n\n$apiKey = 'Your Latoken API key';\n$apiSecret = 'Your Latoken API secret';\n$baseUrl = 'https://api.latoken.com';\n$endpoint = '/v2/auth/transaction/withdraw/cancel';\n$method = 'POST';\n\n$params = [\n    'id' => '0c3a106d-bde3-4c13-a26e-3fd2394529e5'\n];\n\n$bodyParams = join('&', array_map(\n    function($key, $val) { return $key.'='.$val; }, \n    array_keys($params), array_values($params))\n);\n\n$signature = hash_hmac('sha256', $method.$endpoint.$bodyParams, $apiSecret, FALSE);\n\n$url = $baseUrl.$endpoint;\n$options = array(\n    'http' => array(\n        'ignore_errors'=> TRUE,\n        'method' => $method,\n        'header' => array(\n             'Content-Type:application/json',\n             'X-LA-APIKEY:'.$apiKey,\n             'X-LA-SIGNATURE:'.$signature\n        ),\n        'content' => json_encode($params, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT, 1)\n    )\n);\n\n$context = stream_context_create($options);\n$response = file_get_contents($url, FALSE, $context);\n\nvar_dump($response);\n\n?>"
+      - lang: Java
+        source: "package api.client;\n\nimport com.sun.org.apache.xerces.internal.impl.dv.util.HexBin;\nimport javax.crypto.Mac;\nimport javax.crypto.spec.SecretKeySpec;\nimport java.io.IOException;\nimport java.net.URI;\nimport java.net.http.HttpClient;\nimport java.net.http.HttpRequest;\nimport java.net.http.HttpResponse;\nimport java.security.InvalidKeyException;\nimport java.security.NoSuchAlgorithmException;\nimport java.util.HashMap;\nimport java.util.Vector;\n\npublic class RestApiV1 {\n    public static void runSample() throws InvalidKeyException, NoSuchAlgorithmException, IOException, InterruptedException {\n        final String apiKey = \"Your Latoken API key\";\n        final String apiSecret = \"Your Latoken API secret\";\n        final String baseUrl = \"https://api.latoken.com\";\n        final String endpoint = \"/v2/auth/transaction/withdraw/cancel\";\n\n        HashMap<String, String> params = new HashMap<>();\n        params.put(\"id\", \"0c3a106d-bde3-4c13-a26e-3fd2394529e5\");\n\t\t\n\t\t/* Body parameters for request (json) */\n        Vector<String> bodyParams = new Vector<>();\n        params.forEach((key, value) -> bodyParams.add(\"\\\"\" + key + \"\\\": \\\"\" + value + \"\\\"\"));\n        final String bodyContent = \"{\" + String.join(\",\", bodyParams) + \"}\";\n        \n\t\t/* Body parameters for signature */\n        Vector<String> temporaryParams = new Vector<>();\n        params.forEach((key, value) -> temporaryParams.add(key + \"=\" + value));\n        final String signableBodyParams = String.join(\"&\", temporaryParams);\n\n        /* Signature */\n        Mac crypto = Mac.getInstance(\"HmacSHA256\");\n        crypto.init(new SecretKeySpec(apiSecret.getBytes(\"UTF-8\"), \"HmacSHA256\"));\n        String signature = HexBin.encode( crypto.doFinal(\n                              (\"POST\" + endpoint + signableBodyParams).getBytes(\"UTF-8\")\n                           )).toLowerCase();\n\n        /* Requesting */\n        HttpClient client = HttpClient.newHttpClient();\n        HttpRequest request = HttpRequest.newBuilder()\n                .uri(URI.create(baseUrl + endpoint))\n\t\t\t\t.header(\"Content-Type\", \"application/json\")\n                .header(\"X-LA-APIKEY\", apiKey)\n                .header(\"X-LA-SIGNATURE\", signature)\n                .POST(HttpRequest.BodyPublishers.ofString(bodyContent))\n                .build();\n        HttpResponse<String> response =  client.send(request, HttpResponse.BodyHandlers.ofString());\n\n        System.out.println(response.body().toString());\n    }\n}"
+      - lang: C#
+        source: "using System;\nusing System.Collections.Generic;\nusing System.Net;\nusing System.Text;\nusing System.Linq;\nusing System.IO;\n\nusing System.Security.Cryptography;\n\npublic class Program\n{\n\tpublic static void Main()\n\t{\n\t\tvar apiKey = \"Your Latoken API key\";\n\t\tvar apiSecret = \"Your Latoken API secret\";\n\t\tvar baseUrl = \"https://api.latoken.com\";\n\t\tvar endpoint = \"/v2/auth/transaction/withdraw/cancel\";\n\t\tvar method = \"POST\";\n\n\t\t/* form parameters */\n\t\tvar parameters = new Dictionary<string, string>(){\n\t\t\t{\"id\", \"0c3a106d-bde3-4c13-a26e-3fd2394529e5\"}\n\t\t};\n\t\tvar bodyContent = \"{\" + string.Join(\",\", parameters.Select(kvp => \"\\\"\" + kvp.Key + \"\\\": \\\"\" + kvp.Value + \"\\\"\").ToArray()) + \"}\";\n\t\tvar signableParams = string.Join(\"&\", parameters.Select(kvp => kvp.Key + \"=\" + kvp.Value).ToArray());\n\n\t\t/* sign request */\n\t\tHMAC crypto = new HMACSHA256(Encoding.ASCII.GetBytes(apiSecret));\n\t\tbyte[] signBytes = crypto.ComputeHash(Encoding.ASCII.GetBytes(method + endpoint + signableParams));\n\t\tstring signature = string.Empty;\n\t\tsignBytes.ToList().ForEach(b => signature += b.ToString(\"x2\"));\n\n\t\t/* create request */\n\t\tvar request = HttpWebRequest.CreateHttp(baseUrl + endpoint);\n\t\trequest.Method = method;\n\t\trequest.ContentType = \"application/json\";\n\t\trequest.Headers.Add(\"X-LA-APIKEY\", apiKey);\n\t\trequest.Headers.Add(\"X-LA-SIGNATURE\", signature);\n\t\trequest.ContentLength = bodyContent.Length;\n\t\tvar body = request.GetRequestStream();\n\t\tbody.Write(Encoding.ASCII.GetBytes(bodyContent), 0, bodyContent.Length);\n\t\tbody.Close();\n\n\t\t/* get response */\n\t\ttry\n\t\t{\n\t\t\tvar response = (HttpWebResponse)request.GetResponse();\n\t\t\tvar responseString = new StreamReader(response.GetResponseStream()).ReadToEnd();\n\t\t\tConsole.WriteLine(responseString);\n\t\t}\n\t\tcatch (WebException we)\n\t\t{\n\t\t\tvar errorResponse = we.Response as HttpWebResponse;\n\t\t\tvar responseString = new StreamReader(errorResponse.GetResponseStream()).ReadToEnd();\n\t\t\tConsole.WriteLine(responseString);\n\t\t}\n\t}\n}\n"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/json_CancelWithdrawalRequest'
+        description: request with withdrawal confirmation details
+  /v2/auth/transaction/withdraw/confirm:
+    post:
+      security:
+      - api_key: []
+        api_signature: []
+      summary: Confirm withdrawal
+      tags:
+      - Transaction
+      operationId: confirmWithdrawal
+      responses:
+        '200':
+          description: on success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/json_ReplyBase'
+        '400':
+          description: if request is invalid
+        '404':
+          description: if there is no such withdrawal
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/json_ConfirmWithdrawalRequest'
+        description: request with withdrawal confirmation details
+  /v2/auth/transaction/withdraw/resendCode:
+    post:
+      security:
+      - api_key: []
+        api_signature: []
+      summary: Resend verification code for withdrawal
+      tags:
+      - Transaction
+      operationId: resendVerificationCode
+      responses:
+        '200':
+          description: on success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/json_ReplyBase'
+        '400':
+          description: if request is invalid
+        '404':
+          description: if there is no such withdrawal
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/json_ResendVerificationCodeRequest'
+              description: request with withdrawal id
+        description: request with withdrawal id
+  /v2/auth/transaction/{id}:
+    get:
+      security:
+      - api_key: []
+        api_signature: []
+      summary: Get transaction by id
+      tags:
+      - Transaction
+      operationId: getTransactionById
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: transaction id
+        schema:
+          type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/json_TransactionAdapter'
+  /v2/transaction/bindings:
+    get:
+      summary: Request all active bindings
+      tags:
+      - Transaction
+      description: Request list of all active bindings
+      operationId: getBindings
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                description: ''
+                type: array
+                items:
+                  $ref: '#/components/schemas/json_BindingAdapter'
+components:
+  schemas:
+    json_PageAdapterOfTransactionAdapter:
+      type: object
+      title: PageAdapterOfTransactionAdapter
+      required:
+      - pageSize
+      - hasContent
+      - first
+      - hasNext
+      properties:
+        pageSize:
+          example: 20
+          readOnly: false
+          description: amount of transactions per page
+          type: integer
+          format: int64
+        hasContent:
+          example: true
+          readOnly: false
+          description: true if page is not empty
+          type: boolean
+        first:
+          example: true
+          readOnly: false
+          description: whether there is page before
+          type: boolean
+        content:
+          readOnly: false
+          description: ''
+          type: array
+          items:
+            $ref: '#/components/schemas/json_TransactionAdapter'
+        hasNext:
+          example: true
+          readOnly: false
+          description: true if there is page after that page
+          type: boolean
+      example:
+        hasNext: true
+        content:
+        - id: 1506f937-dd29-4645-a213-dd05dd21f53f
+          status: TRANSACTION_STATUS_PENDING
+          type: TRANSACTION_TYPE_DEPOSIT
+          senderAddress: '0x19feD5055ecf52D3fc1977196759413B15BD41Ff'
+          recipientAddress: '0x5f193B130D7c856179AA3D738eE06FAb65E73147'
+          amount: '156.15'
+          transactionFee: '1.5615'
+          timestamp: 1567588869826
+          transactionHash: '0x858267afe73abd8a3c6fbe0de73f78e28edd002227795f72dac7e812c7de7fbc'
+          blockHeight: 8561312
+          currency: 1862a4c2-86fb-48e2-a764-13d3309a04bb
+          rejectReason: '...'
+          memo: 2a466cb3b800e35c
+          paymentProvider: 1385a2f2-0d6b-4227-a18a-c0509c92e450
+          requiresCode: true
+        - id: 761e5f53-d4e5-45cf-9454-fb3eb0c20d10
+          status: TRANSACTION_STATUS_CONFIRMED
+          type: TRANSACTION_TYPE_WITHDRAWAL
+          senderAddress: '0x5f193B130D7c856179AA3D738eE06FAb65E73147'
+          recipientAddress: '0x19feD5055ecf52D3fc1977196759413B15BD41Ff'
+          amount: '1803.260000000000000000'
+          transactionFee: '3.000000000000000000'
+          timestamp: 1567588869825
+          transactionHash: '0x858267afe73abd8a3c6fbe0de73f78e28edd002227795f72dac7e812c7de7fbc'
+          blockHeight: 0
+          currency: 1862a4c2-86fb-48e2-a764-13d3309a04bb
+          rejectReason: '...'
+          memo: 2a466cb3b800e35c
+          paymentProvider: 1385a2f2-0d6b-4227-a18a-c0509c92e450
+          requiresCode: false
+        first: false
+        pageSize: 20
+        hasContent: true
+      description: ''
+    json_DepositAddressRequest:
+      type: object
+      title: DepositAddressRequest
+      required:
+      - currencyBinding
+      properties:
+        currencyBinding:
+          example: 5d60da3a-3411-4954-aabf-1e91569a2700
+          maxLength: 50
+          minLength: 0
+          readOnly: false
+          description: ''
+          type: string
+      example:
+        currencyBinding: 5d60da3a-3411-4954-aabf-1e91569a2700
+      description: ''
+    json_CancelWithdrawalRequest:
+      type: object
+      title: CancelWithdrawalRequest
+      required:
+      - id
+      properties:
+        id:
+          example: 3c077351-36f7-4484-ab3a-c1a91eb21889
+          maxLength: 50
+          minLength: 0
+          readOnly: false
+          description: ''
+          type: string
+      example:
+        id: 3c077351-36f7-4484-ab3a-c1a91eb21889
+      description: ''
+    json_TransactionAdapter:
+      type: object
+      title: TransactionAdapter
+      required:
+      - requiresCode
+      properties:
+        id:
+          example: 1506f937-dd29-4645-a213-dd05dd21f53f
+          readOnly: false
+          description: ''
+          type: string
+        status:
+          example: TRANSACTION_STATUS_CONFIRMED
+          readOnly: false
+          type: string
+        type:
+          example: TRANSACTION_TYPE_DEPOSIT
+          readOnly: false
+          description: ''
+          type: string
+          enum:
+          - TRANSACTION_TYPE_DEPOSIT
+          - TRANSACTION_TYPE_WITHDRAWAL
+        senderAddress:
+          example: '0x19feD5055ecf52D3fc1977196759413B15BD41Ff'
+          readOnly: false
+          description: ''
+          type: string
+        recipientAddress:
+          example: '0x5f193B130D7c856179AA3D738eE06FAb65E73147'
+          readOnly: false
+          description: ''
+          type: string
+        amount:
+          example: '156.15'
+          readOnly: false
+          description: ''
+          type: string
+        transactionFee:
+          example: '1.5615'
+          readOnly: false
+          description: ''
+          type: string
+        timestamp:
+          example: 1567588869826
+          readOnly: false
+          description: ''
+          type: integer
+          format: int64
+        transactionHash:
+          example: '0x858267afe73abd8a3c6fbe0de73f78e28edd002227795f72dac7e812c7de7fbc'
+          readOnly: false
+          description: ''
+          type: string
+        blockHeight:
+          example: 8561312
+          readOnly: false
+          description: ''
+          type: integer
+          format: int64
+        currency:
+          example: 1862a4c2-86fb-48e2-a764-13d3309a04bb
+          readOnly: false
+          description: ''
+          type: string
+        rejectReason:
+          readOnly: false
+          description: present if transaction was rejected
+          type: string
+        memo:
+          example: 2a466cb3b800e35c
+          readOnly: false
+          description: ''
+          type: string
+        paymentProvider:
+          example: 1385a2f2-0d6b-4227-a18a-c0509c92e450
+          readOnly: false
+          description: ''
+          type: string
+        requiresCode:
+          example: true
+          readOnly: false
+          description: ''
+          type: boolean
+      example:
+        id: 1506f937-dd29-4645-a213-dd05dd21f53f
+        status: TRANSACTION_STATUS_CONFIRMED
+        type: TRANSACTION_TYPE_WITHDRAWAL
+        senderAddress: '0x19feD5055ecf52D3fc1977196759413B15BD41Ff'
+        recipientAddress: '0x5f193B130D7c856179AA3D738eE06FAb65E73147'
+        amount: '300.000000000000000000'
+        transactionFee: '3.000000000000000000'
+        timestamp: 1567588869826
+        transactionHash: '0x858267afe73abd8a3c6fbe0de73f78e28edd002227795f72dac7e812c7de7fbc'
+        blockHeight: 0
+        currency: 1862a4c2-86fb-48e2-a764-13d3309a04bb
+        rejectReason: '...'
+        memo: 2a466cb3b800e35c
+        paymentProvider: 1385a2f2-0d6b-4227-a18a-c0509c92e450
+        requiresCode: false
+      description: ''
+    json_WithdrawalRequest:
+      type: object
+      title: WithdrawalRequest
+      required:
+      - currencyBinding
+      - amount
+      - recipientAddress
+      properties:
+        twoFaCode:
+          example: '586248'
+          pattern: \d*
+          maxLength: 20
+          minLength: 0
+          readOnly: false
+          description: ''
+          type: string
+        currencyBinding:
+          example: 4fecf392-b91b-4857-b58b-9d0b7f69db23
+          maxLength: 50
+          minLength: 0
+          readOnly: false
+          description: ''
+          type: string
+        amount:
+          example: '15.00'
+          maxLength: 50
+          minLength: 0
+          readOnly: false
+          description: ''
+          type: string
+        recipientAddress:
+          example: 1QJFifyazC9Wz2qrHHRKqVe5cFFYk5eG86
+          maxLength: 200
+          minLength: 0
+          readOnly: false
+          description: ''
+          type: string
+        memo:
+          maxLength: 300
+          minLength: 0
+          readOnly: false
+          description: present if additional data must be included into transaction
+          type: string
+      example:
+        twoFaCode: '586248'
+        currencyBinding: 4fecf392-b91b-4857-b58b-9d0b7f69db23
+        amount: '15.00'
+        recipientAddress: 1QJFifyazC9Wz2qrHHRKqVe5cFFYk5eG86
+        memo: '...'
+      description: ''
+    json_ConfirmWithdrawalRequest:
+      type: object
+      title: ConfirmWithdrawalRequest
+      required:
+      - id
+      - confirmationCode
+      properties:
+        id:
+          example: 3c077351-36f7-4484-ab3a-c1a91eb21889
+          maxLength: 50
+          minLength: 0
+          readOnly: false
+          description: ''
+          type: string
+        confirmationCode:
+          example: '927516'
+          maxLength: 20
+          minLength: 0
+          readOnly: false
+          description: ''
+          type: string
+      example:
+        id: 3c077351-36f7-4484-ab3a-c1a91eb21889
+        confirmationCode: '927516'
+      description: ''
+    json_BindingAdapter_Transaction:
+      type: object
+      title: BindingAdapter
+      required:
+      - memoSupported
+      - decimals
+      properties:
+        id:
+          example: 4fecf392-b91b-4857-b58b-9d0b7f69db23
+          readOnly: false
+          description: ''
+          type: string
+        currencyProvider:
+          example: 81fac3d4-f5fb-4755-a5a6-806836584d9e
+          readOnly: false
+          description: ''
+          type: string
+        status:
+          example: CURRENCY_BINDING_STATUS_ACTIVE
+          readOnly: false
+          description: ''
+          type: string
+        type:
+          example: CURRENCY_BINDING_TYPE_INPUT
+          readOnly: false
+          description: ''
+          type: string
+        currency:
+          example: 3c8e239a-3dae-4a7b-8a2f-92ff1a4b59de
+          readOnly: false
+          description: ''
+          type: string
+        minAmount:
+          example: '5.00'
+          readOnly: false
+          description: ''
+          type: string
+        fee:
+          example: '0.00'
+          readOnly: false
+          description: ''
+          type: string
+        percentFee:
+          example: '1'
+          readOnly: false
+          description: ''
+          type: string
+        warning:
+          example: Attention !!
+          readOnly: false
+          description: ''
+          type: string
+        feeCurrency:
+          example: 3c8e239a-3dae-4a7b-8a2f-92ff1a4b59de
+          readOnly: false
+          description: ''
+          type: string
+        title:
+          example: USDT Omni Input
+          readOnly: false
+          description: ''
+          type: string
+        confirmationBlocks:
+          example: 2
+          readOnly: false
+          description: ''
+          type: integer
+          format: int64
+        memoSupported:
+          example: false
+          readOnly: false
+          description: ''
+          type: boolean
+        decimals:
+          example: 8
+          readOnly: false
+          description: ''
+          type: integer
+          format: int32
+        config:
+          example: '{"address": "address"}'
+          readOnly: false
+          description: ''
+          type: object
+          additionalProperties:
+            type: string
+        providerName:
+          example: ERC20
+          readOnly: false
+          description: ''
+          type: string
+        restrictedCountries:
+          example: US, TH
+          readOnly: false
+          description: list of restricted countries
+          type: object
+          additionalProperties:
+            type: string
+      example:
+        id: 4fecf392-b91b-4857-b58b-9d0b7f69db23
+        currencyProvider: 81fac3d4-f5fb-4755-a5a6-806836584d9e
+        status: CURRENCY_BINDING_STATUS_ACTIVE
+        type: CURRENCY_BINDING_TYPE_INPUT
+        currency: 3c8e239a-3dae-4a7b-8a2f-92ff1a4b59de
+        minAmount: '5.00'
+        fee: '0.00'
+        percentFee: '1'
+        warning: Attention !!
+        feeCurrency: 3c8e239a-3dae-4a7b-8a2f-92ff1a4b59de
+        title: USDT Omni Input
+        confirmationBlocks: 2
+        memoSupported: false
+        decimals: 8
+        config:
+          '{"address":': '"address"}'
+        providerName: ERC20
+        restrictedCountries: '["US","TH"]'
+      description: ''
+    json_ResendVerificationCodeRequest:
+      type: object
+      title: ResendVerificationCodeRequest
+      required:
+      - id
+      properties:
+        id:
+          example: 3c077351-36f7-4484-ab3a-c1a91eb21889
+          maxLength: 50
+          minLength: 0
+          readOnly: false
+          description: ''
+          type: string
+      example:
+        id: 3c077351-36f7-4484-ab3a-c1a91eb21889
+      description: ''
+    json_DepositAccountAdapter:
+      type: object
+      title: DepositAccountAdapter
+      properties:
+        address:
+          example: '0x5f193B130D7c856179AA3D738eE06FAb65E73147'
+          readOnly: false
+          description: ''
+          type: string
+        memo:
+          readOnly: false
+          description: present if additional data must be included into transaction
+          type: string
+      example:
+        address: '0x5f193B130D7c856179AA3D738eE06FAb65E73147'
+        memo: '...'
+      description: ''
+    json_DepositAddressReply:
+      type: object
+      title: DepositAddressReply
+      allOf:
+      - $ref: '#/components/schemas/json_ReplyBase'
+      - properties:
+          depositAccount:
+            $ref: '#/components/schemas/json_DepositAccountAdapter'
+      example:
+        depositAccount:
+          address: '0x5f193B130D7c856179AA3D738eE06FAb65E73147'
+          memo: '...'
+        message: your request was successfully processed
+        status: SUCCESS
+        error: '...'
+        errors:
+          property1: '...'
+          property2: '...'
+      description: Base reply for all methods
+    json_ReplyBase:
+      type: object
+      title: ReplyBase
+      properties:
+        message:
+          example: your request was successfully processed
+          readOnly: false
+          description: ''
+          type: string
+        status:
+          example: SUCCESS
+          readOnly: false
+          description: ''
+          type: string
+        error:
+          readOnly: false
+          description: short description of what went wrong, present if status is not SUCCESS
+          type: string
+        errors:
+          readOnly: false
+          description: more verbose description of which request fields are not valid, present if status is not SUCCESS
+          type: object
+          additionalProperties:
+            type: string
+      example:
+        message: your request was successfully processed
+        status: SUCCESS
+        error: ''
+        errors: {}
+      description: Base reply for all methods
+    json_BindingAdapter:
+      type: object
+      title: BindingAdapter
+      properties:
+        tag:
+          readOnly: false
+          description: Currency tag
+          type: string
+        min_amount:
+          readOnly: false
+          description: Minimal amount of currency
+          type: string
+        fee:
+          readOnly: false
+          description: Fee amount of currency
+          type: string
+      example:
+        tag: '...'
+        min_amount: '...'
+        fee: '...'
+      description: ''
+    json_PossibleBindingEntity:
+      type: object
+      title: PossibleBindingEntity
+      properties:
+        inputs:
+          readOnly: false
+          description: ''
+          type: array
+          items:
+            type: string
+        outputs:
+          readOnly: false
+          description: ''
+          type: array
+          items:
+            type: string
+      example:
+        inputs:
+        - 3c8e239a-3dae-4a7b-8a2f-92ff1a4b59de
+        - caa351fa-beaf-4f72-a2be-3e198fa60aaa
+        outputs:
+        - b4a77a1c-34c0-43d4-87c7-e5dae8a545c0
+      description: ''
+    json_WithdrawalReceiptAdapter:
+      type: object
+      title: WithdrawalReceiptAdapter
+      required:
+      - codeRequired
+      properties:
+        withdrawalId:
+          example: 3c077351-36f7-4484-ab3a-c1a91eb21889
+          readOnly: false
+          description: ''
+          type: string
+        codeRequired:
+          example: true
+          readOnly: false
+          description: ''
+          type: boolean
+        transaction:
+          readOnly: false
+          $ref: '#/components/schemas/json_TransactionAdapter'
+          description: ''
+      example:
+        withdrawalId: 3c077351-36f7-4484-ab3a-c1a91eb21889
+        codeRequired: true
+        transaction:
+          id: 1506f937-dd29-4645-a213-dd05dd21f53f
+          status: TRANSACTION_STATUS_CONFIRMED
+          type: TRANSACTION_TYPE_DEPOSIT
+          senderAddress: '0x19feD5055ecf52D3fc1977196759413B15BD41Ff'
+          recipientAddress: '0x5f193B130D7c856179AA3D738eE06FAb65E73147'
+          amount: '156.15'
+          timestamp: 1567588869826
+          transactionHash: '0x858267afe73abd8a3c6fbe0de73f78e28edd002227795f72dac7e812c7de7fbc'
+          blockHeight: 8561312
+          currency: 1862a4c2-86fb-48e2-a764-13d3309a04bb
+          rejectReason: '...'
+          memo: 2a466cb3b800e35c
+          paymentProvider: 1385a2f2-0d6b-4227-a18a-c0509c92e450
+          requiresCode: true
+      description: ''
+  securitySchemes:
+    api_key:
+      type: apiKey
+      name: X-LA-APIKEY
+      in: header
+    api_signature:
+      type: apiKey
+      name: X-LA-SIGNATURE
+      in: header
+x-refined-from:
+- latoken-api-v2-swagger.json
+- latoken-openapi.yml

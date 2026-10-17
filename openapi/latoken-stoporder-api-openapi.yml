@@ -1,0 +1,587 @@
+openapi: 3.2.0
+info:
+  title: Latoken Stop Order API
+  version: V2
+  x-logo:
+    url: ./logo.png
+    altText: Latoken logo
+  description: 'Operations tagged StopOrder across 2 of this provider''s published API definitions: latoken-api-v2-swagger.json, latoken-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.latoken.com/
+tags:
+- name: StopOrder
+paths:
+  /v2/auth/stopOrder:
+    get:
+      security:
+      - api_key: []
+        api_signature: []
+      summary: Get all my stoporders
+      tags:
+      - StopOrder
+      description: Request list of all my stop orders
+      operationId: getMyStopOrders
+      parameters:
+      - name: from
+        in: query
+        description: Request order history for given timestamp `from` and early (by default there is current timestamp). In milliseconds
+        schema:
+          type: string
+      - name: limit
+        in: query
+        description: Limit list of orders by `limit`
+        schema:
+          type: string
+          default: '100'
+      responses:
+        '200':
+          description: on success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/json_ArrayAdapterOfStopOrderAdapter'
+  /v2/auth/stopOrder/cancel:
+    post:
+      security:
+      - api_key: []
+        api_signature: []
+      summary: Cancel one stop order by id
+      tags:
+      - StopOrder
+      operationId: cancelStopOrder
+      responses:
+        '200':
+          description: on success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/json_CancelStopOrderReply'
+        '400':
+          description: if request is not valid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/json_400Reply'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/json_CancelStopOrderRequest'
+        required: true
+  /v2/auth/stopOrder/cancelAll:
+    post:
+      security:
+      - api_key: []
+        api_signature: []
+      summary: Cancel all orders
+      tags:
+      - StopOrder
+      operationId: cancelAllStopOrders
+      responses:
+        '200':
+          description: on success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/json_CancelAllStopOrdersReply'
+        '400':
+          description: if request is not valid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/json_400Reply'
+  /v2/auth/stopOrder/cancelAll/{currency}/{quote}:
+    post:
+      security:
+      - api_key: []
+        api_signature: []
+      summary: Cancel all orders in specified pair
+      tags:
+      - StopOrder
+      operationId: cancelAllStopOrdersByPair
+      parameters:
+      - name: currency
+        in: path
+        required: true
+        description: ID or TAG of base currency
+        schema:
+          type: string
+      - name: quote
+        in: path
+        required: true
+        description: ID or TAG of quote currency
+        schema:
+          type: string
+      responses:
+        '200':
+          description: on success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/json_CancelAllStopOrdersReply'
+        '400':
+          description: if request is not valid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/json_400Reply'
+  /v2/auth/stopOrder/getOrder/{id}:
+    get:
+      security:
+      - api_key: []
+        api_signature: []
+      summary: Get a stoporder by id
+      tags:
+      - StopOrder
+      operationId: getStopOrderById
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: Order ID
+        schema:
+          type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/json_StopOrderAdapter'
+  /v2/auth/stopOrder/pair/{currency}/{quote}:
+    get:
+      security:
+      - api_key: []
+        api_signature: []
+      summary: Get all my orders on traded pair
+      tags:
+      - StopOrder
+      operationId: getMyStopOrdersByPair
+      parameters:
+      - name: currency
+        in: path
+        required: true
+        description: Base currency tag or ID (for example, `USDT`)
+        schema:
+          type: string
+      - name: quote
+        in: path
+        required: true
+        description: Quote currency tag or ID (for example, `LA`)
+        schema:
+          type: string
+      - name: from
+        in: query
+        description: Request order history for given timestamp `from` and early (by default there is current timestamp). In milliseconds
+        schema:
+          type: string
+      - name: limit
+        in: query
+        description: Limit list of orders by `limit`
+        schema:
+          type: string
+          default: '100'
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/json_ArrayAdapterOfStopOrderAdapter'
+  /v2/auth/stopOrder/pair/{currency}/{quote}/active:
+    get:
+      security:
+      - api_key: []
+        api_signature: []
+      summary: Get my active orders on traded pair
+      tags:
+      - StopOrder
+      operationId: getMyActiveStopOrdersByPair
+      parameters:
+      - name: currency
+        in: path
+        required: true
+        description: Base currency ID (for example, `3092b810-c39f-47ba-8c5f-a8ca3bd8902c`)
+        schema:
+          type: string
+      - name: quote
+        in: path
+        required: true
+        description: Quote currency ID (for example, `1232b810-c39f-47ba-8c5f-a8ca3bd8902c`)
+        schema:
+          type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/json_ArrayAdapterOfStopOrderAdapter'
+  /v2/auth/stopOrder/place:
+    post:
+      security:
+      - api_key: []
+        api_signature: []
+      summary: Placing a new order
+      tags:
+      - StopOrder
+      description: Place order
+      operationId: placeStopOrder
+      responses:
+        '201':
+          description: Id of created order
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/json_CreateStopOrderReply'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/json_CreateStopOrderRequest'
+        description: request structure with order params
+components:
+  schemas:
+    json_CancelStopOrderRequest:
+      type: object
+      title: CancelStopOrderRequest
+      required:
+      - id
+      properties:
+        id:
+          maxLength: 200
+          minLength: 0
+          readOnly: false
+          description: Order ID
+          type: string
+      example:
+        id: 12609cf4-fca5-43ed-b0ea-b40fb48d3b0d
+      description: ''
+    json_CreateStopOrderReply:
+      type: object
+      title: CreateOrderReply
+      allOf:
+      - $ref: '#/components/schemas/json_ReplyBase'
+      - properties:
+          id:
+            readOnly: false
+            description: ''
+            type: string
+      example:
+        id: '...'
+        message: order accepted for placing
+        status: SUCCESS
+        error: '...'
+        errors:
+          property1: '...'
+          property2: '...'
+      description: Base reply for all methods
+    json_400Reply:
+      type: object
+      title: 400Reply
+      allOf:
+      - $ref: '#/components/schemas/json_ReplyErrorBase'
+      example:
+        message: Bad Request
+        status: FAILURE
+        error: BAD_REQUEST
+        errors:
+          property1: Wrong property 1
+          property2: Wrong property 2
+      description: Base reply 400 for all methods
+    json_CancelStopOrderReply:
+      type: object
+      title: CancelStopOrderReply
+      allOf:
+      - $ref: '#/components/schemas/json_ReplyBase'
+      - properties:
+          id:
+            readOnly: false
+            description: ''
+            type: string
+      example:
+        id: 12345678-1234-1244-1244-123456789012
+        message: cancellation request successfully submitted
+        status: SUCCESS
+        error: ''
+        errors: {}
+      description: Base reply for all methods
+    json_ArrayAdapterOfStopOrderAdapter:
+      readOnly: false
+      description: List of stop orders
+      type: array
+      items:
+        $ref: '#/components/schemas/json_StopOrderAdapter'
+      example:
+      - id: 92609cf4-fca5-43ed-b0ea-b40fb48d3b0d
+        status: PLACED
+        side: SELL
+        type: ORDER_TYPE_STOP_ORDER
+        baseCurrency: 3092b810-c39f-47ba-8c5f-a8ca3bd8902c
+        quoteCurrency: 4092b810-c39f-47ba-8c5f-a8ca3bd0004c
+        clientOrderId: myOrder
+        price: '130.12'
+        stopPrice: '130.12'
+        quantity: '1000.0'
+        cost: '130120.00'
+        filled: '999.1'
+        trader: 12345678-fca5-43ed-b0ea-b40fb48d3b0d
+        timestamp: 3800012333
+      - id: 12609cf4-fca5-43ed-b0ea-b40fb48d3b0d
+        status: PLACED
+        side: BUY
+        type: ORDER_TYPE_STOP_ORDER
+        baseCurrency: 3092b810-c39f-47ba-8c5f-a8ca3bd8902c
+        quoteCurrency: 4092b810-c39f-47ba-8c5f-a8ca3bd0004c
+        clientOrderId: myOrder
+        price: '100.0'
+        stopPrice: '100.0'
+        quantity: '1000.0'
+        cost: '100000.0'
+        filled: '230.0'
+        trader: 12345678-fca5-43ed-b0ea-b40fb48d3b0d
+        timestamp: 3800014433
+    json_CreateStopOrderRequest:
+      type: object
+      title: CreateStopOrderRequest
+      required:
+      - baseCurrency
+      - quoteCurrency
+      - side
+      - condition
+      - type
+      - quantity
+      - timestamp
+      properties:
+        baseCurrency:
+          example: f7dac554-8139-4ff6-841f-0e586a5984a0
+          maxLength: 20
+          minLength: 0
+          readOnly: false
+          description: id of base currency
+          type: string
+        quoteCurrency:
+          example: a5a7a7a9-e2a3-43f9-8754-29a02f6b709b
+          maxLength: 20
+          minLength: 0
+          readOnly: false
+          description: id of quote currency
+          type: string
+        side:
+          example: BID
+          maxLength: 10
+          minLength: 0
+          readOnly: false
+          description: order side, one of {"BUY","ORDER_SIDE_BUY", "BID", "SELL","ORDER_SIDE_SELL", "ASK"}
+          type: string
+        clientOrderId:
+          example: my-wonderful-order-number-71566
+          maxLength: 50
+          minLength: 0
+          readOnly: false
+          description: custom order id, 50 chars max
+          type: string
+        price:
+          example: '10103.19'
+          minimum: 0
+          maxLength: 50
+          minLength: 0
+          readOnly: false
+          description: price as decimal number with fixed point
+          type: string
+        stopPrice:
+          example: '10103.19'
+          minimum: 0
+          maxLength: 50
+          minLength: 0
+          readOnly: false
+          description: price as decimal number with fixed point
+          type: string
+        quantity:
+          example: '3.21'
+          minimum: 0
+          maxLength: 50
+          minLength: 0
+          readOnly: false
+          description: quantity as decimal number with fixed point
+          type: string
+        timestamp:
+          example: 1568185507
+          minimum: 0
+          readOnly: false
+          description: client provided timestamp
+          type: integer
+          format: int64
+      example:
+        baseCurrency: f7dac554-8139-4ff6-841f-0e586a5984a0
+        quoteCurrency: a5a7a7a9-e2a3-43f9-8754-29a02f6b709b
+        side: BID
+        clientOrderId: my-wonderful-order-number-71566
+        price: '10103.19'
+        stopPrice: '10103.19'
+        quantity: '3.21'
+        timestamp: 1568185507
+      description: ''
+    json_CancelAllStopOrdersReply:
+      type: object
+      title: CancelAllStopOrdersReply
+      allOf:
+      - $ref: '#/components/schemas/json_ReplyBase'
+      example:
+        message: cancellation request successfully submitted
+        status: SUCCESS
+        error: ''
+        errors: {}
+      description: Base reply for all methods
+    json_StopOrderAdapter:
+      type: object
+      title: StopOrderAdapter
+      properties:
+        id:
+          readOnly: false
+          description: Order ID
+          type: string
+        status:
+          readOnly: false
+          description: Order status (for example, filled or canceled)
+          type: string
+        side:
+          readOnly: false
+          description: For example, buy or sell
+          type: string
+        type:
+          readOnly: false
+          description: Order type
+          type: string
+        baseCurrency:
+          readOnly: false
+          description: Base currency ID
+          type: string
+        quoteCurrency:
+          readOnly: false
+          description: Quote currency ID
+          type: string
+        clientOrderId:
+          readOnly: false
+          description: Name (or id) of customized order
+          type: string
+        price:
+          readOnly: false
+          description: Price of base currency in quote currency
+          type: string
+        stopPrice:
+          readOnly: false
+          description: Price of base currency in quote currency
+          type: string
+        quantity:
+          readOnly: false
+          description: Quantity of base currency
+          type: string
+        cost:
+          readOnly: false
+          description: Cost of base currency amount (price * quantity)
+          type: string
+        filled:
+          readOnly: false
+          description: Filled quantity of base currency
+          type: string
+        trader:
+          readOnly: false
+          description: Trader ID
+          type: string
+        timestamp:
+          readOnly: false
+          description: Trade timestamp
+          type: integer
+          format: int64
+      example:
+        id: 12609cf4-fca5-43ed-b0ea-b40fb48d3b0d
+        status: CLOSED
+        side: BUY
+        baseCurrency: 3092b810-c39f-47ba-8c5f-a8ca3bd8902c
+        quoteCurrency: 4092b810-c39f-47ba-8c5f-a8ca3bd0004c
+        clientOrderId: myOrder
+        price: '100.0'
+        stopPrice: '100.0'
+        quantity: '1000.0'
+        cost: '100000.0'
+        filled: '230.0'
+        trader: 12345678-fca5-43ed-b0ea-b40fb48d3b0d
+        timestamp: 3800014433
+      description: ''
+    json_ReplyErrorBase:
+      type: object
+      title: ReplyErrorBase
+      properties:
+        message:
+          example: Validation errors
+          readOnly: false
+          description: Short error description of what went wrong
+          type: string
+        status:
+          example: FAILURE
+          readOnly: false
+          description: status description, can only be "FAILURE"
+          type: string
+        error:
+          readOnly: false
+          enum:
+          - VALIDATION_ERROR
+          - FORBIDDEN
+          - NOT_FOUND
+          - UNAVAILABLE_FOR_LEGAL_REASONS
+          - UNAVAILABLE
+          description: error codes, present if status is not SUCCESS
+          type: string
+        errors:
+          readOnly: false
+          description: more verbose description of which request fields are not valid, present if status is not SUCCESS
+          type: object
+          additionalProperties:
+            type: string
+        result:
+          type: boolean
+          description: request result, can only be "false"
+          example: false
+    json_ReplyBase:
+      type: object
+      title: ReplyBase
+      properties:
+        message:
+          example: your request was successfully processed
+          readOnly: false
+          description: ''
+          type: string
+        status:
+          example: SUCCESS
+          readOnly: false
+          description: ''
+          type: string
+        error:
+          readOnly: false
+          description: short description of what went wrong, present if status is not SUCCESS
+          type: string
+        errors:
+          readOnly: false
+          description: more verbose description of which request fields are not valid, present if status is not SUCCESS
+          type: object
+          additionalProperties:
+            type: string
+      example:
+        message: your request was successfully processed
+        status: SUCCESS
+        error: ''
+        errors: {}
+      description: Base reply for all methods
+  securitySchemes:
+    api_key:
+      type: apiKey
+      name: X-LA-APIKEY
+      in: header
+    api_signature:
+      type: apiKey
+      name: X-LA-SIGNATURE
+      in: header
+x-refined-from:
+- latoken-api-v2-swagger.json
+- latoken-openapi.yml

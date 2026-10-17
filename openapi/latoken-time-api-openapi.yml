@@ -1,0 +1,55 @@
+openapi: 3.2.0
+info:
+  title: Latoken Time API
+  version: V2
+  x-logo:
+    url: ./logo.png
+    altText: Latoken logo
+  description: 'Operations tagged Time across 2 of this provider''s published API definitions: latoken-api-v2-swagger.json, latoken-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.latoken.com/
+tags:
+- name: Time
+paths:
+  /v2/time:
+    get:
+      summary: Get current time
+      tags:
+      - Time
+      description: Request current server time
+      operationId: currentTime
+      responses:
+        '200':
+          description: on success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/json_CurrentTimeReply'
+components:
+  schemas:
+    json_CurrentTimeReply:
+      type: object
+      title: CurrentTimeReply
+      required:
+      - serverTime
+      properties:
+        serverTime:
+          readOnly: false
+          description: ''
+          type: integer
+          format: int64
+      example:
+        serverTime: 1570615577321
+      description: ''
+  securitySchemes:
+    api_key:
+      type: apiKey
+      name: X-LA-APIKEY
+      in: header
+    api_signature:
+      type: apiKey
+      name: X-LA-SIGNATURE
+      in: header
+x-refined-from:
+- latoken-api-v2-swagger.json
+- latoken-openapi.yml

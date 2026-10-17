@@ -1,0 +1,430 @@
+openapi: 3.2.0
+info:
+  title: Latoken Transfer API
+  version: V2
+  x-logo:
+    url: ./logo.png
+    altText: Latoken logo
+  description: 'Operations tagged Transfer across 2 of this provider''s published API definitions: latoken-api-v2-swagger.json, latoken-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.latoken.com/
+tags:
+- name: Transfer
+paths:
+  /v2/auth/transfer:
+    get:
+      security:
+      - api_key: []
+        api_signature: []
+      summary: Get transfers
+      tags:
+      - Transfer
+      operationId: getUsersTransfers
+      parameters:
+      - name: page
+        in: query
+        description: ''
+        schema:
+          type: string
+      - name: size
+        in: query
+        description: ''
+        schema:
+          type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/json_PageAdapterOfTransferAdapter'
+  /v2/auth/transfer/email:
+    post:
+      security:
+      - api_key: []
+        api_signature: []
+      summary: Create transfer by recipient email
+      tags:
+      - Transfer
+      operationId: transferByEmail
+      responses:
+        '201':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/json_TransferAdapter'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/json_TransferByEmailRequest'
+  /v2/auth/transfer/id:
+    post:
+      security:
+      - api_key: []
+        api_signature: []
+      summary: Create transfer by recipient id
+      tags:
+      - Transfer
+      operationId: transferById
+      responses:
+        '201':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/json_TransferAdapter'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/json_TransferByIdRequest'
+  /v2/auth/transfer/phone:
+    post:
+      security:
+      - api_key: []
+        api_signature: []
+      summary: Create transfer by recipient phone number
+      tags:
+      - Transfer
+      operationId: transferByPhone
+      responses:
+        '201':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/json_TransferAdapter'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/json_TransferByPhoneRequest'
+components:
+  schemas:
+    json_PageOfTransferAdapter:
+      type: object
+      title: PageOfTransferAdapter
+      required:
+      - totalElements
+      - totalPages
+      properties:
+        totalElements:
+          readOnly: false
+          description: ''
+          type: integer
+          format: int64
+        totalPages:
+          readOnly: false
+          description: ''
+          type: integer
+          format: int32
+      example:
+        totalElements: 12345
+        totalPages: 12345
+      description: ''
+    json_TransferByEmailRequest:
+      type: object
+      title: TransferByEmailRequest
+      required:
+      - value
+      - recipient
+      - currency
+      properties:
+        value:
+          minimum: 0
+          readOnly: false
+          description: ''
+          type: string
+        recipient:
+          maxLength: 200
+          minLength: 0
+          readOnly: false
+          description: ''
+          type: string
+        currency:
+          maxLength: 50
+          minLength: 0
+          readOnly: false
+          description: ''
+          type: string
+        twoFaCode:
+          example: '589135'
+          maxLength: 20
+          minLength: 0
+          readOnly: false
+          description: 2fa code (TOTP)
+          type: string
+      example:
+        value: '...'
+        recipient: '...'
+        currency: '...'
+        twoFaCode: '589135'
+      description: ''
+    json_TransferAdapter:
+      type: object
+      title: TransferAdapter
+      properties:
+        id:
+          readOnly: false
+          description: Transfer ID
+          type: string
+        status:
+          readOnly: false
+          description: Transfer status (one of TRANSFER_STATUS_PENDING, TRANSFER_STATUS_COMPLETED, TRANSFER_STATUS_REJECTED, TRANSFER_STATUS_UNVERIFIED, TRANSFER_STATUS_CANCELLED)
+          type: string
+        type:
+          readOnly: false
+          description: Transfer type (one of TRANSFER_TYPE_DEPOSIT_SPOT, TRANSFER_TYPE_WITHDRAW_SPOT)
+          type: string
+        fromAccount:
+          readOnly: false
+          description: Wallet ID from which transfer was transferred
+          type: string
+        toAccount:
+          readOnly: false
+          description: Wallet ID for which transfer was received
+          type: string
+        transferringFunds:
+          readOnly: false
+          description: Transfer amount in Currency
+          type: string
+        usdValue:
+          readOnly: false
+          description: Transfer amount in USD
+          type: string
+        rejectReason:
+          readOnly: false
+          description: If transfer is rejected then here is a reason
+          type: string
+        timestamp:
+          readOnly: false
+          description: Transfer timestamp
+          type: integer
+          format: int64
+        direction:
+          $ref: '#/components/schemas/json_Direction'
+        method:
+          readOnly: false
+          description: Transfer method (one of TRANSFER_METHOD_EMAIL, TRANSFER_METHOD_DIRECT, TRANSFER_METHOD_PHONE)
+          type: string
+        recipient:
+          readOnly: false
+          description: Recipient ID
+          type: string
+        sender:
+          readOnly: false
+          description: Sender ID
+          type: string
+        currency:
+          readOnly: false
+          description: Currency which used for transfer
+          type: string
+        codeRequired:
+          readOnly: false
+          description: 2FA code is required
+        fromUser:
+          readOnly: false
+          description: ID of user
+        toUser:
+          readOnly: false
+          description: ID of user
+        fee:
+          readOnly: false
+          description: fee from this transfer
+      example:
+        id: e6fc4ace-7750-44e4-b7e9-6af038ac7107
+        status: TRANSFER_STATUS_COMPLETED
+        type: TRANSFER_TYPE_DEPOSIT_SPOT
+        fromAccount: 3bf61015-bf32-47a6-b237-c9f70df772ad
+        toAccount: 355eb279-7c7e-4515-814a-575a49dc0325
+        transferringFunds: '500000.000000000000000000'
+        usdValue: '0.000000000000000000'
+        rejectReason: ''
+        timestamp: 1576844438402
+        direction: INTERNAL
+        method: TRANSFER_METHOD_UNKNOWN
+        recipient: ''
+        sender: ''
+        currency: 40af7879-a8cc-4576-a42d-7d2749821b58
+        codeRequired: false
+        fromUser: cd555555-666d-46fb-9ae6-487f66738073
+        toUser: cd555555-666d-46fb-9ae6-487f66738073
+        fee: 0
+      description: ''
+    json_TransferByIdRequest:
+      type: object
+      title: TransferByIdRequest
+      required:
+      - value
+      - recipient
+      - currency
+      properties:
+        value:
+          minimum: 0
+          readOnly: false
+          description: ''
+          type: string
+        recipient:
+          readOnly: false
+          description: ''
+          type: string
+        currency:
+          maxLength: 50
+          minLength: 0
+          readOnly: false
+          description: ''
+          type: string
+        twoFaCode:
+          example: '589135'
+          maxLength: 20
+          minLength: 0
+          readOnly: false
+          description: 2fa code (TOTP)
+          type: string
+      example:
+        value: '...'
+        recipient: '...'
+        currency: '...'
+        twoFaCode: '589135'
+      description: ''
+    json_Direction:
+      type: string
+      title: Direction
+      enum:
+      - INTERNAL
+      - OUTCOME
+      - INCOME
+      description: ''
+    json_PageAdapterOfTransferAdapter:
+      type: object
+      title: PageAdapterOfTransferAdapter
+      required:
+      - pageSize
+      - first
+      - hasNext
+      - hasContent
+      properties:
+        pageSize:
+          example: 20
+          readOnly: false
+          description: size of page
+          type: integer
+          format: int64
+        first:
+          example: true
+          readOnly: false
+          description: whether there is page before
+          type: boolean
+        hasNext:
+          example: true
+          readOnly: false
+          description: true if there is page after that page
+          type: boolean
+        content:
+          readOnly: false
+          description: ''
+          type: array
+          items:
+            $ref: '#/components/schemas/json_TransferAdapter'
+        hasContent:
+          example: true
+          readOnly: false
+          description: true if page is not empty
+          type: boolean
+        page:
+          $ref: '#/components/schemas/json_PageOfTransferAdapter'
+      example:
+        hasNext: true
+        content:
+        - id: ebd6312f-cb4f-45d1-9409-4b0b3027f21e
+          status: TRANSFER_STATUS_COMPLETED
+          type: TRANSFER_TYPE_WITHDRAW_SPOT
+          fromAccount: c429c551-adbb-4078-b74b-276bea308a36
+          toAccount: 631c6203-bd62-4734-a04d-9b2a951f43b9
+          transferringFunds: 1259.0321785
+          usdValue: 1259.032179
+          rejectReason: null
+          timestamp: 1633515579530
+          direction: INTERNAL
+          method: TRANSFER_METHOD_UNKNOWN
+          recipient: null
+          sender: null
+          currency: 0c3a106d-bde3-4c13-a26e-3fd2394529e5
+          codeRequired: false
+          fromUser: ce555f3f-585d-46fb-9ae6-487f66738073
+          toUser: ce555f3f-585d-46fb-9ae6-487f66738073
+          fee: 0
+        - id: ebd6312f-cb4f-45d1-9409-4b0b3027f21e
+          status: TRANSFER_STATUS_COMPLETED
+          type: TRANSFER_TYPE_INTER_USER
+          fromAccount: c429c551-adbb-4078-b74b-276bea308a36
+          toAccount: 631c6203-bd62-4734-a04d-9b2a951f43b9
+          transferringFunds: 1259.0321785
+          usdValue: 1259.032179
+          rejectReason: null
+          timestamp: 1633515579530
+          direction: INTERNAL
+          method: TRANSFER_METHOD_EMAIL
+          recipient: joe@mail.com
+          sender: paul@mail.com
+          currency: 0c3a106d-bde3-4c13-a26e-3fd2394529e5
+          codeRequired: false
+          fromUser: ce555f3f-585d-46fb-9ae6-487f66738073
+          toUser: ce555f3f-585d-46fb-9ae6-487f66738073
+          fee: 0
+        first: true
+        pageSize: 20
+        hasContent: true
+      description: ''
+    json_TransferByPhoneRequest:
+      type: object
+      title: TransferByPhoneRequest
+      required:
+      - value
+      - recipient
+      - currency
+      properties:
+        value:
+          minimum: 0
+          readOnly: false
+          description: ''
+          type: string
+        recipient:
+          maxLength: 200
+          minLength: 0
+          readOnly: false
+          description: ''
+          type: string
+        currency:
+          maxLength: 50
+          minLength: 0
+          readOnly: false
+          description: ''
+          type: string
+        twoFaCode:
+          example: '589135'
+          maxLength: 20
+          minLength: 0
+          readOnly: false
+          description: 2fa code (TOTP)
+          type: string
+      example:
+        value: '...'
+        recipient: '...'
+        currency: '...'
+        twoFaCode: '589135'
+      description: ''
+  securitySchemes:
+    api_key:
+      type: apiKey
+      name: X-LA-APIKEY
+      in: header
+    api_signature:
+      type: apiKey
+      name: X-LA-SIGNATURE
+      in: header
+x-refined-from:
+- latoken-api-v2-swagger.json
+- latoken-openapi.yml

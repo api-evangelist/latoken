@@ -1,0 +1,705 @@
+openapi: 3.2.0
+info:
+  title: Latoken Offer Controller API
+  version: V1
+  x-logo:
+    url: ./logo.png
+  description: 'Operations tagged OfferController across 2 of this provider''s published API definitions: latoken-p2p-api-swagger.json, latoken-p2p-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: /pay/v1
+- url: https://api.latoken.com/pay/v1
+tags:
+- name: OfferController
+paths:
+  /p2p/offers:
+    get:
+      summary: List Public Offers
+      tags:
+      - OfferController
+      parameters:
+      - in: query
+        name: page
+        description: Number of the page
+        schema:
+          type: integer
+          default: 1
+          minimum: 1
+      - in: query
+        name: size
+        description: Count of entities in the set
+        schema:
+          type: integer
+          default: 50
+          minimum: 1
+      - in: query
+        name: sort
+        description: Property for sorting
+        schema:
+          type: string
+          default: updatedAt
+      - in: query
+        name: direction
+        description: Sorting direction
+        schema:
+          type: string
+          enum:
+          - ASC
+          - DESC
+          default: DESC
+      - in: query
+        name: cryptoTag
+        description: Select offers with this cryptocurrency
+        schema:
+          type: string
+          default: ''
+      - in: query
+        name: fiatTag
+        description: Select offers with this fiat currency
+        schema:
+          type: string
+          default: ''
+      - in: query
+        name: type
+        description: Offers' direction
+        schema:
+          type: string
+          enum:
+          - OFFER_TYPE_UNSPECIFIED
+          - OFFER_TYPE_SELL
+          - OFFER_TYPE_BUY
+          default: OFFER_TYPE_UNSPECIFIED
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OffersList'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '503':
+          description: Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceUnavailableError'
+      x-code-samples:
+      - lang: TypeScript
+        source: "import axios from 'axios';\n\nconst baseUrl = 'https://api.latoken.com';\nconst endpoint = '/pay/v1/p2p/offers';\n\naxios\n  .get(baseUrl + endpoint)\n  .then((result) => console.log(result.data))\n  .catch((error) => console.error(error));\n"
+      operationId: getP2pOffers
+      x-operation-id-source: derived
+    servers:
+    - url: /pay/v1
+  /p2p/config:
+    get:
+      summary: Get Config
+      tags:
+      - OfferController
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Config'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '503':
+          description: Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceUnavailableError'
+      x-code-samples:
+      - lang: TypeScript
+        source: "import axios from 'axios';\n\nconst baseUrl = 'https://api.latoken.com';\nconst endpoint = '/pay/v1/p2p/config';\n\naxios\n  .get(baseUrl + endpoint)\n  .then((result) => console.log(result.data))\n  .catch((error) => console.error(error));\n"
+      operationId: getP2pConfig
+      x-operation-id-source: derived
+    servers:
+    - url: /pay/v1
+  /p2p/offers/rates:
+    get:
+      summary: Get Rates
+      tags:
+      - OfferController
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rates'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '503':
+          description: Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceUnavailableError'
+      x-code-samples:
+      - lang: TypeScript
+        source: "import axios from 'axios';\n\nconst baseUrl = 'https://api.latoken.com';\nconst endpoint = '/pay/v1/p2p/offers/rates';\n\naxios\n  .get(baseUrl + endpoint)\n  .then((result) => console.log(result.data))\n  .catch((error) => console.error(error));\n"
+      operationId: getP2pOffersRates
+      x-operation-id-source: derived
+    servers:
+    - url: /pay/v1
+  /auth/p2p/offer:
+    post:
+      security:
+      - api_key: []
+        api_signature: []
+      summary: Create new Offer
+      tags:
+      - OfferController
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Offer'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: User Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '503':
+          description: Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceUnavailableError'
+      x-code-samples:
+      - lang: TypeScript
+        source: "import * as crypto from 'crypto';\nimport axios, { AxiosRequestConfig } from 'axios';\n\nconst apiKey = '<Your API Public Key>';\nconst apiSecret = '<You API Private Key>';\n\nconst baseUrl = 'https://api.latoken.com';\nconst endpoint = '/pay/v1/auth/p2p/offer';\nconst method = 'POST';\n\nconst signature: string = crypto\n  .createHmac('sha256', apiSecret)\n  .update(method + endpoint)\n  .digest('hex');\n\nconst config: AxiosRequestConfig = {\n  headers: {\n    'X-LA-APIKEY': apiKey,\n    'X-LA-SIGNATURE': signature,\n  },\n};\n\nconst params = {\n  cryptoTag: 'USDT',\n  fiatTag: 'USD',\n  type: 'OFFER_TYPE_BUY',\n  method: '1c18d0bb-511d-41c5-8fb2-66626531d59d',\n  acceptableMethod: 'PAYMENT_TYPE_BANK_TRANSFER',\n  amount: '1000',\n  status: 'OFFER_STATUS_ACTIVE',\n  rate: {\n    type: 'RATE_TYPE_FLOAT_PERCENT',\n    value: '0.05',\n  },\n  limits: {\n    min: '10',\n    max: '100',\n  },\n  terms: 'Buy bitcoin',\n};\n\naxios\n  .post(baseUrl + endpoint, params, config)\n  .then((result) => console.log(result.data))\n  .catch((error) => console.error(error));\n"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOfferRequest'
+        required: true
+      operationId: postAuthP2pOffer
+      x-operation-id-source: derived
+    servers:
+    - url: /pay/v1
+  /auth/p2p/merchant/offers:
+    get:
+      security:
+      - api_key: []
+        api_signature: []
+      summary: List Merchant Offers
+      tags:
+      - OfferController
+      parameters:
+      - in: query
+        name: page
+        description: Number of the page
+        schema:
+          type: integer
+          default: 1
+          minimum: 1
+      - in: query
+        name: size
+        description: Count of entities in the set
+        schema:
+          type: integer
+          default: 50
+          minimum: 1
+      - in: query
+        name: sort
+        description: Property for sorting
+        schema:
+          type: string
+          default: updatedAt
+      - in: query
+        name: direction
+        description: Sorting direction
+        schema:
+          type: string
+          enum:
+          - ASC
+          - DESC
+          default: DESC
+      - in: query
+        name: type
+        description: Offers' direction
+        schema:
+          type: string
+          enum:
+          - OFFER_TYPE_UNSPECIFIED
+          - OFFER_TYPE_SELL
+          - OFFER_TYPE_BUY
+          default: OFFER_TYPE_UNSPECIFIED
+      - in: query
+        name: status
+        description: Offers' status
+        schema:
+          type: string
+          enum:
+          - OFFER_STATUS_UNSPECIFIED
+          - OFFER_STATUS_ACTIVE
+          - OFFER_STATUS_NOT_ACTIVE
+          default: OFFER_STATUS_UNSPECIFIED
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OffersList'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: User Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '503':
+          description: Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceUnavailableError'
+      x-code-samples:
+      - lang: TypeScript
+        source: "import * as crypto from 'crypto';\nimport axios, { AxiosRequestConfig } from 'axios';\n\nconst apiKey = '<Your API Public Key>';\nconst apiSecret = '<You API Private Key>';\n\nconst baseUrl = 'https://api.latoken.com';\nconst endpoint = '/pay/v1/auth/p2p/merchant/offers';\nconst method = 'GET';\n\nconst signature: string = crypto\n  .createHmac('sha256', apiSecret)\n  .update(method + endpoint)\n  .digest('hex');\n\nconst config: AxiosRequestConfig = {\n  headers: {\n    'X-LA-APIKEY': apiKey,\n    'X-LA-SIGNATURE': signature,\n  },\n};\n\naxios\n  .get(baseUrl + endpoint, config)\n  .then((result) => console.log(result.data))\n  .catch((error) => console.error(error));\n"
+      operationId: getAuthP2pMerchantOffers
+      x-operation-id-source: derived
+    servers:
+    - url: /pay/v1
+  /auth/p2p/offer/update:
+    post:
+      security:
+      - api_key: []
+        api_signature: []
+      summary: Update Offer
+      tags:
+      - OfferController
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Offer'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: User Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '503':
+          description: Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceUnavailableError'
+      x-code-samples:
+      - lang: TypeScript
+        source: "import * as crypto from 'crypto';\nimport axios, { AxiosRequestConfig } from 'axios';\n\nconst apiKey = '<Your API Public Key>';\nconst apiSecret = '<You API Private Key>';\n\nconst baseUrl = 'https://api.latoken.com';\nconst endpoint = '/pay/v1/auth/p2p/offer/update';\nconst method = 'POST';\n\nconst signature: string = crypto\n  .createHmac('sha256', apiSecret)\n  .update(method + endpoint)\n  .digest('hex');\n\nconst config: AxiosRequestConfig = {\n  headers: {\n    'X-LA-APIKEY': apiKey,\n    'X-LA-SIGNATURE': signature,\n  },\n};\n\nconst params = {\n  offer: '32ba928f-02c3-4d62-a455-1e36dc1d6b64',\n  method: '1c18d0bb-511d-41c5-8fb2-66626531d59d',\n  acceptableMethod: 'PAYMENT_TYPE_BANK_TRANSFER',\n  amount: '1000',\n  status: 'OFFER_STATUS_ACTIVE',\n  limits: {\n    min: '10',\n    max: '100',\n  },\n};\n\naxios\n  .post(baseUrl + endpoint, params, config)\n  .then((result) => console.log(result.data))\n  .catch((error) => console.error(error));\n"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateOfferRequest'
+        required: true
+      operationId: postAuthP2pOfferUpdate
+      x-operation-id-source: derived
+    servers:
+    - url: /pay/v1
+  /auth/p2p/offer/delete:
+    post:
+      security:
+      - api_key: []
+        api_signature: []
+      summary: Delete Offer
+      tags:
+      - OfferController
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Offer'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: User Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '503':
+          description: Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceUnavailableError'
+      x-code-samples:
+      - lang: TypeScript
+        source: "import * as crypto from 'crypto';\nimport axios, { AxiosRequestConfig } from 'axios';\n\nconst apiKey = '<Your API Public Key>';\nconst apiSecret = '<You API Private Key>';\n\nconst baseUrl = 'https://api.latoken.com';\nconst endpoint = '/pay/v1/auth/p2p/offer/delete';\nconst method = 'POST';\n\nconst signature: string = crypto\n  .createHmac('sha256', apiSecret)\n  .update(method + endpoint)\n  .digest('hex');\n\nconst config: AxiosRequestConfig = {\n  headers: {\n    'X-LA-APIKEY': apiKey,\n    'X-LA-SIGNATURE': signature,\n  },\n};\n\nconst params = {\n  offer: '32ba928f-02c3-4d62-a455-1e36dc1d6b64',\n};\n\naxios\n  .post(baseUrl + endpoint, params, config)\n  .then((result) => console.log(result.data))\n  .catch((error) => console.error(error));\n"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RemoveOfferRequest'
+        required: true
+      operationId: postAuthP2pOfferDelete
+      x-operation-id-source: derived
+    servers:
+    - url: /pay/v1
+components:
+  schemas:
+    PaymentMethodPublic:
+      type: object
+      title: Payment Method Public
+      properties:
+        type:
+          type: string
+          enum:
+          - PAYMENT_TYPE_UNSPECIFIED
+          - PAYMENT_TYPE_BANK_TRANSFER
+          - PAYMENT_TYPE_BKASH
+          - PAYMENT_TYPE_ROCKET
+          - PAYMENT_TYPE_NAGAD
+          - PAYMENT_TYPE_UPI
+          example: PAYMENT_TYPE_BANK_TRANSFER
+        bank:
+          type: string
+          example: BANK NAME
+        account:
+          type: string
+          example: 1234123412341234
+        name:
+          type: string
+          example: NAME SURNAME
+      description: Payment Method Public Entity
+    Rates:
+      type: object
+      title: Rates
+      example:
+        USDT:
+          BDT: '85.872938008300000000'
+          INR: '74.508477450600000000'
+          NGN: '411.127588000000000000'
+      description: Rates Entity
+    Error:
+      type: object
+      title: Error
+      properties:
+        message:
+          type: string
+          example: '...'
+        status:
+          type: string
+          example: FAILURE
+        error:
+          type: string
+          example: INVALID_ARGUMENT
+      description: Error Entity
+    UserPublic:
+      type: object
+      title: User Public
+      properties:
+        online:
+          type: boolean
+          example: true
+        nickname:
+          type: string
+          example: cointrader
+      description: User Public Entity
+    RemoveOfferRequest:
+      type: object
+      title: RemoveOfferRequest
+      properties:
+        offer:
+          type: string
+          example: 32ba928f-02c3-4d62-a455-1e36dc1d6b64
+      description: RemoveOfferRequest Entity
+    CreateOfferRequest:
+      type: object
+      title: CreateOfferRequest
+      properties:
+        cryptoTag:
+          type: string
+          example: USDT
+        fiatTag:
+          type: string
+          example: USD
+        type:
+          type: string
+          enum:
+          - OFFER_TYPE_UNSPECIFIED
+          - OFFER_TYPE_SELL
+          - OFFER_TYPE_BUY
+          example: OFFER_TYPE_BUY
+        method:
+          type: string
+          example: 1c18d0bb-511d-41c5-8fb2-66626531d59d
+        acceptableMethod:
+          type: string
+          enum:
+          - PAYMENT_TYPE_UNSPECIFIED
+          - PAYMENT_TYPE_BANK_TRANSFER
+          - PAYMENT_TYPE_BKASH
+          - PAYMENT_TYPE_ROCKET
+          - PAYMENT_TYPE_NAGAD
+          - PAYMENT_TYPE_UPI
+          example: PAYMENT_TYPE_BANK_TRANSFER
+        amount:
+          type: string
+          example: 1000
+        status:
+          type: string
+          enum:
+          - OFFER_STATUS_ACTIVE
+          - OFFER_STATUS_NOT_ACTIVE
+          example: OFFER_STATUS_ACTIVE
+        rate:
+          type: object
+          properties:
+            type:
+              type: string
+              enum:
+              - RATE_TYPE_FIXED
+              - RATE_TYPE_FLOAT_PERCENT
+              - RATE_TYPE_FLOAT_VALUE
+              - RATE_TYPE_FLOAT_PERCENT_AND_VALUE
+              example: RATE_TYPE_FLOAT_PERCENT
+            value:
+              type: string
+              example: 0.05
+        limits:
+          type: object
+          properties:
+            min:
+              type: string
+              example: 10
+            max:
+              type: string
+              example: 100
+        terms:
+          type: string
+          example: Buy bitcoin
+      description: CreateOfferRequest Entity
+    OffersList:
+      type: object
+      title: Offers List
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/Offer'
+        currentPage:
+          example: 1
+          minimum: 1
+          type: integer
+        lastPage:
+          example: 1
+          minimum: 1
+          type: integer
+        size:
+          example: 50
+          minimum: 1
+          type: integer
+    Config:
+      type: object
+      title: Config
+      example:
+        defaultFeePercent: '0.01'
+        showForCountries: '["NG","BND"]'
+        paymentTypesByCurrency: '{"NGN":["PAYMENT_TYPE_BANK_TRANSFER"]}'
+        fee: '[{"currency":BDT","value":0.05}]'
+      description: Config Entity
+    UpdateOfferRequest:
+      type: object
+      title: UpdateOfferRequest
+      properties:
+        offer:
+          type: string
+          example: 32ba928f-02c3-4d62-a455-1e36dc1d6b64
+        method:
+          type: string
+          example: 1c18d0bb-511d-41c5-8fb2-66626531d59d
+        acceptableMethod:
+          type: string
+          enum:
+          - PAYMENT_TYPE_UNSPECIFIED
+          - PAYMENT_TYPE_BANK_TRANSFER
+          - PAYMENT_TYPE_BKASH
+          - PAYMENT_TYPE_ROCKET
+          - PAYMENT_TYPE_NAGAD
+          - PAYMENT_TYPE_UPI
+          example: PAYMENT_TYPE_BANK_TRANSFER
+        amount:
+          type: string
+          example: 1000
+        status:
+          type: string
+          enum:
+          - OFFER_STATUS_ACTIVE
+          - OFFER_STATUS_NOT_ACTIVE
+          example: OFFER_STATUS_ACTIVE
+        limits:
+          type: object
+          properties:
+            min:
+              type: string
+              example: 10
+            max:
+              type: string
+              example: 100
+      description: UpdateOfferRequest Entity
+    Offer:
+      type: object
+      title: Offer
+      properties:
+        id:
+          type: string
+          example: 3d7e1b02-c7f7-49c2-912e-5f4dc9460f8e
+        cryptoTag:
+          type: string
+          example: BTC
+        fiatTag:
+          type: string
+          example: USD
+        amount:
+          type: string
+          example: '0.500368396618455100'
+        availableAmount:
+          type: string
+          example: '0.400368396618455140'
+        limits:
+          type: object
+          properties:
+            min:
+              type: string
+              example: '0.000100000000000000'
+            max:
+              type: string
+              example: '0.005000000000000000'
+        rate:
+          type: object
+          properties:
+            type:
+              type: string
+              enum:
+              - RATE_TYPE_FIXED
+              - RATE_TYPE_FLOAT_PERCENT
+              - RATE_TYPE_FLOAT_VALUE
+              - RATE_TYPE_FLOAT_PERCENT_AND_VALUE
+              example: RATE_TYPE_FLOAT_PERCENT
+            value:
+              type: string
+              example: '24703558.793020000000000000'
+        merchant:
+          $ref: '#/components/schemas/UserPublic'
+        type:
+          type: string
+          enum:
+          - OFFER_TYPE_UNSPECIFIED
+          - OFFER_TYPE_SELL
+          - OFFER_TYPE_BUY
+          example: OFFER_TYPE_BUY
+        status:
+          type: string
+          enum:
+          - OFFER_STATUS_UNSPECIFIED
+          - OFFER_STATUS_ACTIVE
+          - OFFER_STATUS_NOT_ACTIVE
+          - OFFER_STATUS_DELETED
+          example: OFFER_STATUS_ACTIVE
+        terms:
+          type: string
+          example: Buy bitcoin
+        method:
+          $ref: '#/components/schemas/PaymentMethodPublic'
+        acceptableMethod:
+          type: string
+          example: null
+        createdAt:
+          type: string
+          example: '2021-08-19T15:56:16.323Z'
+        updatedAt:
+          type: string
+          example: '2021-08-20T17:12:30.332Z'
+      description: Offer Entity
+    UnauthorizedError:
+      type: object
+      title: Unauthorized Error
+      properties:
+        result:
+          type: boolean
+          example: false
+        message:
+          type: string
+          example: user must be authenticated
+        status:
+          type: string
+          example: FAILURE
+        error:
+          type: string
+          example: UNAUTHORIZED
+      description: Unauthorized Error Entity
+    ServiceUnavailableError:
+      type: object
+      title: Service Unavailable Error
+      properties:
+        message:
+          type: string
+          example: service unavailable
+        status:
+          type: string
+          example: FAILURE
+        error:
+          type: string
+          example: SERVICE_UNAVAILABLE
+      description: Service Unavailable Error Entity
+  securitySchemes:
+    api_key:
+      type: apiKey
+      name: X-LA-APIKEY
+      in: header
+    api_signature:
+      type: apiKey
+      name: X-LA-SIGNATURE
+      in: header
+x-refined-from:
+- latoken-p2p-api-swagger.json
+- latoken-p2p-openapi.yml

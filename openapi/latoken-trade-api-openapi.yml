@@ -1,0 +1,369 @@
+openapi: 3.2.0
+info:
+  title: Latoken Trade API
+  version: V2
+  x-logo:
+    url: ./logo.png
+    altText: Latoken logo
+  description: 'Operations tagged Trade across 2 of this provider''s published API definitions: latoken-api-v2-swagger.json, latoken-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.latoken.com/
+tags:
+- name: Trade
+paths:
+  /v2/auth/trade:
+    get:
+      security:
+      - api_key: []
+        api_signature: []
+      summary: Get trades
+      description: Request trade history of authorized user for given pair
+      tags:
+      - Trade
+      operationId: getTradesByTrader
+      parameters:
+      - name: from
+        in: query
+        description: Request trade history for given timestamp `from` and early (by default there is current timestamp). In milliseconds
+        schema:
+          type: string
+      - name: limit
+        in: query
+        description: Limit list of trades by `limit`
+        schema:
+          type: string
+          default: '100'
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/json_ArrayAdapterOfTradeAdapter'
+  /v2/auth/trade/pair/{currency}/{quote}:
+    get:
+      security:
+      - api_key: []
+        api_signature: []
+      summary: Get trades by pair
+      description: Request trade history of authorized user for given pair
+      tags:
+      - Trade
+      operationId: getTradesByAssetAndTrader
+      parameters:
+      - name: currency
+        in: path
+        required: true
+        description: Tag or ID of base currency (for example, `BTC`)
+        schema:
+          type: string
+      - name: quote
+        in: path
+        required: true
+        description: Tag or ID of quote currency (for example, `USDT`)
+        schema:
+          type: string
+      - name: from
+        in: query
+        description: Request trade history for given timestamp `from` and early (by default there is current timestamp). In milliseconds
+        schema:
+          type: string
+      - name: limit
+        in: query
+        description: Limit list of trades by `limit`
+        schema:
+          type: string
+          default: '100'
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/json_ArrayAdapterOfTradeAdapter'
+  /v2/auth/trade/fee/{currency}/{quote}:
+    get:
+      security:
+      - api_key: []
+        api_signature: []
+      summary: Get fee scheme for given pair and user
+      tags:
+      - Trade
+      description: Request trade fee scheme for given pair and user
+      operationId: getAuthFeeByPair
+      parameters:
+      - name: currency
+        in: path
+        required: true
+        description: Tag or ID of base currency (for example, `BTC`)
+        schema:
+          type: string
+      - name: quote
+        in: path
+        required: true
+        description: Tag or ID of quote currency (for example, `LA`)
+        schema:
+          type: string
+      responses:
+        '200':
+          description: fee scheme
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/json_FeeAdapter'
+  /v2/trade/history/{currency}/{quote}:
+    get:
+      summary: Get any trades by pair
+      tags:
+      - Trade
+      description: Request trade history for given pair
+      operationId: getTradesByPair
+      parameters:
+      - name: currency
+        in: path
+        required: true
+        description: Tag or ID of base currency (for example, `BTC`)
+        schema:
+          type: string
+      - name: quote
+        in: path
+        required: true
+        description: Tag or ID of quote currency (for example, `LA`)
+        schema:
+          type: string
+      - name: limit
+        in: query
+        description: Limit list of trades by `limit`
+        schema:
+          type: integer
+          default: '100'
+          maximum: 100
+          minimum: 1
+      responses:
+        '200':
+          description: list of trades
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/json_ArrayAdapterOfTradeAdapter'
+  /v2/trade/fee/{currency}/{quote}:
+    get:
+      summary: Get fee scheme for given pair
+      tags:
+      - Trade
+      description: Request trade fee scheme for given pair
+      operationId: getFeeByPair
+      parameters:
+      - name: currency
+        in: path
+        required: true
+        description: Tag or ID of base currency (for example, `BTC`)
+        schema:
+          type: string
+      - name: quote
+        in: path
+        required: true
+        description: Tag or ID of quote currency (for example, `LA`)
+        schema:
+          type: string
+      responses:
+        '200':
+          description: fee scheme
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/json_FeeAdapter'
+  /v2/trade/feeLevels:
+    get:
+      summary: Get fee levels
+      tags:
+      - Trade
+      description: Request fee levels
+      operationId: getFeeLevels
+      responses:
+        '200':
+          description: fee scheme
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/json_FeeLevelsAdapter'
+components:
+  schemas:
+    json_TradeAdapter:
+      type: object
+      title: TradeAdapter
+      properties:
+        id:
+          example: 92609cf4-fca5-43ed-b0ea-b40fb48d3b0d
+          readOnly: false
+          description: Trade ID
+          type: string
+        isMakerBuyer:
+          example: false
+          readOnly: false
+          description: Trade direction (sell or buy)
+          type: boolean
+        direction:
+          example: TRADE_DIRECTION_BUY
+          readOnly: false
+          description: Trade direction (buy or sell)
+          type: string
+        baseCurrency:
+          example: 6ae140a9-8e75-4413-b157-8dd95c711b23
+          readOnly: false
+          description: Base currency ID
+          type: string
+        quoteCurrency:
+          example: d721fcf2-cf87-4626-916a-da50548fe5b3
+          readOnly: false
+          description: Quote currency ID
+          type: string
+        price:
+          example: '10000.00'
+          readOnly: false
+          description: Price of base currency
+          type: string
+        quantity:
+          example: '18.0000'
+          readOnly: false
+          description: Quantity of base currency
+          type: string
+        cost:
+          example: '180000.000'
+          readOnly: false
+          description: Cost of base currency (or Quantity of quote currency)
+          type: string
+        fee:
+          example: '0.175584'
+          readOnly: false
+          description: Fee of the trade
+          type: string
+        order:
+          example: 98cea832-8e3f-4053-acaa-96d521f9411d
+          readOnly: false
+          description: Order ID being filled by this trade
+          type: string
+        timestamp:
+          example: 1568396094704
+          readOnly: false
+          description: Trade timestamp
+          type: integer
+          format: int64
+        MakerBuyer:
+          example: false
+          readOnly: false
+          description: Trade direction (sell or buy)
+          type: boolean
+      example:
+        id: 92609cf4-fca5-43ed-b0ea-b40fb48d3b0d
+        isMakerBuyer: false
+        direction: TRADE_DIRECTION_BUY
+        baseCurrency: 6ae140a9-8e75-4413-b157-8dd95c711b23
+        quoteCurrency: d721fcf2-cf87-4626-916a-da50548fe5b3
+        price: '10000.00'
+        quantity: '18.0000'
+        cost: '180000.000'
+        fee: '0.175584'
+        order: 98cea832-8e3f-4053-acaa-96d521f9411d
+        timestamp: 1568396094704
+        MakerBuyer: false
+      description: ''
+    json_FeeLevelsAdapter:
+      type: object
+      title: FeeLevelsAdapter
+      properties:
+        makerFee:
+          example: '0.002200000000000000'
+          readOnly: false
+          description: Maker Fee
+          type: string
+        takerFee:
+          example: '0.002800000000000000'
+          readOnly: false
+          description: Taker Fee
+          type: string
+        volume:
+          example: '100000'
+          readOnly: false
+          description: Trading volume
+          type: string
+      example:
+        makerFee: '0.002200000000000000'
+        takerFee: '0.002800000000000000'
+        volume: '10000'
+      description: ''
+    json_FeeAdapter:
+      type: object
+      title: FeeAdapter
+      properties:
+        makerFee:
+          example: '0.002200000000000000'
+          readOnly: false
+          description: Maker Fee
+          type: string
+        takerFee:
+          example: '0.002800000000000000'
+          readOnly: false
+          description: Taker Fee
+          type: string
+        type:
+          example: FEE_SCHEME_TYPE_PERCENT_QUOTE
+          readOnly: false
+          description: Type of fee scheme
+          type: string
+        take:
+          example: FEE_SCHEME_TAKE_PROPORTION
+          readOnly: false
+          description: Take proportion
+          type: string
+      example:
+        makerFee: '0.002200000000000000'
+        takerFee: '0.002800000000000000'
+        type: FEE_SCHEME_TYPE_PERCENT_QUOTE
+        take: FEE_SCHEME_TAKE_PROPORTION
+      description: ''
+    json_ArrayAdapterOfTradeAdapter:
+      readOnly: false
+      description: List of trades
+      type: array
+      items:
+        $ref: '#/components/schemas/json_TradeAdapter'
+      example:
+      - id: 92609cf4-fca5-43ed-b0ea-b40fb48d3b0d
+        isMakerBuyer: false
+        direction: TRADE_DIRECTION_BUY
+        baseCurrency: 6ae140a9-8e75-4413-b157-8dd95c711b23
+        quoteCurrency: d721fcf2-cf87-4626-916a-da50548fe5b3
+        price: '10000.00'
+        quantity: '18.0000'
+        cost: '180000.000'
+        fee: '0.175584'
+        order: 98cea832-8e3f-4053-acaa-96d521f9411d
+        timestamp: 1568396094704
+        makerBuyer: false
+      - id: 92609cf4-fca5-43ed-b0ea-b40fb48d3b0d
+        isMakerBuyer: false
+        direction: TRADE_DIRECTION_BUY
+        baseCurrency: 6ae140a9-8e75-4413-b157-8dd95c711b23
+        quoteCurrency: d721fcf2-cf87-4626-916a-da50548fe5b3
+        price: '10000.00'
+        quantity: '18.0000'
+        cost: '180000.000'
+        fee: '0.175584'
+        order: 98cea832-8e3f-4053-acaa-96d521f9411d
+        timestamp: 1568396094704
+        makerBuyer: false
+  securitySchemes:
+    api_key:
+      type: apiKey
+      name: X-LA-APIKEY
+      in: header
+    api_signature:
+      type: apiKey
+      name: X-LA-SIGNATURE
+      in: header
+x-refined-from:
+- latoken-api-v2-swagger.json
+- latoken-openapi.yml

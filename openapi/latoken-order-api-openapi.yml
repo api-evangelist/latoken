@@ -1,0 +1,734 @@
+openapi: 3.2.0
+info:
+  title: Latoken Order API
+  version: V2
+  x-logo:
+    url: ./logo.png
+    altText: Latoken logo
+  description: 'Operations tagged Order across 2 of this provider''s published API definitions: latoken-api-v2-swagger.json, latoken-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.latoken.com/
+tags:
+- name: Order
+paths:
+  /v2/auth/order:
+    get:
+      security:
+      - api_key: []
+        api_signature: []
+      summary: Get all my orders
+      tags:
+      - Order
+      operationId: getMyOrders
+      parameters:
+      - name: from
+        in: query
+        description: Request order history until given timestamp `from`(by default there is current timestamp in milliseconds). Sorted by timestamp DESC
+        schema:
+          type: string
+          default: current UNIX timestamp
+      - name: limit
+        in: query
+        description: Limit amount of shown order by "limit"
+        schema:
+          type: integer
+          default: 100
+          maximum: 1000
+          minimum: 1
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/json_ArrayAdapterOfOrderAdapter'
+      x-code-samples:
+      - lang: JavaScript
+        source: "const request = require('request')\nconst crypto = require('crypto')\n\nconst apiKey = 'Your Latoken API key'\nconst apiSecret = 'Your Latoken API secret'\nconst baseUrl = 'https://api.latoken.com'\nconst endpoint = '/v2/auth/order'\nconst method = 'GET';\n\nconst params = {\n    from: Date.now(),\n    limit: '50'\n}\nconst queryParams = Object.entries(params).map(([key, val]) => key + '=' + val).join('&');\n\nconst signature = crypto\n    .createHmac('sha256', apiSecret)\n    .update(method + endpoint + queryParams)\n    .digest('hex')\n\nconst options = {\n    method: method,\n    url: baseUrl + endpoint + '?' + queryParams,\n    headers: {\n        'X-LA-APIKEY': apiKey,\n        'X-LA-SIGNATURE': signature\n    }\n}\n\nrequest.get(\n    options,\n    function (error, response, responseBody) {\n        console.log('response:', JSON.stringify(responseBody))\n    }\n)\n"
+      - lang: Python
+        source: "import requests\nimport hashlib\nimport hmac\n\napiKey = 'Your Latoken API key'\napiSecret = b'Your Latoken API secret'\nbaseUrl = 'https://api.latoken.com'\nendpoint = '/v2/auth/order'\n\nparams = {\n    'from': int(datetime.datetime.now().timestamp()*1000),\n    'limit': '50'\n}\nserializeFunc = map(lambda it : it[0] + '=' + str(it[1]), params.items())\nqueryParams = '&'.join(serializeFunc)\n                  \nsignature = hmac.new(\n    apiSecret, \n    ('GET' + endpoint + queryParams).encode('ascii'), \n    hashlib.sha512\n)\n\nurl = baseUrl + endpoint + '?' + queryParams\n\nresponse = requests.get(\n    url,\n    headers = {\n        'X-LA-APIKEY': apiKey,\n        'X-LA-SIGNATURE': signature.hexdigest(),\n        'X-LA-DIGEST': 'HMAC-SHA512'\n    }\n)\n\nprint(response.json())"
+      - lang: Php
+        source: "<?php\n\n$apiKey = 'Your Latoken API key';\n$apiSecret = 'Your Latoken API secret';\n$baseUrl = 'https://api.latoken.com';\n$endpoint = '/v2/auth/order';\n$method = 'GET';\n\n$params = [\n    'from' => round(microtime(TRUE)*1000),\n    'limit' => '50'\n];\n\n$queryParams = join('&', array_map(\n    function($key, $val) { return $key.'='.$val; }, \n    array_keys($params), array_values($params))\n);\n\n$signature = hash_hmac('sha256', $method.$endpoint.$queryParams, $apiSecret, FALSE);\n\n$url = $baseUrl.$endpoint.'?'.$queryParams;\n$options = array(\n    'http' => array(\n        'ignore_errors'=> TRUE,\n        'method' => $method,\n        'header' => array(\n             'X-LA-APIKEY:'.$apiKey,\n             'X-LA-SIGNATURE:'.$signature\n        )\n    )\n);\n\n$context = stream_context_create($options);\n$response = file_get_contents($url, FALSE, $context);\n\nvar_dump($response);\n\n?>"
+      - lang: Java
+        source: "package api.client;\n\nimport com.sun.org.apache.xerces.internal.impl.dv.util.HexBin;\nimport javax.crypto.Mac;\nimport javax.crypto.spec.SecretKeySpec;\nimport java.io.IOException;\nimport java.net.URI;\nimport java.net.http.HttpClient;\nimport java.net.http.HttpRequest;\nimport java.net.http.HttpResponse;\nimport java.security.InvalidKeyException;\nimport java.security.NoSuchAlgorithmException;\nimport java.util.HashMap;\nimport java.util.Vector;\n\npublic class RestApiV1 {\n    public static void runSample() throws InvalidKeyException, NoSuchAlgorithmException, IOException, InterruptedException {\n        final String apiKey = \"Your Latoken API key\";\n        final String apiSecret = \"Your Latoken API secret\";\n        final String baseUrl = \"https://api.latoken.com\";\n        final String endpoint = \"/v2/auth/order\";\n\n        HashMap<String, String> params = new HashMap<>();\n        params.put(\"from\", String.valueOf(System.currentTimeMillis()));\n        params.put(\"limit\", \"50\");\n\n\t\t/* Body parameters for signature */\n        Vector<String> temporaryParams = new Vector<>();\n        params.forEach((key, value) -> temporaryParams.add(key + \"=\" + value));\n        final String queryParams = String.join(\"&\", temporaryParams);\n\n        /* Signature */\n        Mac crypto = Mac.getInstance(\"HmacSHA256\");\n        crypto.init(new SecretKeySpec(apiSecret.getBytes(\"UTF-8\"), \"HmacSHA256\"));\n        String signature = HexBin.encode( crypto.doFinal(\n                              (\"GET\" + endpoint + queryParams).getBytes(\"UTF-8\")\n                           )).toLowerCase();\n\n        /* Requesting */\n        HttpClient client = HttpClient.newHttpClient();\n        HttpRequest request = HttpRequest.newBuilder()\n                .uri(URI.create(baseUrl + endpoint + \"?\" + queryParams))\n                .header(\"X-LA-APIKEY\", apiKey)\n                .header(\"X-LA-SIGNATURE\", signature)\n                .GET()\n                .build();\n        HttpResponse<String> response =  client.send(request, HttpResponse.BodyHandlers.ofString());\n\n        System.out.println(response.body().toString());\n    }\n}"
+      - lang: C#
+        source: "using System;\nusing System.Collections.Generic;\nusing System.Net;\nusing System.Text;\nusing System.Linq;\nusing System.IO;\n\nusing System.Security.Cryptography;\n\npublic class Program\n{\n\tpublic static void Main()\n\t{\n\t\tvar apiKey = \"Your Latoken API key\";\n\t\tvar apiSecret = \"Your Latoken API secret\";\n\t\tvar baseUrl = \"https://api.latoken.com\";\n\t\tvar endpoint = \"/v2/auth/order\";\n\t\tvar method = \"GET\";\n\n\t\t/* form parameters */\n\t\tvar parameters = new Dictionary<string, string>(){\n\t\t\t{\"from\", DateTimeOffset.Now.ToUnixTimeMilliseconds().ToString()},\n\t\t\t{\"limit\", \"50\"}\n\t\t};\n\t\tvar queryParams = string.Join(\"&\", parameters.Select(kvp => kvp.Key + \"=\" + kvp.Value).ToArray());\n\n\t\t/* sign request */\n\t\tHMAC crypto = new HMACSHA256(Encoding.ASCII.GetBytes(apiSecret));\n\t\tbyte[] signBytes = crypto.ComputeHash(Encoding.ASCII.GetBytes(method + endpoint + queryParams));\n\t\tstring signature = string.Empty;\n\t\tsignBytes.ToList().ForEach(b => signature += b.ToString(\"x2\"));\n\n\t\t/* create request */\n\t\tvar request = HttpWebRequest.CreateHttp(baseUrl + endpoint + \"?\" + queryParams);\n\t\trequest.Method = method;\n\t\trequest.Headers.Add(\"X-LA-APIKEY\", apiKey);\n\t\trequest.Headers.Add(\"X-LA-SIGNATURE\", signature);\n\n\t\t/* get response */\n\t\ttry\n\t\t{\n\t\t\tvar response = (HttpWebResponse)request.GetResponse();\n\t\t\tvar responseString = new StreamReader(response.GetResponseStream()).ReadToEnd();\n\t\t\tConsole.WriteLine(responseString);\n\t\t}\n\t\tcatch (WebException we)\n\t\t{\n\t\t\tvar errorResponse = we.Response as HttpWebResponse;\n\t\t\tvar responseString = new StreamReader(errorResponse.GetResponseStream()).ReadToEnd();\n\t\t\tConsole.WriteLine(responseString);\n\t\t}\n\t}\n}\n"
+  /v2/auth/order/cancel:
+    post:
+      security:
+      - api_key: []
+        api_signature: []
+      summary: Cancel one order by id
+      tags:
+      - Order
+      operationId: cancelOrder
+      responses:
+        '200':
+          description: on success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/json_CancelOrderReply'
+        '400':
+          description: if request is not valid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/json_400Reply'
+      x-code-samples:
+      - lang: JavaScript
+        source: "\nconst request = require('request')\nconst crypto = require('crypto')\n\nconst apiKey = 'Your Latoken API key'\nconst apiSecret = 'Your Latoken API secret'\nconst method = 'POST';\nconst baseUrl = 'https://api.latoken.com'\nconst endpoint = '/v2/auth/order/cancel'\n\nconst params = {\n    id: '0c3a106d-bde3-4c13-a26e-3fd2394529e5'\n}\nconst body = JSON.stringify(params);\nconst bodySignParams = Object.entries(params).map(([key, val]) => key + '=' + val).join('&');\n\nconst signature = crypto\n    .createHmac('sha256', apiSecret)\n    .update(method + endpoint + bodySignParams)\n    .digest('hex')\n\nconst options = {\n    method: method,\n    url: baseUrl + endpoint,\n    headers: {\n        'Content-Type': 'application/json',\n        'X-LA-APIKEY': apiKey,\n        'X-LA-SIGNATURE': signature\n    },\n    body: body\n}\n\nrequest.post(\n    options,\n    function (error, response, responseBody) {\n        console.log('response:', JSON.stringify(responseBody))\n    }\n)\n\n"
+      - lang: Python
+        source: "import requests\nimport datetime\nimport hashlib\nimport hmac\n\napiKey = 'Your Latoken API key'\napiSecret = b'Your Latoken API secret'\nbaseUrl = 'https://api.latoken.com'\nendpoint = '/v2/auth/order/cancel'\n\nparams = {\n    'id': '0c3a106d-bde3-4c13-a26e-3fd2394529e5'\n}\nserializeFunc = map(lambda it : it[0] + '=' + str(it[1]), params.items())\nbodyParams = '&'.join(serializeFunc)\n                  \nsignature = hmac.new(\n    apiSecret, \n    ('POST' + endpoint + bodyParams).encode('ascii'), \n    hashlib.sha512\n)\n\nurl = baseUrl + endpoint\n\nresponse = requests.post(\n    url,\n    headers = {\n        'Content-Type': 'application/json',\n        'X-LA-APIKEY': apiKey,\n        'X-LA-SIGNATURE': signature.hexdigest(),\n        'X-LA-DIGEST': 'HMAC-SHA512'\n    },\n    json = params\n)\n\nprint(response.json())"
+      - lang: Php
+        source: "<?php\n\n$apiKey = 'Your Latoken API key';\n$apiSecret = 'Your Latoken API secret';\n$baseUrl = 'https://api.latoken.com';\n$endpoint = '/v2/auth/order/cancel';\n$method = 'POST';\n\n$params = [\n    'id' => '0c3a106d-bde3-4c13-a26e-3fd2394529e5'\n];\n\n$bodyParams = join('&', array_map(\n    function($key, $val) { return $key.'='.$val; }, \n    array_keys($params), array_values($params))\n);\n\n$signature = hash_hmac('sha256', $method.$endpoint.$bodyParams, $apiSecret, FALSE);\n\n$url = $baseUrl.$endpoint;\n$options = array(\n    'http' => array(\n        'ignore_errors'=> TRUE,\n        'method' => $method,\n        'header' => array(\n             'Content-Type:application/json',\n             'X-LA-APIKEY:'.$apiKey,\n             'X-LA-SIGNATURE:'.$signature\n        ),\n        'content' => json_encode($params, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT, 1)\n    )\n);\n\n$context = stream_context_create($options);\n$response = file_get_contents($url, FALSE, $context);\n\nvar_dump($response);\n\n?>"
+      - lang: Java
+        source: "package api.client;\n\nimport com.sun.org.apache.xerces.internal.impl.dv.util.HexBin;\nimport javax.crypto.Mac;\nimport javax.crypto.spec.SecretKeySpec;\nimport java.io.IOException;\nimport java.net.URI;\nimport java.net.http.HttpClient;\nimport java.net.http.HttpRequest;\nimport java.net.http.HttpResponse;\nimport java.security.InvalidKeyException;\nimport java.security.NoSuchAlgorithmException;\nimport java.util.HashMap;\nimport java.util.Vector;\n\npublic class RestApiV1 {\n    public static void runSample() throws InvalidKeyException, NoSuchAlgorithmException, IOException, InterruptedException {\n        final String apiKey = \"Your Latoken API key\";\n        final String apiSecret = \"Your Latoken API secret\";\n        final String baseUrl = \"https://api.latoken.com\";\n        final String endpoint = \"/v2/auth/order/cancel\";\n\n        HashMap<String, String> params = new HashMap<>();\n        params.put(\"id\", \"0c3a106d-bde3-4c13-a26e-3fd2394529e5\");\n\t\t\n\t\t/* Body parameters for request (json) */\n        Vector<String> bodyParams = new Vector<>();\n        params.forEach((key, value) -> bodyParams.add(\"\\\"\" + key + \"\\\": \\\"\" + value + \"\\\"\"));\n        final String bodyContent = \"{\" + String.join(\",\", bodyParams) + \"}\";\n        \n\t\t/* Body parameters for signature */\n        Vector<String> temporaryParams = new Vector<>();\n        params.forEach((key, value) -> temporaryParams.add(key + \"=\" + value));\n        final String signableBodyParams = String.join(\"&\", temporaryParams);\n\n        /* Signature */\n        Mac crypto = Mac.getInstance(\"HmacSHA256\");\n        crypto.init(new SecretKeySpec(apiSecret.getBytes(\"UTF-8\"), \"HmacSHA256\"));\n        String signature = HexBin.encode( crypto.doFinal(\n                              (\"POST\" + endpoint + signableBodyParams).getBytes(\"UTF-8\")\n                           )).toLowerCase();\n\n        /* Requesting */\n        HttpClient client = HttpClient.newHttpClient();\n        HttpRequest request = HttpRequest.newBuilder()\n                .uri(URI.create(baseUrl + endpoint))\n\t\t\t\t.header(\"Content-Type\", \"application/json\")\n                .header(\"X-LA-APIKEY\", apiKey)\n                .header(\"X-LA-SIGNATURE\", signature)\n                .POST(HttpRequest.BodyPublishers.ofString(bodyContent))\n                .build();\n        HttpResponse<String> response =  client.send(request, HttpResponse.BodyHandlers.ofString());\n\n        System.out.println(response.body().toString());\n    }\n}"
+      - lang: C#
+        source: "using System;\nusing System.Collections.Generic;\nusing System.Net;\nusing System.Text;\nusing System.Linq;\nusing System.IO;\n\nusing System.Security.Cryptography;\n\npublic class Program\n{\n\tpublic static void Main()\n\t{\n\t\tvar apiKey = \"Your Latoken API key\";\n\t\tvar apiSecret = \"Your Latoken API secret\";\n\t\tvar baseUrl = \"https://api.latoken.com\";\n\t\tvar endpoint = \"/v2/auth/order/cancel\";\n\t\tvar method = \"POST\";\n\n\t\t/* form parameters */\n\t\tvar parameters = new Dictionary<string, string>(){\n\t\t\t{\"id\", \"0c3a106d-bde3-4c13-a26e-3fd2394529e5\"}\n\t\t};\n\t\tvar bodyContent = \"{\" + string.Join(\",\", parameters.Select(kvp => \"\\\"\" + kvp.Key + \"\\\": \\\"\" + kvp.Value + \"\\\"\").ToArray()) + \"}\";\n\t\tvar signableParams = string.Join(\"&\", parameters.Select(kvp => kvp.Key + \"=\" + kvp.Value).ToArray());\n\n\t\t/* sign request */\n\t\tHMAC crypto = new HMACSHA256(Encoding.ASCII.GetBytes(apiSecret));\n\t\tbyte[] signBytes = crypto.ComputeHash(Encoding.ASCII.GetBytes(method + endpoint + signableParams));\n\t\tstring signature = string.Empty;\n\t\tsignBytes.ToList().ForEach(b => signature += b.ToString(\"x2\"));\n\n\t\t/* create request */\n\t\tvar request = HttpWebRequest.CreateHttp(baseUrl + endpoint);\n\t\trequest.Method = method;\n\t\trequest.ContentType = \"application/json\";\n\t\trequest.Headers.Add(\"X-LA-APIKEY\", apiKey);\n\t\trequest.Headers.Add(\"X-LA-SIGNATURE\", signature);\n\t\trequest.ContentLength = bodyContent.Length;\n\t\tvar body = request.GetRequestStream();\n\t\tbody.Write(Encoding.ASCII.GetBytes(bodyContent), 0, bodyContent.Length);\n\t\tbody.Close();\n\n\t\t/* get response */\n\t\ttry\n\t\t{\n\t\t\tvar response = (HttpWebResponse)request.GetResponse();\n\t\t\tvar responseString = new StreamReader(response.GetResponseStream()).ReadToEnd();\n\t\t\tConsole.WriteLine(responseString);\n\t\t}\n\t\tcatch (WebException we)\n\t\t{\n\t\t\tvar errorResponse = we.Response as HttpWebResponse;\n\t\t\tvar responseString = new StreamReader(errorResponse.GetResponseStream()).ReadToEnd();\n\t\t\tConsole.WriteLine(responseString);\n\t\t}\n\t}\n}\n"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/json_CancelOrderRequest'
+        required: true
+  /v2/auth/order/cancelAll:
+    post:
+      security:
+      - api_key: []
+        api_signature: []
+      summary: Cancel all orders
+      tags:
+      - Order
+      operationId: cancelAllOrders
+      responses:
+        '200':
+          description: on success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/json_CancelAllOrdersReply'
+        '400':
+          description: if request is not valid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/json_400Reply'
+  /v2/auth/order/cancelAll/{currency}/{quote}:
+    post:
+      security:
+      - api_key: []
+        api_signature: []
+      summary: Cancel all orders in specified pair
+      tags:
+      - Order
+      operationId: cancelAllOrdersByPair
+      parameters:
+      - name: currency
+        in: path
+        required: true
+        description: ID or TAG of base currency
+        schema:
+          type: string
+      - name: quote
+        in: path
+        required: true
+        description: ID or TAG of quote currency
+        schema:
+          type: string
+      responses:
+        '200':
+          description: on success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/json_CancelAllOrdersReply'
+        '400':
+          description: if request is not valid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/json_400Reply'
+  /v2/auth/order/getOrder/{id}:
+    get:
+      security:
+      - api_key: []
+        api_signature: []
+      summary: Get an order by id
+      tags:
+      - Order
+      operationId: getOrderById
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: Order ID
+        schema:
+          type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/json_OrderAdapter'
+        '404':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/json_GetOrderErrorReply'
+  /v2/auth/order/pair/{currency}/{quote}:
+    get:
+      security:
+      - api_key: []
+        api_signature: []
+      summary: Get all my orders on traded pair
+      tags:
+      - Order
+      operationId: getMyOrdersByPair
+      parameters:
+      - name: currency
+        in: path
+        required: true
+        description: Base currency tag or ID (for example, `USDT`)
+        schema:
+          type: string
+      - name: quote
+        in: path
+        required: true
+        description: Quote currency tag or ID (for example, `LA`)
+        schema:
+          type: string
+      - name: from
+        in: query
+        description: Request order history for given timestamp `from` and early (by default there is current timestamp). In milliseconds
+        schema:
+          type: string
+      - name: limit
+        in: query
+        description: Limit list of orders by `limit`
+        schema:
+          type: string
+          default: '100'
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/json_ArrayAdapterOfOrderAdapter'
+  /v2/auth/order/pair/{currency}/{quote}/active:
+    get:
+      security:
+      - api_key: []
+        api_signature: []
+      summary: Get my active orders on traded pair
+      tags:
+      - Order
+      operationId: getMyActiveOrdersByPair
+      parameters:
+      - name: currency
+        in: path
+        required: true
+        description: Base currency ID or TAG (for example, `3092b810-c39f-47ba-8c5f-a8ca3bd8902c` or `LA`)
+        schema:
+          type: string
+      - name: quote
+        in: path
+        required: true
+        description: Quote currency ID or TAG (for example, `1232b810-c39f-47ba-8c5f-a8ca3bd8902c` or `USDT`)
+        schema:
+          type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/json_ArrayAdapterOfOrderAdapter'
+  /v2/auth/order/active:
+    get:
+      security:
+      - api_key: []
+        api_signature: []
+      summary: Get all my active orders
+      tags:
+      - Order
+      operationId: getMyActiveOrders
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/json_ArrayAdapterOfOrderAdapter'
+  /v2/auth/order/place:
+    post:
+      security:
+      - api_key: []
+        api_signature: []
+      summary: Placing a new order
+      tags:
+      - Order
+      description: Place order
+      operationId: placeOrder
+      responses:
+        '200':
+          description: Id of created order
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/json_CreateOrderReply'
+        '400':
+          description: Error description
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/json_CreateOrderErrorReply'
+      x-code-samples:
+      - lang: JavaScript
+        source: "\nconst request = require('request')\nconst crypto = require('crypto')\n\nconst apiKey = 'Your Latoken API key'\nconst apiSecret = 'Your Latoken API secret'\nconst method = 'POST';\nconst baseUrl = 'https://api.latoken.com'\nconst endpoint = '/v2/auth/order/place'\n\nconst params = {\n    baseCurrency: '0c3a106d-bde3-4c13-a26e-3fd2394529e5',\n    quoteCurrency: '620f2019-33c0-423b-8a9d-cde4d7f8ef7f',\n    side: 'SELL',\n    condition: 'GOOD_TILL_CANCELLED',\n    type: 'LIMIT',\n    clientOrderId: 'myCustomOrder',\n    price: 131.50,\n    quantity: 100\n}\nconst body = JSON.stringify(params);\nconst bodySignParams = Object.entries(params).map(([key, val]) => key + '=' + val).join('&');\n\nconst signature = crypto\n    .createHmac('sha256', apiSecret)\n    .update(method + endpoint + bodySignParams)\n    .digest('hex')\n\nconst options = {\n    method: method,\n    url: baseUrl + endpoint,\n    headers: {\n        'Content-Type': 'application/json',\n        'X-LA-APIKEY': apiKey,\n        'X-LA-SIGNATURE': signature\n    },\n    body: body\n}\n\nrequest.post(\n    options,\n    function (error, response, responseBody) {\n        console.log('response:', JSON.stringify(responseBody))\n    }\n)\n\n"
+      - lang: Python
+        source: "import requests\nimport datetime\nimport hashlib\nimport hmac\n\napiKey = 'Your Latoken API key'\napiSecret = b'Your Latoken API secret'\nbaseUrl = 'https://api.latoken.com'\nendpoint = '/v2/auth/order/place'\n\nparams = {\n    'baseCurrency': '0c3a106d-bde3-4c13-a26e-3fd2394529e5',\n    'quoteCurrency': '620f2019-33c0-423b-8a9d-cde4d7f8ef7f',\n    'side': 'SELL',\n    'condition': 'GOOD_TILL_CANCELLED',\n    'type': 'LIMIT',\n    'clientOrderId': 'myCustomOrder',\n    'price': '131.50',\n    'quantity': '100'\n}\nserializeFunc = map(lambda it : it[0] + '=' + str(it[1]), params.items())\nbodyParams = '&'.join(serializeFunc)\n                  \nsignature = hmac.new(\n    apiSecret, \n    ('POST' + endpoint + bodyParams).encode('ascii'), \n    hashlib.sha512\n)\n\nurl = baseUrl + endpoint\n\nresponse = requests.post(\n    url,\n    headers = {\n        'Content-Type': 'application/json',\n        'X-LA-APIKEY': apiKey,\n        'X-LA-SIGNATURE': signature.hexdigest(),\n        'X-LA-DIGEST': 'HMAC-SHA512'\n    },\n    json = params\n)\n\nprint(response.json())"
+      - lang: Php
+        source: "<?php\n\n$apiKey = 'Your Latoken API key';\n$apiSecret = 'Your Latoken API secret';\n$baseUrl = 'https://api.latoken.com';\n$endpoint = '/v2/auth/order/place';\n$method = 'POST';\n\n$params = [\n    'baseCurrency' => '0c3a106d-bde3-4c13-a26e-3fd2394529e5',\n    'quoteCurrency' => '620f2019-33c0-423b-8a9d-cde4d7f8ef7f',\n    'side' => 'SELL',\n    'condition' => 'GOOD_TILL_CANCELLED',\n    'type' => 'LIMIT',\n    'clientOrderId' => 'myCustomOrder',\n    'price' => 131.50,\n    'quantity' => 100\n];\n\n$bodyParams = join('&', array_map(\n    function($key, $val) { return $key.'='.$val; }, \n    array_keys($params), array_values($params))\n);\n\n$signature = hash_hmac('sha256', $method.$endpoint.$bodyParams, $apiSecret, FALSE);\n\n$url = $baseUrl.$endpoint;\n$options = array(\n    'http' => array(\n        'ignore_errors'=> TRUE,\n        'method' => $method,\n        'header' => array(\n             'Content-Type:application/json',\n             'X-LA-APIKEY:'.$apiKey,\n             'X-LA-SIGNATURE:'.$signature\n        ),\n        'content' => json_encode($params, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT, 1)\n    )\n);\n\n$context = stream_context_create($options);\n$response = file_get_contents($url, FALSE, $context);\n\nvar_dump($response);\n\n?>"
+      - lang: Java
+        source: "package api.client;\n\nimport com.sun.org.apache.xerces.internal.impl.dv.util.HexBin;\nimport javax.crypto.Mac;\nimport javax.crypto.spec.SecretKeySpec;\nimport java.io.IOException;\nimport java.net.URI;\nimport java.net.http.HttpClient;\nimport java.net.http.HttpRequest;\nimport java.net.http.HttpResponse;\nimport java.security.InvalidKeyException;\nimport java.security.NoSuchAlgorithmException;\nimport java.util.HashMap;\nimport java.util.Vector;\n\npublic class RestApiV1 {\n    public static void runSample() throws InvalidKeyException, NoSuchAlgorithmException, IOException, InterruptedException {\n        final String apiKey = \"Your Latoken API key\";\n        final String apiSecret = \"Your Latoken API secret\";\n        final String baseUrl = \"https://api.latoken.com\";\n        final String endpoint = \"/v2/auth/order/place\";\n\n        HashMap<String, String> params = new HashMap<>();\n        params.put(\"baseCurrency\", \"0c3a106d-bde3-4c13-a26e-3fd2394529e5\");\n        params.put(\"quoteCurrency\", \"620f2019-33c0-423b-8a9d-cde4d7f8ef7f\");\n        params.put(\"side\", \"SELL\");\n        params.put(\"condition\", \"GOOD_TILL_CANCELLED\");\n        params.put(\"type\", \"LIMIT\");\n        params.put(\"clientOrderId\", \"myCustomOrder\");\n\t\tparams.put(\"price\", \"131.50\");\n\t\tparams.put(\"quantity\", \"100\");\n\t\t\n\t\t/* Body parameters for request (json) */\n        Vector<String> bodyParams = new Vector<>();\n        params.forEach((key, value) -> bodyParams.add(\"\\\"\" + key + \"\\\": \\\"\" + value + \"\\\"\"));\n        final String bodyContent = \"{\" + String.join(\",\", bodyParams) + \"}\";\n        \n\t\t/* Body parameters for signature */\n        Vector<String> temporaryParams = new Vector<>();\n        params.forEach((key, value) -> temporaryParams.add(key + \"=\" + value));\n        final String signableBodyParams = String.join(\"&\", temporaryParams);\n\n        /* Signature */\n        Mac crypto = Mac.getInstance(\"HmacSHA256\");\n        crypto.init(new SecretKeySpec(apiSecret.getBytes(\"UTF-8\"), \"HmacSHA256\"));\n        String signature = HexBin.encode( crypto.doFinal(\n                              (\"POST\" + endpoint + signableBodyParams).getBytes(\"UTF-8\")\n                           )).toLowerCase();\n\n        /* Requesting */\n        HttpClient client = HttpClient.newHttpClient();\n        HttpRequest request = HttpRequest.newBuilder()\n                .uri(URI.create(baseUrl + endpoint))\n\t\t\t\t.header(\"Content-Type\", \"application/json\")\n                .header(\"X-LA-APIKEY\", apiKey)\n                .header(\"X-LA-SIGNATURE\", signature)\n                .POST(HttpRequest.BodyPublishers.ofString(bodyContent))\n                .build();\n        HttpResponse<String> response =  client.send(request, HttpResponse.BodyHandlers.ofString());\n\n        System.out.println(response.body().toString());\n    }\n}"
+      - lang: C#
+        source: "using System;\nusing System.Collections.Generic;\nusing System.Net;\nusing System.Text;\nusing System.Linq;\nusing System.IO;\n\nusing System.Security.Cryptography;\n\npublic class Program\n{\n\tpublic static void Main()\n\t{\n\t\tvar apiKey = \"Your Latoken API key\";\n\t\tvar apiSecret = \"Your Latoken API secret\";\n\t\tvar baseUrl = \"https://api.latoken.com\";\n\t\tvar endpoint = \"/v2/auth/order/place\";\n\t\tvar method = \"POST\";\n\n\t\t/* form parameters */\n\t\tvar parameters = new Dictionary<string, string>(){\n\t\t\t{\"baseCurrency\", \"0c3a106d-bde3-4c13-a26e-3fd2394529e5\"},\n\t\t\t{\"quoteCurrency\", \"620f2019-33c0-423b-8a9d-cde4d7f8ef7f\"},\n\t\t\t{\"side\", \"SELL\"},\n\t\t\t{\"condition\", \"GOOD_TILL_CANCELLED\"},\n\t\t\t{\"type\", \"LIMIT\"},\n\t\t\t{\"clientOrderId\", \"myCustomOrder\"},\n\t\t\t{\"price\", \"131.50\"},\n\t\t\t{\"quantity\", \"100\"},\n\t\t};\n\t\tvar bodyContent = \"{\" + string.Join(\",\", parameters.Select(kvp => \"\\\"\" + kvp.Key + \"\\\": \\\"\" + kvp.Value + \"\\\"\").ToArray()) + \"}\";\n\t\tvar signableParams = string.Join(\"&\", parameters.Select(kvp => kvp.Key + \"=\" + kvp.Value).ToArray());\n\n\t\t/* sign request */\n\t\tHMAC crypto = new HMACSHA256(Encoding.ASCII.GetBytes(apiSecret));\n\t\tbyte[] signBytes = crypto.ComputeHash(Encoding.ASCII.GetBytes(method + endpoint + signableParams));\n\t\tstring signature = string.Empty;\n\t\tsignBytes.ToList().ForEach(b => signature += b.ToString(\"x2\"));\n\n\t\t/* create request */\n\t\tvar request = HttpWebRequest.CreateHttp(baseUrl + endpoint);\n\t\trequest.Method = method;\n\t\trequest.ContentType = \"application/json\";\n\t\trequest.Headers.Add(\"X-LA-APIKEY\", apiKey);\n\t\trequest.Headers.Add(\"X-LA-SIGNATURE\", signature);\n\t\trequest.ContentLength = bodyContent.Length;\n\t\tvar body = request.GetRequestStream();\n\t\tbody.Write(Encoding.ASCII.GetBytes(bodyContent), 0, bodyContent.Length);\n\t\tbody.Close();\n\n\t\t/* get response */\n\t\ttry\n\t\t{\n\t\t\tvar response = (HttpWebResponse)request.GetResponse();\n\t\t\tvar responseString = new StreamReader(response.GetResponseStream()).ReadToEnd();\n\t\t\tConsole.WriteLine(responseString);\n\t\t}\n\t\tcatch (WebException we)\n\t\t{\n\t\t\tvar errorResponse = we.Response as HttpWebResponse;\n\t\t\tvar responseString = new StreamReader(errorResponse.GetResponseStream()).ReadToEnd();\n\t\t\tConsole.WriteLine(responseString);\n\t\t}\n\t}\n}\n"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/json_CreateOrderRequest'
+        description: request structure with order params
+components:
+  schemas:
+    json_CreateOrderErrorReply:
+      type: object
+      title: CreateOrderErrorReply
+      allOf:
+      - $ref: '#/components/schemas/json_ReplyErrorBase'
+      example:
+        message: Validation errors
+        status: FAILURE
+        error: VALIDATION_ERROR
+        errors:
+          condition: must be one of [GTC, GOOD_TILL_CANCELLED, IOC, IMMEDIATE_OR_CANCEL, FOK, FILL_OR_KILL]
+        result: false
+      description: Base reply for all methods
+    json_OrderAdapter:
+      type: object
+      title: OrderAdapter
+      properties:
+        id:
+          readOnly: false
+          description: UUID of the order
+          type: string
+        status:
+          readOnly: false
+          enum:
+          - ORDER_STATUS_PLACED
+          - ORDER_STATUS_REJECTED
+          - ORDER_STATUS_CLOSED
+          - ORDER_STATUS_CANCELLED
+          type: string
+        side:
+          readOnly: false
+          enum:
+          - ORDER_SIDE_BUY
+          - ORDER_SIDE_SELL
+          type: string
+        condition:
+          readOnly: false
+          enum:
+          - ORDER_CONDITION_GOOD_TILL_CANCELLED
+          - ORDER_CONDITION_IMMEDIATE_OR_CANCEL
+          - ORDER_CONDITION_FILL_OR_KILL
+          type: string
+        type:
+          readOnly: false
+          enum:
+          - ORDER_TYPE_LIMIT
+          - ORDER_TYPE_MARKET
+          type: string
+        baseCurrency:
+          readOnly: false
+          description: Base currency UUID
+          type: string
+        quoteCurrency:
+          readOnly: false
+          description: Quote currency UUID
+          type: string
+        clientOrderId:
+          readOnly: false
+          description: Name (or id) of customized order, set by user when placing order
+          type: string
+        price:
+          readOnly: false
+          description: Price of the order, decimal number. Equal 0 if order type is "ORDER_TYPE_MARKET"
+          type: string
+        quantity:
+          readOnly: false
+          description: Quantity of base currency, decimal number
+          type: string
+        cost:
+          readOnly: false
+          description: Cost of filled order in quote currency (price * quantity), decimal number
+          type: string
+        filled:
+          readOnly: false
+          description: Filled amount of the order in base currency, decimal number
+          type: string
+        trader:
+          readOnly: false
+          description: User UUID
+          type: string
+        timestamp:
+          readOnly: false
+          description: Time when order was last updated (Unix timestamp in milliseconds)
+          type: integer
+          format: int64
+        creator:
+          readOnly: false
+          description: Who created the order
+          type: string
+        creatorId:
+          readOnly: false
+          description: Id of the creator
+          type: string
+      example:
+        id: 12609cf4-fca5-43ed-b0ea-b40fb48d3b0d
+        status: CLOSED
+        side: BUY
+        condition: GTC
+        type: LIMIT
+        baseCurrency: 3092b810-c39f-47ba-8c5f-a8ca3bd8902c
+        quoteCurrency: 4092b810-c39f-47ba-8c5f-a8ca3bd0004c
+        clientOrderId: myOrder
+        price: '100.0'
+        quantity: '1000.0'
+        cost: '100000.0'
+        filled: '230.0'
+        trader: 12345678-fca5-43ed-b0ea-b40fb48d3b0d
+        timestamp: 3800014433
+        creator: USER
+        creatorId: ''
+      description: ''
+    json_CreateOrderReply:
+      type: object
+      title: CreateOrderReply
+      properties:
+        id:
+          readOnly: false
+          description: UUID of the created order
+          type: string
+        message:
+          type: string
+          description: result of the operation
+        status:
+          type: string
+          description: operation status, can only be "SUCCESS"
+      example:
+        id: 12609cf4-fca5-43ed-b0ea-b40fb48d3b0d
+        message: order accepted for placing
+        status: SUCCESS
+      description: Base reply for all methods
+    json_400Reply:
+      type: object
+      title: 400Reply
+      allOf:
+      - $ref: '#/components/schemas/json_ReplyErrorBase'
+      example:
+        message: Bad Request
+        status: FAILURE
+        error: BAD_REQUEST
+        errors:
+          property1: Wrong property 1
+          property2: Wrong property 2
+      description: Base reply 400 for all methods
+    json_CancelOrderReply:
+      type: object
+      title: CancelOrderReply
+      allOf:
+      - $ref: '#/components/schemas/json_ReplyBase'
+      - properties:
+          id:
+            readOnly: false
+            description: ''
+            type: string
+      example:
+        id: 12345678-1234-1244-1244-123456789012
+        message: cancellation request successfully submitted
+        status: SUCCESS
+        error: ''
+        errors: {}
+      description: Base reply for all methods
+    json_CancelOrderRequest:
+      type: object
+      title: CancelOrderRequest
+      required:
+      - id
+      properties:
+        id:
+          maxLength: 200
+          minLength: 0
+          readOnly: false
+          description: Order ID
+          type: string
+      example:
+        id: 12609cf4-fca5-43ed-b0ea-b40fb48d3b0d
+      description: ''
+    json_GetOrderErrorReply:
+      type: object
+      title: GetOrderErrorReply
+      allOf:
+      - $ref: '#/components/schemas/json_ReplyErrorBase'
+      example:
+        status: FAILURE
+        message: Order not found
+        error: NOT_FOUND
+        errors: null
+        result: false
+      description: ''
+    json_CreateOrderRequest:
+      type: object
+      title: CreateOrderRequest
+      required:
+      - baseCurrency
+      - quoteCurrency
+      - side
+      - condition
+      - type
+      - quantity
+      properties:
+        baseCurrency:
+          example: LA
+          maxLength: 20
+          minLength: 1
+          readOnly: false
+          description: id or tag of base currency
+          type: string
+        quoteCurrency:
+          example: USDT
+          maxLength: 20
+          minLength: 1
+          readOnly: false
+          description: id or tag of quote currency
+          type: string
+        side:
+          example: BID
+          maxLength: 10
+          minLength: 1
+          readOnly: false
+          description: buy or sell
+          type: string
+          enum:
+          - BUY
+          - SELL
+        condition:
+          example: GTC
+          maxLength: 30
+          minLength: 1
+          readOnly: false
+          description: '• GTC: good till cancelled<br/>• IOC: immediate or cancel<br/>• FOK: fill or kill'
+          type: string
+          enum:
+          - GTC
+          - IOC
+          - FOK
+        type:
+          example: LIMIT
+          maxLength: 30
+          minLength: 1
+          readOnly: false
+          description: '• LIMIT: buy or sell at specified price<br/>• MARKET: buy or sell at market price'
+          type: string
+          enum:
+          - LIMIT
+          - MARKET
+        clientOrderId:
+          example: my-wonderful-order-number-71566
+          maxLength: 50
+          minLength: 0
+          readOnly: false
+          description: client's custom order id (free field for your convenience)
+          type: string
+        price:
+          example: '0.0020019'
+          minimum: 0
+          maxLength: 50
+          minLength: 0
+          readOnly: false
+          description: decimal number, will be ignored for MARKET order type, however required for LIMIT order type
+          type: string
+        quantity:
+          example: '3.21'
+          maxLength: 50
+          minLength: 1
+          readOnly: false
+          description: decimal number
+          type: string
+          exclusiveMinimum: 0
+      example:
+      - baseCurrency: LA
+        quoteCurrency: USDT
+        side: SELL
+        condition: GTC
+        type: LIMIT
+        clientOrderId: my-wonderful-order-number-71566
+        price: '0.06909'
+        quantity: '3.21'
+        timestamp: 1568185507
+      - baseCurrency: d663138b-3ec1-436c-9275-b3a161761523
+        quoteCurrency: 0c3a106d-bde3-4c13-a26e-3fd2394529e5
+        side: BUY
+        condition: IOC
+        type: MARKET
+        clientOrderId: my-wonderful-market-order-number-453
+        quantity: '50'
+        timestamp: 1568185507
+      description: ''
+    json_CancelAllOrdersReply:
+      type: object
+      title: CancelAllOrdersReply
+      allOf:
+      - $ref: '#/components/schemas/json_ReplyBase'
+      example:
+        message: cancellation request successfully submitted
+        status: SUCCESS
+        error: ''
+        errors: {}
+      description: Base reply for all methods
+    json_ReplyErrorBase:
+      type: object
+      title: ReplyErrorBase
+      properties:
+        message:
+          example: Validation errors
+          readOnly: false
+          description: Short error description of what went wrong
+          type: string
+        status:
+          example: FAILURE
+          readOnly: false
+          description: status description, can only be "FAILURE"
+          type: string
+        error:
+          readOnly: false
+          enum:
+          - VALIDATION_ERROR
+          - FORBIDDEN
+          - NOT_FOUND
+          - UNAVAILABLE_FOR_LEGAL_REASONS
+          - UNAVAILABLE
+          description: error codes, present if status is not SUCCESS
+          type: string
+        errors:
+          readOnly: false
+          description: more verbose description of which request fields are not valid, present if status is not SUCCESS
+          type: object
+          additionalProperties:
+            type: string
+        result:
+          type: boolean
+          description: request result, can only be "false"
+          example: false
+    json_ReplyBase:
+      type: object
+      title: ReplyBase
+      properties:
+        message:
+          example: your request was successfully processed
+          readOnly: false
+          description: ''
+          type: string
+        status:
+          example: SUCCESS
+          readOnly: false
+          description: ''
+          type: string
+        error:
+          readOnly: false
+          description: short description of what went wrong, present if status is not SUCCESS
+          type: string
+        errors:
+          readOnly: false
+          description: more verbose description of which request fields are not valid, present if status is not SUCCESS
+          type: object
+          additionalProperties:
+            type: string
+      example:
+        message: your request was successfully processed
+        status: SUCCESS
+        error: ''
+        errors: {}
+      description: Base reply for all methods
+    json_ArrayAdapterOfOrderAdapter:
+      readOnly: false
+      description: List of orders
+      type: array
+      items:
+        $ref: '#/components/schemas/json_OrderAdapter'
+      example:
+      - id: 8315128e-0038-42b1-bc7e-b22c214ed7e3
+        status: ORDER_STATUS_CLOSED
+        side: ORDER_SIDE_SELL
+        condition: ORDER_CONDITION_FILL_OR_KILL
+        type: ORDER_TYPE_LIMIT
+        baseCurrency: b0b81e12-80f9-4612-bad6-625757b60fcd
+        quoteCurrency: 0c3a106d-bde3-4c13-a26e-3fd2394529e5
+        clientOrderId: ''
+        price: '1.000'
+        quantity: '0.956'
+        cost: '0.956000000'
+        filled: '0.956'
+        trader: 34935dfd-1653-4327-94d7-ab9400602592
+        creator: USER
+        creatorId: ''
+        timestamp: 1658305183008
+      - id: e5c4e2d8-64be-4a30-8d5e-a2c13eb4b756
+        status: ORDER_STATUS_PLACED
+        side: ORDER_SIDE_BUY
+        condition: ORDER_CONDITION_GOOD_TILL_CANCELLED
+        type: ORDER_TYPE_LIMIT
+        baseCurrency: b0b81e12-80f9-4612-bad6-625757b60fcd
+        quoteCurrency: 0c3a106d-bde3-4c13-a26e-3fd2394529e5
+        clientOrderId: ''
+        price: '1.050'
+        quantity: '0.500'
+        cost: '0.525000000'
+        filled: '0.000'
+        trader: 34935dfd-1653-4327-94d7-ab9400602592
+        creator: USER
+        creatorId: ''
+        timestamp: 1658303308336
+      - id: bcfb6232-5d67-4b68-b94c-2c5278978e4b
+        status: ORDER_STATUS_CANCELLED
+        side: ORDER_SIDE_SELL
+        condition: ORDER_CONDITION_IMMEDIATE_OR_CANCEL
+        type: ORDER_TYPE_MARKET
+        baseCurrency: b0b81e12-80f9-4612-bad6-625757b60fcd
+        quoteCurrency: 0c3a106d-bde3-4c13-a26e-3fd2394529e5
+        clientOrderId: ''
+        price: '0.000'
+        quantity: '3000.249'
+        cost: '0.012500000'
+        filled: '0.250'
+        trader: 34935dfd-1653-4327-94d7-ab9400602592
+        creator: USER
+        creatorId: ''
+        timestamp: 1658304950952
+  securitySchemes:
+    api_key:
+      type: apiKey
+      name: X-LA-APIKEY
+      in: header
+    api_signature:
+      type: apiKey
+      name: X-LA-SIGNATURE
+      in: header
+x-refined-from:
+- latoken-api-v2-swagger.json
+- latoken-openapi.yml
