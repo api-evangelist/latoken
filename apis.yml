@@ -25,6 +25,14 @@ modified: '2026-10-13'
 tags:
 - Company
 - Cryptocurrency
+- Exchange
+- Trading
+- Market Data
+- P2P
+- WebSocket
+tags_raw:
+- Company
+- Cryptocurrency
 - Exchanges
 - Trading
 - Market Data
@@ -95,6 +103,9 @@ apis:
   humanURL: https://api.latoken.com/doc/ws/
   baseURL: wss://api.latoken.com/stomp
   tags:
+  - WebSocket
+  - Market Data
+  tags_raw:
   - WebSockets
   - Market Data
   properties:
@@ -218,6 +229,8 @@ apis:
   humanURL: https://api.latoken.com/doc/v2/
   baseURL: https://api.latoken.com/v2
   tags:
+  - order-controller
+  tags_raw:
   - OrderController
   properties:
   - type: OpenAPI
@@ -359,6 +372,8 @@ apis:
   humanURL: https://api.latoken.com/doc/v2/
   baseURL: https://api.latoken.com/v2
   tags:
+  - user-controller
+  tags_raw:
   - UserController
   properties:
   - type: OpenAPI
@@ -373,6 +388,8 @@ apis:
   humanURL: https://api.latoken.com/doc/ws/
   baseURL: wss://api.latoken.com/stomp
   tags:
+  - Order Book
+  tags_raw:
   - Orderbook
   properties:
   - type: OpenAPI
